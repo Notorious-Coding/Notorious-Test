@@ -8,6 +8,7 @@
 - [Features](#features)
 - [Motivation](#motivation)
 - [Getting started](#getting-started)
+- [Test scoped infrastructures](#test-scoped-infrastructures)
 
 ## Support
 
@@ -142,7 +143,7 @@ public async Task Test2()
 }
 ```
 
-## I have only one test that need a specific infrastructure, how could i do it ?
+## Test scoped infrastructures?
 
 You can use infrastructures as standalone :
 

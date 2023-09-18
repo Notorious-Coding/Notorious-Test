@@ -14,7 +14,7 @@ namespace NotoriousTest.SampleProject.Tests
         [Fact]
         public async Task Test2()
         {
-            using(var db = new DatabaseInfrastructure())
+            using(var db = new DatabaseInfrastructure(initialize: true))
             {
                 HttpClient client = CurrentEnvironment.GetInfrastructure<SampleProjectWebApplicationInfrastructure>().HttpClient;
 
