@@ -81,9 +81,9 @@ internal class SampleProjectApp : WebApplicationFactory<Program>
 Dont forget to turn on **InternalsVisibleTo** to use the Program entry point class.
 
 ```xml
-	<ItemGroup>
-		<InternalsVisibleTo Include="Your.Test.Project" />
-	</ItemGroup>
+<ItemGroup>
+    <InternalsVisibleTo Include="Your.Test.Project" />
+</ItemGroup>
 ```
 
 In addition, reference the web project in your test project so the WebApplicationFactory have access to it.
@@ -91,37 +91,37 @@ In addition, reference the web project in your test project so the WebApplicatio
 Then, an infrastructure for a WebApp is ready for you, just inherit from **WebApplicationInfrastructure** :
 
 ```csharp
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
+internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
+{
+    public SampleProjectWebApplicationInfrastructure(WebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory)
     {
-        public SampleProjectWebApplicationInfrastructure(WebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory)
-        {
-        }
     }
+}
 ```
 
 Once you have built all necessaries infrastructures, you can now configure an Environment, for this, inherit from **Environment** base class, and override the **_ConfigureEnvironment_** method:
 
 ```csharp
-    public class SampleEnvironment : Environment
+public class SampleEnvironment : Environment
+{
+    public override void ConfigureEnvironment(EnvironmentConfig config)
     {
-        public override void ConfigureEnvironment(EnvironmentConfig config)
-        {
-            config
-                .AddInfrastructures(new SampleProjectWebApplicationInfrastructure(new SampleProjectApp()))
-                .AddInfrastructures(new DatabaseInfrastructure());
-        }
+        config
+            .AddInfrastructures(new SampleProjectWebApplicationInfrastructure(new SampleProjectApp()))
+            .AddInfrastructures(new DatabaseInfrastructure());
     }
+}
 ```
 
 The last thing you will need to do is to inherit from **IntegrationTest** in all of your tests class:
 
 ```csharp
-    public class UnitTest1 : IntegrationTest<SampleEnvironment>
+public class UnitTest1 : IntegrationTest<SampleEnvironment>
+{
+    public UnitTest1(SampleEnvironment environment) : base(environment)
     {
-        public UnitTest1(SampleEnvironment environment) : base(environment)
-        {
-        }
     }
+}
 ```
 
 Contragulations ! Now you are ready to test your applications serenely.
@@ -148,15 +148,15 @@ public async Task Test2()
 You can use infrastructures as standalone :
 
 ```csharp
-    public class DatabaseInfrastructure : Infrastructure
+public class DatabaseInfrastructure : Infrastructure
+{
+    // Best practice is to declare a constructor in your infrastructure.
+    public DatabaseInfrastructure(bool initialize = false) : base(initialize)
     {
-        // Best practice is to declare a constructor in your infrastructure.
-        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
-        {
-        }
-
-        // ...rest
     }
+
+    // ...rest
+}
 ```
 
 ```csharp
