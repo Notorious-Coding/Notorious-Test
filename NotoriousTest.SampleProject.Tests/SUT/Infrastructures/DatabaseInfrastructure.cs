@@ -9,6 +9,10 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
     public class DatabaseInfrastructure : Infrastructure
     {
+        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
+        {
+        }
+
         public override int Order => 1;
 
         public override void Destroy()

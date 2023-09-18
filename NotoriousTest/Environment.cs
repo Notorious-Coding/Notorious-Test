@@ -7,7 +7,7 @@ namespace NotoriousTest
     {
         public Guid EnvironmentId { get; private set; } = Guid.NewGuid();
 
-        private List<Infrastructure> _persistantInfrastructures = new List<Infrastructure>();
+        private List<Infrastructure> _infrastructures = new List<Infrastructure>();
 
         public Environment()
         {
@@ -15,16 +15,16 @@ namespace NotoriousTest
             var config = new EnvironmentConfig();
             ConfigureEnvironment(config);
 
-            _persistantInfrastructures = config.PersistantInfrastructures;
+            _infrastructures = config.PersistantInfrastructures;
 
             Initialize();
         }
 
         public abstract void ConfigureEnvironment(EnvironmentConfig config);
        
-        public T GetPersistantInfrastructure<T>()
+        public T GetInfrastructure<T>()
         {
-            T? infrastructure = _persistantInfrastructures.OfType<T>().FirstOrDefault();
+            T? infrastructure = _infrastructures.OfType<T>().FirstOrDefault();
 
             if (infrastructure == null) throw new InfrastructureNotFoundException($"L'infrastructure persistante de type {nameof(T)} n'éxiste pas, veuillez vérififer la méthode ${nameof(ConfigureEnvironment)}");
 
@@ -33,14 +33,14 @@ namespace NotoriousTest
 
         public void Initialize()
         {
-            foreach (Infrastructure infra in _persistantInfrastructures)
+            foreach (Infrastructure infra in _infrastructures)
             {
                 infra.Initialize();
             }
         }
         public void Reset()
         {
-            foreach(Infrastructure infrastructure in _persistantInfrastructures.OrderBy(pi => pi.Order))
+            foreach(Infrastructure infrastructure in _infrastructures.OrderBy(pi => pi.Order))
             {
                 infrastructure.Reset();
             }
@@ -49,7 +49,7 @@ namespace NotoriousTest
         {
             // Called after test campaign
 
-            foreach (Infrastructure infra in _persistantInfrastructures)
+            foreach (Infrastructure infra in _infrastructures)
             {
                 infra.Destroy();
             }
@@ -60,7 +60,7 @@ namespace NotoriousTest
     {
         public List<Infrastructure> PersistantInfrastructures { get; private set; } = new List<Infrastructure>();
 
-        public EnvironmentConfig AddPersistantInfrastructures(Infrastructure infrastructure)
+        public EnvironmentConfig AddInfrastructures(Infrastructure infrastructure)
         {
             PersistantInfrastructures.Add(infrastructure);
             return this;

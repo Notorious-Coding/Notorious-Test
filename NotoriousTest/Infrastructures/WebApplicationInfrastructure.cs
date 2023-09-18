@@ -16,6 +16,11 @@ namespace NotoriousTest.Infrastructures
             _webApplicationFactory = webApplicationFactory;
         }
 
+        public WebApplicationInfrastructure()
+        {
+            _webApplicationFactory = new WebApplicationFactory<TEntryPoint>();
+        }
+
         public override int Order => 999;
 
         public override void Destroy()

@@ -11,7 +11,7 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
     internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
     {
-        public SampleProjectWebApplicationInfrastructure(WebApplicationFactory<Program> webApplicationFactory) : base(webApplicationFactory)
+        public SampleProjectWebApplicationInfrastructure() : base()
         {
         }
     }

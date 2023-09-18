@@ -9,8 +9,8 @@ namespace NotoriousTest.SampleProject.Tests.SUT
         public override void ConfigureEnvironment(EnvironmentConfig config)
         {
             config
-                .AddPersistantInfrastructures(new SampleProjectWebApplicationInfrastructure(new SampleProjectApp()))
-                .AddPersistantInfrastructures(new DatabaseInfrastructure());
+                .AddInfrastructures(new SampleProjectWebApplicationInfrastructure())
+                .AddInfrastructures(new DatabaseInfrastructure());
         }
     }
 }

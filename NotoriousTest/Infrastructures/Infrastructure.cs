@@ -2,6 +2,11 @@
 {
     public abstract class Infrastructure : IDisposable
     {
+        public Infrastructure(bool initialize = false)
+        {
+            if (initialize) Initialize();
+        }
+
         public abstract int Order { get; }
         public abstract void Initialize();
         public abstract void Reset();
