@@ -2,14 +2,14 @@
 
   <PropertyGroup>
 	  <TargetFramework>net6.0</TargetFramework>
-	  <Description>A fluent HTTPResponseMessage builder with fully extendable API Client implementation.</Description>
-	  <PackageId>NotoriousClient</PackageId>
+	  <Description>A simple way to handle integration tests environment, with complete isolation of every tests.</Description>
+	  <PackageId>NotoriousTests</PackageId>
 	  <ImplicitUsings>enable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
-	  <Version>1.0.1</Version>
+	  <Version>1.0.0</Version>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <Authors>Brice SCHUMACHER</Authors>
-	  <RepositoryUrl>https://github.com/Notorious-Coding/Notorious-Tests/</RepositoryUrl>
+	  <RepositoryUrl>https://github.com/Notorious-Coding/Notorious-Test/</RepositoryUrl>
 	  <PackageIcon>icon.png</PackageIcon>
 	  <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
