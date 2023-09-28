@@ -161,7 +161,7 @@ public class DatabaseInfrastructure : Infrastructure
 
 ```csharp
 [Fact]
-public async Task Test2()
+public void Test2()
 {
     // Infrastructure will be created if initiliaze is true.
     using(var db = new DatabaseInfrastructure(initialize: true))
@@ -176,7 +176,7 @@ public async Task Test2()
 }
 
 [Fact]
-public async Task Test2()
+public void Test2()
 {
     using(var db = new DatabaseInfrastructure())
     {
@@ -193,3 +193,9 @@ public async Task Test2()
 }
 
 ```
+
+:warning: Note : Every classes used here have a **Async Implementation** for **Asynchronous Testing**.
+
+Use **AsyncInfrastructure** for Asynchronous Infrastructures.\
+Use **AsyncEnvironment** for Asynchronous Environment.\
+Use **AsyncIntegrationTest<>** for Asynchronous Integration Test.

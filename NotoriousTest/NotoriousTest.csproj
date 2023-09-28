@@ -1,20 +1,27 @@
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-	  <TargetFramework>net6.0</TargetFramework>
-	  <Description>A simple way to handle integration tests environment, with complete isolation of every tests.</Description>
-	  <PackageId>NotoriousTest</PackageId>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <Version>1.0.0</Version>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <Authors>Brice SCHUMACHER</Authors>
-	  <RepositoryUrl>https://github.com/Notorious-Coding/Notorious-Test/</RepositoryUrl>
-	  <PackageIcon>icon.png</PackageIcon>
-	  <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-  </PropertyGroup>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Description>A simple way to handle integration tests environment, with complete isolation of every tests.</Description>
+		<PackageId>NotoriousTest</PackageId>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Version>1.0.0</Version>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Authors>Brice SCHUMACHER</Authors>
+		<RepositoryUrl>https://github.com/Notorious-Coding/Notorious-Test/</RepositoryUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.22" />
-    <PackageReference Include="xunit" Version="2.5.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.22" />
+		<PackageReference Include="xunit" Version="2.5.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\icon.png" Pack="true" PackagePath="" Visible="False" />
+		<None Include="..\README.md" Pack="true" PackagePath="" Visible="False" />
+		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
+	</ItemGroup>
 </Project>

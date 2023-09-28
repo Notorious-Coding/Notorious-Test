@@ -1,4 +1,6 @@
 ﻿using Xunit;
+using NotoriousTest.Environments;
+using Environment = NotoriousTest.Environments.Environment;
 
 namespace NotoriousTest
 {

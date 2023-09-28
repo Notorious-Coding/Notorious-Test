@@ -1,7 +1,7 @@
 ﻿using NotoriousTest.Exceptions;
 using NotoriousTest.Infrastructures;
 
-namespace NotoriousTest
+namespace NotoriousTest.Environments
 {
     public abstract class Environment : IDisposable
     {
@@ -15,14 +15,14 @@ namespace NotoriousTest
             var config = new EnvironmentConfig();
             ConfigureEnvironment(config);
 
-            _infrastructures = config.PersistantInfrastructures;
+            _infrastructures = config.Infrastructures;
 
             Initialize();
         }
 
         public abstract void ConfigureEnvironment(EnvironmentConfig config);
-       
-        public T GetInfrastructure<T>()
+
+        public T GetInfrastructure<T>() where T : Infrastructure
         {
             T? infrastructure = _infrastructures.OfType<T>().FirstOrDefault();
 
@@ -38,32 +38,21 @@ namespace NotoriousTest
                 infra.Initialize();
             }
         }
+
         public void Reset()
         {
-            foreach(Infrastructure infrastructure in _infrastructures.OrderBy(pi => pi.Order))
+            foreach (Infrastructure infrastructure in _infrastructures.OrderBy(pi => pi.Order))
             {
                 infrastructure.Reset();
             }
         }
+
         public void Dispose()
         {
-            // Called after test campaign
-
             foreach (Infrastructure infra in _infrastructures)
             {
                 infra.Destroy();
             }
-        }
-    }
-
-    public class EnvironmentConfig
-    {
-        public List<Infrastructure> PersistantInfrastructures { get; private set; } = new List<Infrastructure>();
-
-        public EnvironmentConfig AddInfrastructures(Infrastructure infrastructure)
-        {
-            PersistantInfrastructures.Add(infrastructure);
-            return this;
         }
     }
 }

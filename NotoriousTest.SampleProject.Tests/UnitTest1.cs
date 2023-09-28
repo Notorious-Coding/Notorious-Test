@@ -4,7 +4,7 @@ using NotoriousTest.SampleProject.Tests.SUT.Infrastructures;
 namespace NotoriousTest.SampleProject.Tests
 {
 
-    public class UnitTest1 : IntegrationTest<SampleEnvironment>
+    public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
     {
         public UnitTest1(SampleEnvironment environment) : base(environment)
         {
@@ -14,9 +14,9 @@ namespace NotoriousTest.SampleProject.Tests
         [Fact]
         public async Task Test2()
         {
-            using(var db = new DatabaseInfrastructure(initialize: true))
+            await using(var db = new DatabaseInfrastructure(initialize: true))
             {
-                HttpClient client = CurrentEnvironment.GetInfrastructure<SampleProjectWebApplicationInfrastructure>().HttpClient;
+                HttpClient client = (await CurrentEnvironment.GetInfrastructureAsync<SampleProjectWebApplicationInfrastructure>()).HttpClient;
 
                 HttpResponseMessage response = await client.GetAsync("api/weather");
                 Assert.True(response.IsSuccessStatusCode);

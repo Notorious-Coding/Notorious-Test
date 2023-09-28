@@ -1,12 +1,13 @@
-﻿using NotoriousTest.Infrastructures;
+﻿using NotoriousTest.Environments;
+using NotoriousTest.Infrastructures;
 using NotoriousTest.SampleProject.Tests.SUT.Infrastructures;
 
 
 namespace NotoriousTest.SampleProject.Tests.SUT
 {
-    public class SampleEnvironment : Environment
+    public class SampleEnvironment : AsyncEnvironment
     {
-        public override void ConfigureEnvironment(EnvironmentConfig config)
+        public override async Task ConfigureEnvironmentAsync(AsyncEnvironmentConfig config)
         {
             config
                 .AddInfrastructures(new SampleProjectWebApplicationInfrastructure())

@@ -7,7 +7,7 @@ using NotoriousTest.Infrastructures;
 
 namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
-    public class DatabaseInfrastructure : Infrastructure
+    public class DatabaseInfrastructure : AsyncInfrastructure
     {
         public DatabaseInfrastructure(bool initialize = false) : base(initialize)
         {
@@ -15,15 +15,15 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 
         public override int Order => 1;
 
-        public override void Destroy()
+        public override async Task Destroy()
         {
         }
 
-        public override void Initialize()
+        public override async Task Initialize()
         {
         }
 
-        public override void Reset()
+        public override async Task Reset()
         {
         }
     }

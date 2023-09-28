@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotoriousTest", "NotoriousTest\NotoriousTest.csproj", "{053731D2-ECD8-42F8-8CAA-4AA81F50284E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest", "NotoriousTest\NotoriousTest.csproj", "{053731D2-ECD8-42F8-8CAA-4AA81F50284E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotoriousTest.SampleProject", "NotoriousTest.SampleProject\NotoriousTest.SampleProject.csproj", "{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest.SampleProject", "NotoriousTest.SampleProject\NotoriousTest.SampleProject.csproj", "{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotoriousTest.SampleProject.Tests", "NotoriousTest.SampleProject.Tests\NotoriousTest.SampleProject.Tests.csproj", "{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest.SampleProject.Tests", "NotoriousTest.SampleProject.Tests\NotoriousTest.SampleProject.Tests.csproj", "{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{DEE908A6-8A85-4C15-9F67-1EE6B2DD7A71}"
+	ProjectSection(SolutionItems) = preProject
+		NotoriousTest\LICENSE.txt = NotoriousTest\LICENSE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

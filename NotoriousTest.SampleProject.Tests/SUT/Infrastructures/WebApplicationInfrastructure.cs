@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
+    internal class SampleProjectWebApplicationInfrastructure : WebApplicationAsyncInfrastructure<Program>
     {
         public SampleProjectWebApplicationInfrastructure() : base()
         {
