@@ -1,17 +1,16 @@
-﻿using NotoriousTest.Environments;
-using NotoriousTest.Infrastructures;
-using NotoriousTest.SampleProject.Tests.SUT.Infrastructures;
-
+﻿using NotoriousTest.SampleProject.Tests.SUT.Infrastructures;
+using NotoriousTest.Web.Environments;
 
 namespace NotoriousTest.SampleProject.Tests.SUT
 {
-    public class SampleEnvironment : AsyncEnvironment
+    public class SampleEnvironment : AsyncWebEnvironment<Program>
     {
-        public override async Task ConfigureEnvironmentAsync(AsyncEnvironmentConfig config)
+        public override Task ConfigureEnvironmentAsync()
         {
-            config
-                .AddInfrastructures(new SampleProjectWebApplicationInfrastructure())
-                .AddInfrastructures(new DatabaseInfrastructure());
+            AddInfrastructure(new DatabaseInfrastructure());
+            AddWebApplication(new SampleProjectApp());
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,16 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using NotoriousTest.Common.Infrastructures.Sync;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NotoriousTest.Infrastructures
+namespace NotoriousTest.Web.Infrastructures
 {
-    public abstract class WebApplicationInfrastructure<TEntryPoint> : Infrastructure where TEntryPoint : class
+    public class WebApplicationInfrastructure<TEntryPoint> : Infrastructure where TEntryPoint : class
     {
         private WebApplicationFactory<TEntryPoint> _webApplicationFactory;
-        public HttpClient HttpClient;
+        public HttpClient? HttpClient;
         public override int Order => 999;
 
         public WebApplicationInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory)

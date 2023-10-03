@@ -1,7 +1,7 @@
 ﻿using Xunit;
-using AsyncEnvironment = NotoriousTest.Environments.AsyncEnvironment;
+using AsyncEnvironment = NotoriousTest.Common.Environments.AsyncEnvironment;
 
-namespace NotoriousTest
+namespace NotoriousTest.Common
 {
     public abstract class AsyncIntegrationTest<T> : IClassFixture<T>, IAsyncLifetime where T : AsyncEnvironment
     {
@@ -13,14 +13,14 @@ namespace NotoriousTest
             CurrentEnvironment = environment;
         }
 
-        public async Task InitializeAsync()
+        public Task InitializeAsync()
         {
-            // Nothing to do here.
+            return Task.CompletedTask;
         }
 
         public async Task DisposeAsync()
         {
-            await CurrentEnvironment.ResetAsync();
+            await CurrentEnvironment.Reset();
         }
     }
 }

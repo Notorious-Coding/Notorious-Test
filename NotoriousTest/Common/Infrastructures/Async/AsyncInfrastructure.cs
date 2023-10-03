@@ -1,16 +1,17 @@
 ﻿using Xunit;
 
-namespace NotoriousTest.Infrastructures
+namespace NotoriousTest.Common.Infrastructures.Async
 {
     public abstract class AsyncInfrastructure : IAsyncLifetime, IAsyncDisposable
     {
+        public abstract int Order { get; }
         private bool _initialize = false;
+
         public AsyncInfrastructure(bool initialize = false)
         {
             _initialize = initialize;
         }
 
-        public abstract int Order { get; }
         public abstract Task Initialize();
         public abstract Task Reset();
         public abstract Task Destroy();
@@ -28,6 +29,11 @@ namespace NotoriousTest.Infrastructures
         async ValueTask IAsyncDisposable.DisposeAsync()
         {
             await DisposeAsync();
+        }
+
+        ~AsyncInfrastructure()
+        {
+            Destroy().Wait();
         }
     }
 }

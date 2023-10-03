@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
-using NotoriousTest.Infrastructures;
+using NotoriousTest.Web.Infrastructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,8 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
     internal class SampleProjectWebApplicationInfrastructure : WebApplicationAsyncInfrastructure<Program>
     {
-        public SampleProjectWebApplicationInfrastructure() : base()
+        public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration) 
+            : base(new SampleProjectApp().Configure(configuration))
         {
         }
     }

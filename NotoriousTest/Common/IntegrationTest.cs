@@ -1,8 +1,7 @@
 ﻿using Xunit;
-using NotoriousTest.Environments;
-using Environment = NotoriousTest.Environments.Environment;
+using Environment = NotoriousTest.Common.Environments.Environment;
 
-namespace NotoriousTest
+namespace NotoriousTest.Common
 {
     public abstract class IntegrationTest<T> : IClassFixture<T>, IDisposable where T : Environment
     {

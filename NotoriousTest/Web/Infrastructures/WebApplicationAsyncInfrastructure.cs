@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using NotoriousTest.Common.Infrastructures.Async;
 
-namespace NotoriousTest.Infrastructures
+namespace NotoriousTest.Web.Infrastructures
 {
-    public abstract class WebApplicationAsyncInfrastructure<TEntryPoint> : AsyncInfrastructure where TEntryPoint : class
+    public class WebApplicationAsyncInfrastructure<TEntryPoint> : AsyncInfrastructure where TEntryPoint : class
     {
         private WebApplicationFactory<TEntryPoint> _webApplicationFactory;
-        public HttpClient HttpClient;
+        public HttpClient? HttpClient;
         public override int Order => 999;
 
         public WebApplicationAsyncInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory)
@@ -24,13 +25,15 @@ namespace NotoriousTest.Infrastructures
             await _webApplicationFactory.DisposeAsync();
         }
 
-        public override async Task Initialize()
+        public override Task Initialize()
         {
             HttpClient = _webApplicationFactory.CreateDefaultClient();
+            return Task.CompletedTask;
         }
 
-        public override async Task Reset()
+        public override Task Reset()
         {
+            return Task.CompletedTask;
         }
     }
 }

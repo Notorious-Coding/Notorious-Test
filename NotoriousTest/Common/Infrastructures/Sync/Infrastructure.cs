@@ -1,7 +1,11 @@
-﻿namespace NotoriousTest.Infrastructures
+﻿using NotoriousTest.Common.Helpers;
+
+namespace NotoriousTest.Common.Infrastructures.Sync
 {
     public abstract class Infrastructure : IDisposable
     {
+        public Dictionary<string, string> Configuration { get; protected set; } = new Dictionary<string, string>();
+
         public Infrastructure(bool initialize = false)
         {
             if (initialize) Initialize();
@@ -16,5 +20,12 @@
         {
             Destroy();
         }
+
+        ~Infrastructure()
+        {
+            Destroy();
+        }
     }
+
+
 }

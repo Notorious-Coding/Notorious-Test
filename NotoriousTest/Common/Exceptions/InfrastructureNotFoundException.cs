@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NotoriousTest.Exceptions
+namespace NotoriousTest.Common.Exceptions
 {
     public class InfrastructureNotFoundException : Exception
     {
