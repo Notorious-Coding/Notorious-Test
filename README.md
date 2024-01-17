@@ -34,6 +34,18 @@ The goal is to provide a way to make integration test without worrying about dat
 
 ## Getting Started
 
+First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
+
+```
+PM> Install-Package NotoriousTest
+```
+
+Or from the .NET CLI as:
+
+```
+dotnet add package NotoriousTest
+```
+
 ## Setup
 
 First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousClient](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
