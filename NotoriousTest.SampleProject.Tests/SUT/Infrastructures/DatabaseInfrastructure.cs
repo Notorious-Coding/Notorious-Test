@@ -8,8 +8,9 @@ using NotoriousTest.Common.Infrastructures.Sync;
 
 namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
-    public class DatabaseInfrastructure : ConfigurableAsyncInfrastructure<DatabaseConfiguration>
+    public class DatabaseInfrastructure : ConfigurationProducerAsyncInfrastructure<Configuration>
     {
+        
         public DatabaseInfrastructure(bool initialize = false) : base(initialize)
         {
         }
@@ -22,8 +23,12 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
         }
 
         public override Task Initialize()
-        {   
-            Configuration.ConnectionString = "Test";
+        {
+            Configuration.DatabaseConfiguration = new DatabaseConfiguration()
+            {
+                ConnectionString = "Test"
+            };
+
             return Task.CompletedTask;
         }
 

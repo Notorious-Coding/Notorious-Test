@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
-using NotoriousTest.Web;
+using NotoriousTest.Web.Applications;
 using System;
 using System.Collections.Generic;
 using System.Linq;

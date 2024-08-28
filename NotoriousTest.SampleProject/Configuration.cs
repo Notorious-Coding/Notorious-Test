@@ -2,7 +2,7 @@
 {
     public class Configuration
     {
-        public DatabaseConfiguration DatabaseConfiguration = new DatabaseConfiguration();
+        public DatabaseConfiguration DatabaseConfiguration { get; set; } = new DatabaseConfiguration();
     }
 
     public class DatabaseConfiguration

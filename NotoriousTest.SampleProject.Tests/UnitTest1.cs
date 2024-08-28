@@ -15,15 +15,12 @@ namespace NotoriousTest.SampleProject.Tests
         [Fact]
         public async Task Test2()
         {
-            await using(var db = new DatabaseInfrastructure(initialize: true))
-            {
-                HttpClient? client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
+            HttpClient? client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
 
-                HttpResponseMessage response = await client!.GetAsync("api/weather");
-                Assert.True(response.IsSuccessStatusCode);
+            HttpResponseMessage response = await client!.GetAsync("api/weather");
+            Assert.True(response.IsSuccessStatusCode);
 
-                string content = await response.Content.ReadAsStringAsync();
-            }
+            string content = await response.Content.ReadAsStringAsync();
         }
     }
 }

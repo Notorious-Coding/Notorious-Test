@@ -13,6 +13,7 @@ namespace NotoriousTest.SampleProject // Note: actual namespace depends on the p
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Configuration.GetConnectionString("Test");
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -11,6 +11,12 @@ namespace NotoriousTest.Common.Helpers
             this object obj,
             string name = "")
         {
+
+            if (obj is Dictionary <string, string> dict)
+            {
+                return dict;
+            }
+
             var dictionary = new Dictionary<string, string?>();
 
             Flatten(dictionary, obj, name);

@@ -11,28 +11,35 @@ namespace NotoriousTest.Common.Environments
         public Guid EnvironmentId => Guid.NewGuid();
 
         protected readonly List<AsyncInfrastructure> Infrastructures = new List<AsyncInfrastructure>();
-        protected Dictionary<string, string> Configuration = new Dictionary<string, string>();
 
         #region IAsyncLifetime Implementation
 
-
         /// <summary>
-        /// Initialize environment by creating infrastructure. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+        /// Initialize environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
         /// </summary>
-        public virtual async Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            await ConfigureEnvironmentAsync();
-            await Initialize();
+            await InitializeEnvironmentAsync();
         }
 
         /// <summary>
-        /// Destroy every created infrastructure. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+        /// Destroy environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
         /// </summary>
         public async Task DisposeAsync()
         {
             await Destroy();
         }
         #endregion
+
+        /// <summary>
+        /// Initialize environment by creating infrastructure.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task InitializeEnvironmentAsync()
+        {
+            await ConfigureEnvironmentAsync();
+            await Initialize();
+        }
 
         /// <summary>
         /// Configure environment with infrastructures. Called before environment initialization.
@@ -70,10 +77,6 @@ namespace NotoriousTest.Common.Environments
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy((i) => i.Order))
             {
                 await infra.Initialize();
-                if (infra is IConfigurable){
-
-                    Configuration = Configuration.Concat((infra as IConfigurable).GetConfigurationAsDictionary()).ToDictionary(k => k.Key, v => v.Value);
-                }
             }
         }
 

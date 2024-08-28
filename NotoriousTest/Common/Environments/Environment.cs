@@ -8,11 +8,15 @@ namespace NotoriousTest.Common.Environments
         public Guid EnvironmentId { get; private set; } = Guid.NewGuid();
 
         protected readonly List<Infrastructure> Infrastructures = new List<Infrastructure>();
-        public Dictionary<string, string> Configuration { get; set; }
 
         public Environment()
         {
             // Called before test campaign
+            InitializeEnvironment();
+        }
+
+        public virtual void InitializeEnvironment()
+        {
             ConfigureEnvironment();
             Initialize();
         }
@@ -52,7 +56,6 @@ namespace NotoriousTest.Common.Environments
             foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
             {
                 infra.Initialize();
-                Configuration = Configuration.Concat(infra.Configuration).ToDictionary(k => k.Key, v => v.Value);
             }
         }
 

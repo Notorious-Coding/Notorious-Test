@@ -3,7 +3,7 @@ using NotoriousTest.Web.Environments;
 
 namespace NotoriousTest.SampleProject.Tests.SUT
 {
-    public class SampleEnvironment : AsyncWebEnvironment<Program>
+    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
     {
         public override Task ConfigureEnvironmentAsync()
         {
@@ -14,3 +14,4 @@ namespace NotoriousTest.SampleProject.Tests.SUT
         }
     }
 }
+
