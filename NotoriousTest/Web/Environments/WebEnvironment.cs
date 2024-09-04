@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using NotoriousTest.Common.Environments;
-using NotoriousTest.Common.Helpers;
 using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NotoriousTest.Web.Environments
 {
@@ -27,7 +21,7 @@ namespace NotoriousTest.Web.Environments
             AddInfrastructure(new WebApplicationInfrastructure<TEntryPoint, TConfig>(webApp));
         }
 
-        public void AddWebApplication(ConfiguredWebApplication<TEntryPoint> webApp)
+        public void AddWebApplication(WebApplication<TEntryPoint> webApp)
         {
             ArgumentNullException.ThrowIfNull(webApp, nameof(webApp));
             AddInfrastructure(new WebApplicationInfrastructure<TEntryPoint, TConfig>(webApp));

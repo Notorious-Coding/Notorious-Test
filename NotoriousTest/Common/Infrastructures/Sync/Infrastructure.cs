@@ -1,6 +1,4 @@
-﻿using NotoriousTest.Common.Helpers;
-
-namespace NotoriousTest.Common.Infrastructures.Sync
+﻿namespace NotoriousTest.Common.Infrastructures.Sync
 {
     public abstract class Infrastructure : IDisposable
     {

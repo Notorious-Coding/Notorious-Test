@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace NotoriousTest.Web.Applications
 {
-    public abstract class ConfiguredWebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, IConfigurableApplication where TEntryPoint : class
+    public abstract class WebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, IConfigurableApplication where TEntryPoint : class
     {
         public Dictionary<string, string>? Configuration { get; set; }
 

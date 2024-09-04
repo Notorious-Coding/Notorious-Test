@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
-    internal class SampleProjectApp : ConfiguredWebApplication<Program>
+    internal class SampleProjectApp : WebApplication<Program>
     {
 
     }

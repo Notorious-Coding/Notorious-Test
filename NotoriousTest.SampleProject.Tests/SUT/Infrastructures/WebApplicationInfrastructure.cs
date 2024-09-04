@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationAsyncInfrastructure<Program, Configuration>
+    internal class SampleProjectWebApplicationInfrastructure : AsyncWebApplicationInfrastructure<Program, Configuration>
     {
-        public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration) 
+        public SampleProjectWebApplicationInfrastructure() 
             : base(new SampleProjectApp())
         {
         }

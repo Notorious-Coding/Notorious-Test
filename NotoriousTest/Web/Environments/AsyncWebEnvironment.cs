@@ -1,13 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using NotoriousTest.Common.Environments;
-using NotoriousTest.Common.Helpers;
 using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NotoriousTest.Web.Environments
 {
@@ -24,21 +18,21 @@ namespace NotoriousTest.Web.Environments
         public Task AddWebApplication(WebApplicationFactory<TEntryPoint> webApp)
         {
             ArgumentNullException.ThrowIfNull(webApp, nameof(webApp));
-            AddInfrastructure(new WebApplicationAsyncInfrastructure<TEntryPoint, TConfig>(webApp));
+            AddInfrastructure(new AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>(webApp));
 
             return Task.CompletedTask;
         }
 
-        public Task AddWebApplication(ConfiguredWebApplication<TEntryPoint> webApp)
+        public Task AddWebApplication(WebApplication<TEntryPoint> webApp)
         {
             ArgumentNullException.ThrowIfNull(webApp, nameof(webApp));
-            AddInfrastructure(new WebApplicationAsyncInfrastructure<TEntryPoint, TConfig>(webApp));
+            AddInfrastructure(new AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>(webApp));
             return Task.CompletedTask;
         }
 
-        public Task<WebApplicationAsyncInfrastructure<TEntryPoint, TConfig>> GetWebApplication()
+        public Task<AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>> GetWebApplication()
         {
-            return GetInfrastructureAsync<WebApplicationAsyncInfrastructure<TEntryPoint, TConfig>>();
+            return GetInfrastructureAsync<AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>>();
         }
     }
 }

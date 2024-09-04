@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NotoriousTest.Common.Infrastructures
+﻿namespace NotoriousTest.Common.Infrastructures
 {
-    public interface IConfigurable<TConfiguration> : IConfigurable
+    public interface IConfigurationConsumer
     {
-        TConfiguration Configuration { get; set; }
+
     }
 
-    public interface IConfigurable
+    public interface IConfigurationProducer
     {
-        public Dictionary<string, string> GetConfigurationAsDictionary();
+
     }
 }

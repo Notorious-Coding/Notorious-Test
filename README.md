@@ -9,12 +9,16 @@
 - [Motivation](#motivation)
 - [Getting started](#getting-started)
 - [Setup](#setup)
-- [Infrastructures](#infrastructures)
-  - [Configurable Infrastructures](#configurable-infrastructures)
-  - [Web Application Infrastructures](#web-application-infrastructures)
-  - [Override Web App configuration](#override-web-app-configuration)
-- [Environment](#environment)
-  - [Web Environment](#web-environment)
+- [Base functionalities](#base-functionalities)
+  - [Infrastructures](#infrastructures)
+  - [Environment](#environment)
+- [Advanced functionalities](#advanced-functionalities)
+  - [Configuration](#configuration)
+    - [Configurable Infrastructures](#configurable-infrastructures)
+    - [Configurable Environment](#configurable-environment)
+  - [Web](#web)
+    - [Web Application Infrastructure](#web-application-infrastructure)
+    - [Web Environment](#web-environment)
 
 ## Support
 
@@ -32,20 +36,6 @@
 
 The goal is to provide a way to make integration test without worrying about data collision, side effects, and infrastructure sharing.
 
-## Getting Started
-
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
-
-```
-PM> Install-Package NotoriousTest
-```
-
-Or from the .NET CLI as:
-
-```
-dotnet add package NotoriousTest
-```
-
 ## Setup
 
 First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousClient](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
@@ -60,7 +50,9 @@ Or from the .NET CLI as:
 dotnet add package NotoriousTest
 ```
 
-## Infrastructures
+## Base functionnalities
+
+### Infrastructures
 
 An infrastructure is a piece of hardware or software that is necessary for your app to work.
 For example, a SQL Server Database is an infrastructure.
@@ -141,199 +133,9 @@ public async Task Database_Creation()
 }
 ```
 
-This is not the main use case of using infrastructure, later, we will see how to setup a whole environment with multiple infrastructure usable for you test.
-But first, let's see all other infrastructures available.
+This is not the main use of infrastructures, now, we will see how to setup a whole environment.
 
-#### Configurable infrastructures
-
-Sometime, you will need to **produce configuration data** (essentialy connection strings but whatever you want). There an infrastructure for that, lets modify our **SQLServerDBInfrastructure** :
-
-```csharp
-public class SqlServerConfiguration{
-    public string ConnectionString { get; set; }
-}
-
-public class SQLServerDBInfrastructure : ConfigurableInfrastructure<SqlServerConfiguration>
-{
-    public override int Order => 1;
-
-    public SQLServerDBAsyncInfrastructure(bool initialize = false) : base(initialize){}
-    public override void Initialize()
-    {
-        // Here you can create the database
-    }
-
-    public override void Reset()
-    {
-        // Here you can empty the database
-    }
-
-    public override void Destroy()
-    {
-        // Here you can destroy the database
-    }
-}
-```
-
-Async version :
-
-```csharp
-public class SQLServerDBAsyncInfrastructure : ConfigurableAsyncInfrastructure<SqlServerConfiguration>
-{
-    public override int Order => 1;
-
-    public SQLServerDBAsyncInfrastructure(bool initialize = false) : base(initialize){}
-
-    public override Task Initialize()
-    {
-        // Here you can create the database
-        // Assign configuration
-        // You could even create a DB Connection and store it in a public readonly variable.
-        Configuration.ConnectionString = "MySweetConnectionString";
-    }
-
-    public override Task Reset()
-    {
-        // Here you can empty the database
-    }
-
-    public override Task Destroy()
-    {
-        // Here you can destroy the database
-    }
-}
-```
-
-You can get configuration as **Dictionnary<string, string>** by calling **GetConfigurationAsDictionary()** on the infrastructure. This one will serialize your configuration as a dictionary with key being the path to the value.
-
-Such as :
-
-- Key : Path.To.ConnectionString
-- Value : MyConnectionString
-
-This will be useful to use for overriding json configuration.
-
-If you dont want to provide a type for your configuration, **ConfigurableAsyncInfrastructure** or **ConfigurableInfrastructure** can be use without generic type. Your configuration will be a simple **Dictionary<string, string>**. **GetConfigurationAsDictionary** will return this dictionary.
-
-#### Web Application Infrastructures
-
-Microsoft provide a simple way to create fake server so your integration tests can call your API. It is called **WebApplicationFactory**.
-
-See the docs for WebApplicationFactory usage: [Integration tests in ASP.NET Core
-](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-7.0)
-
-The easiest way to create a web application infrastructure is to use **WebApplicationInfrastructure** :
-
-```csharp
-using NotoriousTest.Web.Infrastructures;
-
-internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
-{
-    public SampleProjectWebApplicationInfrastructure() : base()
-    {
-    }
-}
-```
-
-Async version :
-
-```csharp
-internal class SampleProjectWebApplicationInfrastructure : WebApplicationAsyncInfrastructure<Program>
-{
-    public SampleProjectWebApplicationInfrastructure() : base()
-    {
-    }
-}
-
-```
-
-It will **automaticaly create a WebApplicationFactory for you**, and run it at initialize.
-
-**Downside of this is that you can't override anything from your app.** It could be a bit inconvenient when testing, cause we could want to mock some calls (even in integration testing).
-
-So lets create a custom app, so we can override everything.
-
-To create an application, we will inherits from this class.
-
-```csharp
-using Microsoft.AspNetCore.Mvc.Testing;
-
-public class SampleProjectApp : WebApplicationFactory<Program>
-{
-    // You could override whatever you want here. Microsoft provide various way to customise WebApplication
-}
-```
-
-Program is the underlying class used in your Program.cs from your ASP.NET project.
-To use it, we will need it as public.
-
-```csharp
-    public class Program
-    {
-        static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
-            ...
-            // Program code
-        }
-    }
-```
-
-Now we can use this application is our **SampleProjectWebApplicationInfrastructure**
-
-```csharp
-using NotoriousTest.Web.Infrastructures;
-
-internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
-{
-    public SampleProjectWebApplicationInfrastructure() : base(new SampleProjetApp())
-    {
-    }
-}
-```
-
-Async version :
-
-```csharp
-internal class SampleProjectWebApplicationInfrastructure : WebApplicationAsyncInfrastructure<Program>
-{
-    public SampleProjectWebApplicationInfrastructure() : base(new SampleProjectApp())
-    {
-    }
-}
-```
-
-Now you can use this infrastructure in your tests, as well as other infrastructures.
-
-#### Override Web App configuration
-
-Earlier, we have talked about how we could generate configuration from infrastructure. Web application configuration are often override by inmemory collection represented by a **Dictionary<string, string>**.
-
-That's why we provide a simple way to override configuration of a WebApplication.
-
-```csharp
-using NotoriousTest.Web;
-
-public class SampleProjectApp : ConfiguredWebApplication<Program>
-{
-}
-```
-
-Then, you could just call the **"Configure" method of "SampleProjectApp"** and pass your configuration.
-
-Here's one of many ways to do that within an infrastructure :
-
-```csharp
-internal class SampleProjectWebApplicationInfrastructure : WebApplicationAsyncInfrastructure<Program>
-{
-    public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration)
-        : base(new SampleProjectApp().Configure(configuration))
-    {
-    }
-}
-```
-
-## Environment
+### Environment
 
 We have seen how we could use an infrastructure directly within a tests, but it will become really difficult to maintain if we do this for every test and for every infrastructure.
 
@@ -344,6 +146,19 @@ An environment is a collection of infrastructure drived by tests's lifecycle.
 ![Cycle de vie des infrastructures](./Documentation/Images/Infrastructure%20lifecycle.png)
 
 Let's create an environment :
+
+```csharp
+public class SampleEnvironment : Environment
+{
+    public override void ConfigureEnvironment()
+    {
+        // Add all your infrastructure here.
+        AddInfrastructure(new DatabaseInfrastructure());
+    }
+}
+```
+
+Async version :
 
 ```csharp
 public class SampleEnvironment : AsyncEnvironment
@@ -358,20 +173,7 @@ public class SampleEnvironment : AsyncEnvironment
 }
 ```
 
-Async version :
-
-```csharp
-public class SampleEnvironment : Environment
-{
-    public override void ConfigureEnvironment()
-    {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
-    }
-}
-```
-
-Then, inherit your test class with **Integration tests**.
+Then, inherit your test class with **IntegrationTest**.
 
 ```csharp
 public class UnitTest1 : IntegrationTest<SampleEnvironment>
@@ -407,53 +209,239 @@ public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
 }
 ```
 
-#### Web Environment
+## Advanced functionalities
 
-Before, we have setup a WebApplicationInfrastructure and a ConfiguredWebApp
+### Configuration
 
-Let's use them inside our Environment, for that, we will inherit from AsyncWebEnvironment :
+In some cases, you will need to handle configuration from your infrastructures, such as connection string, or secrets, etc. **Notorious Tests** provide a nice way to produce and consume configuration within infrastructures.
+
+Here's how :
+
+#### Configurable Infrastructures
+
+To create a configurable infrastructure, the only thing you need to do is to inherits from **ConfiguredInfrastructure** or **AsyncConfiguredInfrastructure**.
 
 ```csharp
-public class SampleEnvironment : AsyncWebEnvironment<Program>
-{
-    public override Task ConfigureEnvironmentAsync()
+    public class DatabaseInfrastructure : ConfiguredInfrastructure<Configuration>
     {
-        AddInfrastructure(new DatabaseInfrastructure());
 
-        // Add your configured web application
-        AddWebApplication(new SampleProjectApp());
+        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
+        {
+        }
 
-        return Task.CompletedTask;
+        public override int Order => 1;
+
+        public override void Destroy(){}
+
+        public override void Initialize()
+        {
+            /// Initialize sql server.
+            Configuration.DatabaseConfiguration = new DatabaseConfiguration()
+            {
+                ConnectionString = "Test"
+            };
+        }
+
+        public override void Reset(){}
+    }
+```
+
+As you can see, this infrastructure will produce configuration after initializing the sql server.
+**Configuration** is available as public so you can then access it when using this infrastructure.
+
+Generic type for configuration is not mandatory, Configuration object will be a **Dictionary<string, string>**
+
+```csharp
+    public class DatabaseInfrastructure : ConfiguredInfrastructure<Configuration>
+    {
+
+        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
+        {
+        }
+
+        public override int Order => 1;
+
+        public override void Destroy(){}
+
+        public override void Initialize()
+        {
+            /// Initialize sql server.
+            Configuration.Add("DatabaseConfiguration.ConnectionString", "Test");
+        }
+
+        public override void Reset(){}
+    }
+```
+
+Now, you can access directly your infrastructure configuration within a test :
+
+```csharp
+[Fact]
+public async Task Test2()
+{
+    await using (var db =  new DatabaseInfrastructure(initialize: true))
+    {
+        var cs = db.Configuration.DatabaseConfiguration.ConnectionString;
     }
 }
 ```
 
-> :information: **AsyncWebEnvironment** will automatically get infrastructures configuration, and add theses configurations to the web app, as an InMemoryCollection.
+#### Configurable Environment
 
-Now that our infrastructure is setup, we can create an integration test.
+You could use **ConfiguredInfrastructure** within **Environment**.
+
+First, inherit from **ConfiguredEnvironment** instead of **Environment**.
+(from **AsyncConfiguredEnvironment** instead of **AsyncEnvironment**).
 
 ```csharp
-public class UnitTest1 : IntegrationTest<SampleEnvironment>
+public class SampleEnvironment : ConfiguredEnvironment<Configuration>
 {
-    public UnitTest1(SampleEnvironment environment) : base(environment)
+    public override void ConfigureEnvironment()
+    {
+        // Add all your infrastructure here.
+        AddInfrastructure(new DatabaseInfrastructure());
+    }
+}
+// Or without generic type
+public class SampleEnvironment : ConfiguredEnvironment{
+    public override void ConfigureEnvironment()
+    {
+        // Add all your infrastructure here.
+        AddInfrastructure(new DatabaseInfrastructure());
+    }
+}
+```
+
+Within environment, you would use the public property **EnvironmentConfiguration** to access produced configuration from infrastructures.
+
+> :warning: Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and every infrastructures will edit his own part of the configuration.
+
+One more step is needed so your environment understand how your infrastructures handle configuration.
+
+If your infrastructure will **consume the environment configuration**, then, inherit from **IConfigurationConsumer**
+
+If your infrastructure will **produce environment configuration**, then, inherit from **IConfigurationProducer**.
+
+If it does both, then inherits from both.
+Here's an example :
+
+```csharp
+public class DatabaseInfrastructure : ConfiguredInfrastructure<Configuration>, IConfigurationProducer
+{
+
+    public DatabaseInfrastructure(bool initialize = false) : base(initialize)
     {
     }
 
-    [Fact]
-    public async void MyTest()
+    public override int Order => 1;
+
+    public override void Destroy(){}
+
+    public override void Initialize()
     {
-        // Access infrastructure by calling
-        WebApplicationAsyncInfrastructure<TEntryPoint> WebAppInfrastructure = await CurrentEnvironment.GetWebApplication();
+        // We produce a connection string, so we use IConfigurationProducer.
+        Configuration.DatabaseConfiguration = new DatabaseConfiguration()
+        {
+            ConnectionString = "Test"
+        };
+    }
 
-        // Get the HTTP Client
-        HttpClient client = infrastructure.HttpClient;
+    public override void Reset(){}
+}
+```
 
-        // Call your API
-        HttpResponseMessage response = await client.GetAsync("api/weather");
+### Web
 
-        // Check whatever you want
+Within web applications, you will certainly need to add an WebApplication that work in background so your tests can call an actual API.
+
+**NotoriousTests** provide everything so you donc need to scratch your head too much.
+
+#### Web Application Infrastructure
+
+First, you will need to create an **WebApplication**.
+
+```csharp
+internal class SampleProjectApp : WebApplication<Program>{}
+```
+
+This is actually a **WebApplicationFactory** provided by .NET ([See microsoft doc for more information.](https://learn.microsoft.com/fr-fr/aspnet/core/test/integration-tests?view=aspnetcore-8.0))
+
+Here you can override everything you need for your app to be fully functional.
+
+Then, let's create an **WebApplicationInfrastructure** and pass our **WebApplication**.
+
+> :information: **WebApplicationInfrastructure** are necessarily a **IConfigurationConsumer**. Configuration passed will be added as configuration on your web app, making it accessible within **IConfiguration** object in _Program.cs_.
+
+```csharp
+    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program, Configuration>
+    {
+        public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration)
+            : base(new SampleProjectApp())
+        {
+        }
+    }
+
+    // Without a generic type, configuration will be a Dictionary<string, string>.
+    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
+    {
+        public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration)
+            : base(new SampleProjectApp())
+        {
+        }
+    }
+```
+
+Now, within your test, you can start your **WebApplicationInfrastructures** like any other infrastructure, and access **HttpClient**:
+
+```csharp
+[Fact]
+public async Task Test2()
+{
+    await using (var app = new SampleProjectWebApplicationInfrastructure())
+    {
+        HttpClient? client = app.HttpClient;
+
+        HttpResponseMessage response = await client!.GetAsync("api/weather");
         Assert.True(response.IsSuccessStatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
     }
+}
+```
+
+#### Web Environment
+
+**WebApplication** or **WebApplicationInfrastructure** can be used within **WebEnvironment**.
+
+```csharp
+    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
+    {
+        public override Task ConfigureEnvironmentAsync()
+        {
+            AddInfrastructure(new DatabaseInfrastructure());
+            AddWebApplication(new SampleProjectApp());
+            // OR
+            AddWebApplication(new SampleProjectWebApplicationInfrastructure());
+
+            return Task.CompletedTask;
+        }
+    }
+```
+
+Your web application will start automatically at the start of a test campaign.
+
+Then, in your test, you can use **GetWebApplication** to access the HttpClient :
+
+```csharp
+[Fact]
+public async Task Test2()
+{
+    HttpClient? client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
+
+    HttpResponseMessage response = await client!.GetAsync("api/weather");
+    Assert.True(response.IsSuccessStatusCode);
+
+    string content = await response.Content.ReadAsStringAsync();
 }
 ```
 

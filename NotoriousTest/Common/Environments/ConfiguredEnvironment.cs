@@ -1,10 +1,6 @@
 ﻿using NotoriousTest.Common.Helpers;
+using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Sync;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NotoriousTest.Common.Environments
 {
@@ -20,18 +16,18 @@ namespace NotoriousTest.Common.Environments
             {
                 // Si l'infrastructure consomme la configuration 
                 // (exemple: WebApp, on lui donne la configuration de l'environnement avant de l'initialiser
-                if (infra is ConfigurationConsumerInfrastructure configurationConsumerAsyncInfrastructure)
+                if (infra is IConfigurationConsumer && infra is ConfiguredInfrastructure consumer)
                 {
-                    (configurationConsumerAsyncInfrastructure).Configuration = Configuration;
+                    consumer.Configuration = Configuration;
                 }
 
                 infra.Initialize();
 
                 // Si l'infrastructure produit de la configuration, on l'initialize avant, puis on ajoute la configuration produite a la configuration de l'environnement.
-                if (infra is ConfigurationProducerInfrastructure configurationProducerAsyncInfrastructure)
+                if (infra is IConfigurationProducer && infra is ConfiguredInfrastructure producer)
                 {
                     Configuration = Configuration
-                                        .Concat(configurationProducerAsyncInfrastructure.Configuration)
+                                        .Concat(producer.Configuration)
                                         .ToDictionary(x => x.Key, x => x.Value);
                 }
             }
@@ -49,17 +45,16 @@ namespace NotoriousTest.Common.Environments
 
             foreach(Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
-                if(infra is ConfigurationConsumerInfrastructure<TConfig> consumer)
+                if(infra is IConfigurationConsumer && infra is ConfiguredInfrastructure<TConfig> consumer)
                 {
                     consumer.Configuration = EnvironmentConfiguration;
                 }
 
                 infra.Initialize();
 
-                if (infra is ConfigurationProducerInfrastructure<TConfig> producer)
+                if (infra is IConfigurationProducer && infra is ConfiguredInfrastructure<TConfig> producer)
                 {
                     EnvironmentConfiguration = producer.Configuration;
-
                 }
             }
         }

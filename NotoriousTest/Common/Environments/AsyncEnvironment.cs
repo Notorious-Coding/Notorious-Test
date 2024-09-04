@@ -1,8 +1,6 @@
-﻿using NotoriousTest.Common.Infrastructures;
-using NotoriousTest.Common.Exceptions;
-using Xunit;
-using Microsoft.AspNetCore.Mvc;
+﻿using NotoriousTest.Common.Exceptions;
 using NotoriousTest.Common.Infrastructures.Async;
+using Xunit;
 
 namespace NotoriousTest.Common.Environments
 {

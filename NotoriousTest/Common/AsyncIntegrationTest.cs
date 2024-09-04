@@ -1,5 +1,5 @@
-﻿using Xunit;
-using AsyncEnvironment = NotoriousTest.Common.Environments.AsyncEnvironment;
+﻿using NotoriousTest.Common.Environments;
+using Xunit;
 
 namespace NotoriousTest.Common
 {
