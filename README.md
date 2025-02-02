@@ -22,6 +22,7 @@ Feel free to reach out! I’d love to hear from you. Here’s how you can get in tou
   - [Infrastructures](#infrastructures)
   - [Environment](#environment)
 - [Advanced functionalities](#advanced-functionalities)
+  - [Advanced Control Over Infrastructure Resets](#advanced-control-over-infrastructure-resets)
   - [Configuration](#configuration)
     - [Configurable Infrastructures](#configurable-infrastructures)
     - [Configurable Environment](#configurable-environment)
