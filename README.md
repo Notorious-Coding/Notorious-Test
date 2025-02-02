@@ -5,7 +5,7 @@
 ## Contact
 
 Have questions, ideas, or feedback about NotoriousTests?
-Feel free to reach out! I’d love to hear from you. Here’s how you can get in touch:
+Feel free to reach out! I'd love to hear from you. Here's how you can get in touch:
 
 - GitHub Issues: [Open an issue](https://github.com/Notorious-Coding/Notorious-Test/issues) to report a problem, request a feature, or share an idea.
 - Email: [briceschumacher21@gmail.com](mailto:briceschumacher21@gmail.com)
@@ -223,7 +223,7 @@ public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
 
 ### Advanced Control Over Infrastructure Resets
 
-By default, infrastructures are reset between each test to ensure data isolation. However, in certain scenarios—such as multi-tenant applications where isolation is ensured by design—automatic resets may not be necessary.
+By default, infrastructures are reset between each test to ensure data isolation. However, in certain scenarios -such as multi-tenant applications where isolation is ensured by design- automatic resets may not be necessary.
 
 **With the `AutoReset` option, you can disable the automatic reset for a specific infrastructure:**
 
