@@ -6,10 +6,9 @@ namespace NotoriousTest.Common.Infrastructures.Async
     {
         public abstract int Order { get; }
         private bool _initialize = false;
-        public bool AutoReset { get; private set; } = true;
-        public AsyncInfrastructure(bool initialize = false, bool autoreset = true)
+        public bool AutoReset { get; set; } = true;
+        public AsyncInfrastructure(bool initialize = false)
         {
-            AutoReset = autoreset;
             _initialize = initialize;
         }
 

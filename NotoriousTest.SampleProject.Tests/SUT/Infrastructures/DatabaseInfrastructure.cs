@@ -12,10 +12,9 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
     public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>, IConfigurationProducer
     {
         
-        public DatabaseInfrastructure(bool initialize = false) : base(autoreset: false)
+        public DatabaseInfrastructure(bool initialize = false): base(initialize)
         {
         }
-
         public override int Order => 1;
 
         public override Task Destroy()

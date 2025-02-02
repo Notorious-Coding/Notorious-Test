@@ -7,7 +7,10 @@ namespace NotoriousTest.SampleProject.Tests.SUT
     {
         public override Task ConfigureEnvironmentAsync()
         {
-            AddInfrastructure(new DatabaseInfrastructure());
+            AddInfrastructure(new DatabaseInfrastructure()
+            {
+                AutoReset = false
+            });
             AddWebApplication(new SampleProjectApp());
 
             return Task.CompletedTask;

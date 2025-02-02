@@ -2,6 +2,15 @@
 
 **Notorious Test** provide a simple way to isolate integration tests. Based on XUnit.
 
+## Contact
+
+Have questions, ideas, or feedback about NotoriousTests?
+Feel free to reach out! I’d love to hear from you. Here’s how you can get in touch:
+
+- GitHub Issues: [Open an issue](https://github.com/Notorious-Coding/Notorious-Test/issues) to report a problem, request a feature, or share an idea.
+- Email: [briceschumacher21@gmail.com](mailto:briceschumacher21@gmail.com)
+- LinkedIn : [Brice SCHUMACHER](http://www.linkedin.com/in/brice-schumacher)
+
 ## Summary
 
 - [Support](#support)
@@ -22,7 +31,7 @@
 
 ## Support
 
-- Net6/7
+- Net6+
 
 ## Features
 
@@ -210,6 +219,33 @@ public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
 ```
 
 ## Advanced functionalities
+
+### Advanced Control Over Infrastructure Resets
+
+By default, infrastructures are reset between each test to ensure data isolation. However, in certain scenarios—such as multi-tenant applications where isolation is ensured by design—automatic resets may not be necessary.
+
+**With the `AutoReset` option, you can disable the automatic reset for a specific infrastructure:**
+
+```csharp
+    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
+    {
+        public override Task ConfigureEnvironmentAsync()
+        {
+            AddInfrastructure(new DatabaseInfrastructure()
+            {
+                AutoReset = false
+            });
+            AddWebApplication(new SampleProjectApp());
+
+            return Task.CompletedTask;
+        }
+    }
+```
+
+When `AutoReset` is set to `false`, the `Reset` method of the specified infrastructure will be skipped during the test lifecycle. This can save significant time and resources in scenarios where resetting is unnecessary.
+
+> :warning: Note: Use this option carefully. Ensure that tests are designed to avoid dependencies on leftover data unless explicitly intended.
+
 
 ### Configuration
 
@@ -446,3 +482,10 @@ public async Task Test2()
 ```
 
 Nice ! Good job, now, your integration test are isolated from each other.
+
+
+## Other nugets i'm working on
+
+- [**NotoriousClient**](https://www.nuget.org/packages/NotoriousClient/) : Notorious Client is meant to simplify the sending of HTTP requests through a fluent builder and an infinitely extensible client system.
+- [**NotoriousModules**](https://github.com/Notorious-Coding/Notorious-Modules) : Notorious Modules provide a simple way to separate monolith into standalone modules.
+

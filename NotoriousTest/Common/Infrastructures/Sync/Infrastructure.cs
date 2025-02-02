@@ -2,10 +2,9 @@
 {
     public abstract class Infrastructure : IDisposable
     {
-        public bool AutoReset { get; private set; } = true;
-        public Infrastructure(bool initialize = false, bool autoreset = false)
+        public bool AutoReset { get; set; } = true;
+        public Infrastructure(bool initialize = false)
         {
-            AutoReset = autoreset;
             if (initialize) Initialize();
         }
 
