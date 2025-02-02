@@ -19,12 +19,12 @@ namespace NotoriousTest.Web.Infrastructures
         public HttpClient? HttpClient;
         public override int Order => 999;
 
-        public AsyncWebApplicationInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory)
+        public AsyncWebApplicationInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory, bool autoreset = true) : base(autoreset: autoreset)
         {
             _webApplicationFactory = webApplicationFactory;
         }
 
-        public AsyncWebApplicationInfrastructure()
+        public AsyncWebApplicationInfrastructure(bool autoreset = true) : base(autoreset: autoreset)
         {
             _webApplicationFactory = new WebApplicationFactory<TEntryPoint>();
         }

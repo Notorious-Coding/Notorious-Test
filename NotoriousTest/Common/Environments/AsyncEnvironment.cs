@@ -82,7 +82,7 @@ namespace NotoriousTest.Common.Environments
         {
             foreach (AsyncInfrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
-                await infrastructure.Reset();
+                if (infrastructure.AutoReset) await infrastructure.Reset();
             }
         }
 

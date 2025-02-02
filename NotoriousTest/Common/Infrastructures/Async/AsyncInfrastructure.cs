@@ -6,9 +6,10 @@ namespace NotoriousTest.Common.Infrastructures.Async
     {
         public abstract int Order { get; }
         private bool _initialize = false;
-
-        public AsyncInfrastructure(bool initialize = false)
+        public bool AutoReset { get; private set; } = true;
+        public AsyncInfrastructure(bool initialize = false, bool autoreset = true)
         {
+            AutoReset = autoreset;
             _initialize = initialize;
         }
 
@@ -16,6 +17,9 @@ namespace NotoriousTest.Common.Infrastructures.Async
         public abstract Task Reset();
         public abstract Task Destroy();
 
+        /// <summary>
+        /// Called by xunit
+        /// </summary>
         public async Task InitializeAsync()
         {
             if (_initialize) await Initialize();

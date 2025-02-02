@@ -12,7 +12,7 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
     public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>, IConfigurationProducer
     {
         
-        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
+        public DatabaseInfrastructure(bool initialize = false) : base(autoreset: false)
         {
         }
 
