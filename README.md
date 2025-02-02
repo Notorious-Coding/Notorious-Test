@@ -1,6 +1,6 @@
 ## ![Logo](./Documentation/Images/NotoriousTest.png)
 
-**Notorious Test** provide a simple way to isolate integration tests. Based en XUnit.
+**Notorious Test** provide a simple way to isolate integration tests. Based on XUnit.
 
 ## Summary
 
@@ -26,7 +26,7 @@
 
 ## Features
 
-- Easy share of test infrastructure
+- Easy share of test infrastructure.
 - Easy building of test framework.
 - Complete isolation of integration tests.
 - Simple implementation.
@@ -34,7 +34,7 @@
 
 ## Motivation
 
-The goal is to provide a way to make integration test without worrying about data collision, side effects, and infrastructure sharing.
+The goal is to provide a way to make integration tests without worrying about data collision, side effects, and infrastructure sharing.
 
 ## Setup
 
@@ -50,7 +50,7 @@ Or from the .NET CLI as:
 dotnet add package NotoriousTest
 ```
 
-## Base functionnalities
+## Base functionalities
 
 ### Infrastructures
 
@@ -112,11 +112,11 @@ public class SQLServerDBAsyncInfrastructure : AsyncInfrastructure
 
 As you can see, an infrastructure is made of 3 main lifecycle method.
 
-**To start an infrastructure**, you can call **Initialize** or put the initialize boolean in the constructor at true.
+- **Initialize** : You can call this method **to start an infrastructure** or set the initialize boolean in the constructor at true.
 
-**To reset an infrastructure**, you can call **Reset**. Reset mean to put the infrastructure in an empty state without recreating it from scratch (essentialy for perfomances).
+- **Reset** : you can call this method **to reset an infrastructure**. Reset mean to put the infrastructure in an empty state without recreating it from scratch (essentialy for perfomances).
 
-**To destroy an infrastructure**, you can call **Destroy** to completly delete the infrastructure.
+- **Destroy** : you can call this method **to destroy an infrastructure**, **Destroy** mean to completly delete the infrastructure.
 
 Once you made it, you can use this infrastructure as standalone in your tests :
 
@@ -133,15 +133,15 @@ public async Task Database_Creation()
 }
 ```
 
-This is not the main use of infrastructures, now, we will see how to setup a whole environment.
+Even if using an infrastructures in standalone can be easy, it should be a best practices to use them inside an **Environment**. Let's see why and how.
 
 ### Environment
 
 We have seen how we could use an infrastructure directly within a tests, but it will become really difficult to maintain if we do this for every test and for every infrastructure.
 
-That's why we provide environment feature :
+That's why we provide this environment feature :
 
-An environment is a collection of infrastructure drived by tests's lifecycle.
+An environment is a collection of infrastructure drived by tests' lifecycle.
 
 ![Cycle de vie des infrastructures](./Documentation/Images/Infrastructure%20lifecycle.png)
 
@@ -173,7 +173,7 @@ public class SampleEnvironment : AsyncEnvironment
 }
 ```
 
-Then, inherit your test class with **IntegrationTest**.
+Then, make your test class inherit from **IntegrationTest**.
 
 ```csharp
 public class UnitTest1 : IntegrationTest<SampleEnvironment>
@@ -213,7 +213,7 @@ public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
 
 ### Configuration
 
-In some cases, you will need to handle configuration from your infrastructures, such as connection string, or secrets, etc. **Notorious Tests** provide a nice way to produce and consume configuration within infrastructures.
+In some cases, you will need to handle configuration from your infrastructures, such as connection string, or secrets, etc. **Notorious Tests** provides a nice way to produce and consume configuration within infrastructures.
 
 Here's how :
 
@@ -273,7 +273,7 @@ Generic type for configuration is not mandatory, Configuration object will be a 
     }
 ```
 
-Now, you can access directly your infrastructure configuration within a test :
+Now, you can access your infrastructure configuration directly within a test :
 
 ```csharp
 [Fact]
@@ -288,9 +288,9 @@ public async Task Test2()
 
 #### Configurable Environment
 
-You could use **ConfiguredInfrastructure** within **Environment**.
+You could use **`ConfiguredInfrastructure`** within **Environment**.
 
-First, inherit from **ConfiguredEnvironment** instead of **Environment**.
+First, inherit from **`ConfiguredEnvironment`** instead of **Environment**.
 (from **AsyncConfiguredEnvironment** instead of **AsyncEnvironment**).
 
 ```csharp
@@ -312,9 +312,9 @@ public class SampleEnvironment : ConfiguredEnvironment{
 }
 ```
 
-Within environment, you would use the public property **EnvironmentConfiguration** to access produced configuration from infrastructures.
+Within any **`ConfiguredEnvironment`**, you would use the public property **`EnvironmentConfiguration`** to access produced configuration from infrastructures.
 
-> :warning: Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and every infrastructures will edit his own part of the configuration.
+> :warning: Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and each infrastructure will edit its own part of the configuration.
 
 One more step is needed so your environment understand how your infrastructures handle configuration.
 
