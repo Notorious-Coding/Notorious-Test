@@ -12,8 +12,13 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
         private string DbName => $"TestDB_{EnvironmentId}";
 
         private Respawner DbRespawner { get; set; }
+
+        // This method is public so you can access a SQL Connection from your test, directly from the infrastructure.
         public SqlConnection GetConnection() => GetSqlConnection(DbName);
 
+        /// <summary>
+        /// This method is called at the end of the test campaign
+        /// </summary>
         public override async Task Destroy()
         {
             await using (var connection = GetSqlConnection())
@@ -23,6 +28,9 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
             }
         }
 
+        /// <summary>
+        /// This method is called at the beginning of the test campaign
+        /// </summary>
         public override async Task Initialize()
         {
             await using (var connection = GetSqlConnection())
@@ -32,12 +40,21 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 
                 connection.ChangeDatabase(DbName);
                 // Play all your migrations script here, use DBUp or any other migration tool
+                // You can also use EF Core to create the database schema, apply migrations, etc.
                 await CreateTables(connection);
             }
 
+            // Since this is a configuration producer, we can add the connection string to the configuration
+            // It will then be consumed by IConfigurationConsumer infrastructures, like the WebApplication for example.
+            // You can see how to retrieve this connection string in the Program.cs file.
             Configuration.Add("ConnectionStrings:SqlServer", GetConnectionString(DbName));
         }
 
+        /// <summary>
+        /// This method is called after each test. It is used to reset the database to an empty on known state.
+        /// Here, i use respawn since it is one of the best solution to easily reset tables without destroying and recreating
+        /// the whole database.
+        /// </summary>
         public override async Task Reset()
         {
             await using (var connection = GetSqlConnection(DbName))
@@ -74,7 +91,6 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 
         private async Task CreateTables(SqlConnection connection)
         {
-            // Apply your table creation scripts here
             var sql = File.ReadAllText("Tables.sql");
 
             using (SqlCommand command = connection.CreateCommand())
