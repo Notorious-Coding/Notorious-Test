@@ -29,7 +29,7 @@ Feel free to reach out! I'd love to hear from you. Here's how you can get in tou
   - [Web](#web)
     - [Web Application Infrastructure](#web-application-infrastructure)
     - [Web Environment](#web-environment)
-- [Samples](#samples)
+- [Hand's On examples](#hands-on-examples)
 
 ## Support
 
