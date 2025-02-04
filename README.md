@@ -29,6 +29,7 @@ Feel free to reach out! I'd love to hear from you. Here's how you can get in tou
   - [Web](#web)
     - [Web Application Infrastructure](#web-application-infrastructure)
     - [Web Environment](#web-environment)
+- [Samples](#samples)
 
 ## Support
 
@@ -246,7 +247,6 @@ By default, infrastructures are reset between each test to ensure data isolation
 When `AutoReset` is set to `false`, the `Reset` method of the specified infrastructure will be skipped during the test lifecycle. This can save significant time and resources in scenarios where resetting is unnecessary.
 
 > :warning: Note: Use this option carefully. Ensure that tests are designed to avoid dependencies on leftover data unless explicitly intended.
-
 
 ### Configuration
 
@@ -484,9 +484,24 @@ public async Task Test2()
 
 Nice ! Good job, now, your integration test are isolated from each other.
 
+## Hands-On Examples
+
+Get started quickly with practical examples available in the [Samples](./Samples/NotoriousTests.InfrastructuresSamples/) folder. These examples demonstrate how to set up and use NotoriousTests for real-world scenarios.
+
+### What's included:
+
+- **[SqlServerInfrastructures.cs](./Samples/NotoriousTests.InfrastructuresSamples/Infrastructures/SqlServerInfrastructures.cs)**  
+  Learn how to manage your SQL Server database using Respawn and plain SQL for creating, destroying, and resetting your database seamlessly.
+- **[TestWebApplication.cs](./Samples/NotoriousTests.InfrastructuresSamples/Infrastructures/TestWebApplication.cs)**  
+  See how to configure a WebApplicationFactory with in-memory configuration for fast and isolated tests.
+- **[TestEnvironment](./Samples/NotoriousTests.InfrastructuresSamples/Environments/TestEnvironment.cs)**  
+  Understand how to set up environments to manage multiple infrastructures effortlessly.
+- **[SampleTests.cs](./Samples/NotoriousTests.InfrastructuresSamples/SampleTests.cs)**  
+  Dive into this file to see how to access infrastructures and use them in your tests.
+- **[Program.cs](./Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/Program.cs)**  
+  Explore how the SqlServerInfrastructure generates configuration for the Web Application.
 
 ## Other nugets i'm working on
 
 - [**NotoriousClient**](https://www.nuget.org/packages/NotoriousClient/) : Notorious Client is meant to simplify the sending of HTTP requests through a fluent builder and an infinitely extensible client system.
 - [**NotoriousModules**](https://github.com/Notorious-Coding/Notorious-Modules) : Notorious Modules provide a simple way to separate monolith into standalone modules.
-

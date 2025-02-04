@@ -21,16 +21,5 @@ namespace NotoriousTest.SampleProject.Tests
 
             string content = await response.Content.ReadAsStringAsync();
         }
-
-        [Fact]
-        public async Task Test3()
-        {
-            HttpClient? client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
-
-            HttpResponseMessage response = await client!.GetAsync("api/weather");
-            Assert.True(response.IsSuccessStatusCode);
-
-            string content = await response.Content.ReadAsStringAsync();
-        }
     }
 }
