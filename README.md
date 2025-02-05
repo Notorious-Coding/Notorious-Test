@@ -11,6 +11,9 @@ Feel free to reach out! I'd love to hear from you. Here's how you can get in tou
 - Email: [briceschumacher21@gmail.com](mailto:briceschumacher21@gmail.com)
 - LinkedIn : [Brice SCHUMACHER](http://www.linkedin.com/in/brice-schumacher)
 
+The discussions tabs is now opened ! 
+Feel free to tell me if you use the package here : https://github.com/Notorious-Coding/Notorious-Test/discussions/1 !
+
 ## Summary
 
 - [Support](#support)
