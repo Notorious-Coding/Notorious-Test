@@ -12,11 +12,6 @@ namespace NotoriousTest.Common.Environments
         public Environment()
         {
             // Called before test campaign
-            InitializeEnvironment();
-        }
-
-        public virtual void InitializeEnvironment()
-        {
             ConfigureEnvironment();
             Initialize();
         }
@@ -52,7 +47,7 @@ namespace NotoriousTest.Common.Environments
             return infrastructure;
         }
 
-        public void Initialize()
+        public virtual void Initialize()
         {
             foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
             {
@@ -60,7 +55,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        public void Reset()
+        public virtual void Reset()
         {
             foreach (Infrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
@@ -68,7 +63,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        public void Destroy()
+        public virtual void Destroy()
         {
             foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
             {

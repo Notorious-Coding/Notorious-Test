@@ -17,7 +17,7 @@ namespace NotoriousTest.Common.Environments
         /// </summary>
         public async Task InitializeAsync()
         {
-            await InitializeEnvironmentAsync();
+            await Initialize();
         }
 
         /// <summary>
@@ -71,15 +71,16 @@ namespace NotoriousTest.Common.Environments
             return Task.FromResult(this);
         } 
 
-        public async Task Initialize()
+        public virtual async Task Initialize()
         {
+
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy((i) => i.Order))
             {
                 await infra.Initialize();
             }
         }
 
-        public async Task Reset()
+        public virtual async Task Reset()
         {
             foreach (AsyncInfrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
@@ -87,7 +88,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        public async Task Destroy()
+        public virtual async Task Destroy()
         {
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
