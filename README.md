@@ -230,6 +230,10 @@ To address this, all infrastructures provide an optional `Order` property. This 
 
 By default, infrastructures without a defined order will be prioritized and executed first.
 
+> ❗ The only exception is WebApplicationInfrastructure, which will ALWAYS be executed last, as it depends on other infrastructures' configuration.
+
+Here's an example :
+
 ```csharp
     public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>
     {
