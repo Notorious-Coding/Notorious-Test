@@ -11,7 +11,7 @@ Feel free to reach out! I'd love to hear from you. Here's how you can get in tou
 - Email: [briceschumacher21@gmail.com](mailto:briceschumacher21@gmail.com)
 - LinkedIn : [Brice SCHUMACHER](http://www.linkedin.com/in/brice-schumacher)
 
-The discussions tabs is now opened ! 
+The discussions tabs is now opened !
 Feel free to tell me if you use the package here : https://github.com/Notorious-Coding/Notorious-Test/discussions/1 !
 
 ## Summary
@@ -25,6 +25,7 @@ Feel free to tell me if you use the package here : https://github.com/Notorious-
   - [Infrastructures](#infrastructures)
   - [Environment](#environment)
 - [Advanced functionalities](#advanced-functionalities)
+  - [Ordering infrastructures execution](#ordering-infrastructures-execution)
   - [Advanced Control Over Infrastructure Resets](#advanced-control-over-infrastructure-resets)
   - [Configuration](#configuration)
     - [Configurable Infrastructures](#configurable-infrastructures)
@@ -77,8 +78,6 @@ using NotoriousTest.Common.Infrastructures.Sync;
 
 public class SQLServerDBInfrastructure : Infrastructure
 {
-    public override int Order => 1;
-
     public SQLServerDBAsyncInfrastructure(bool initialize = false) : base(initialize){}
     public override void Initialize()
     {
@@ -104,8 +103,6 @@ using NotoriousTest.Common.Infrastructures.Async;
 // Async version
 public class SQLServerDBAsyncInfrastructure : AsyncInfrastructure
 {
-    public override int Order => 1;
-
     public SQLServerDBAsyncInfrastructure(bool initialize = false) : base(initialize){}
 
     public override Task Initialize()
@@ -126,11 +123,11 @@ public class SQLServerDBAsyncInfrastructure : AsyncInfrastructure
 
 As you can see, an infrastructure is made of 3 main lifecycle method.
 
-- **Initialize** : You can call this method **to start an infrastructure** or set the initialize boolean in the constructor at true.
+- **`Initialize`** : You can call this method **to start an infrastructure** or set the initialize boolean in the constructor at true.
 
-- **Reset** : you can call this method **to reset an infrastructure**. Reset mean to put the infrastructure in an empty state without recreating it from scratch (essentialy for perfomances).
+- **`Reset`** : you can call this method **to reset an infrastructure**. Reset mean to put the infrastructure in an empty state without recreating it from scratch (essentialy for perfomances).
 
-- **Destroy** : you can call this method **to destroy an infrastructure**, **Destroy** mean to completly delete the infrastructure.
+- **`Destroy`** : you can call this method **to destroy an infrastructure**, **`Destroy`** mean to completly delete the infrastructure.
 
 Once you made it, you can use this infrastructure as standalone in your tests :
 
@@ -147,7 +144,7 @@ public async Task Database_Creation()
 }
 ```
 
-Even if using an infrastructures in standalone can be easy, it should be a best practices to use them inside an **Environment**. Let's see why and how.
+Even if using an infrastructures in standalone can be easy, it should be a best practices to use them inside an `Environment`. Let's see why and how.
 
 ### Environment
 
@@ -187,7 +184,7 @@ public class SampleEnvironment : AsyncEnvironment
 }
 ```
 
-Then, make your test class inherit from **IntegrationTest**.
+Then, make your test class inherit from `IntegrationTest`.
 
 ```csharp
 public class UnitTest1 : IntegrationTest<SampleEnvironment>
@@ -224,6 +221,40 @@ public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
 ```
 
 ## Advanced functionalities
+
+### Ordering infrastructures execution
+
+In certain contexts, the execution order of infrastructures within an environment can be crucial.
+
+To address this, all infrastructures provide an optional `Order` property. This allows specifying the order of initialization, reset, and teardown of infrastructures.
+
+By default, infrastructures without a defined order will be prioritized and executed first.
+
+```csharp
+    public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>
+    {
+        // Use this property to order execution.
+        public override int? Order => 1;
+        public DatabaseInfrastructure(bool initialize = false): base(initialize)
+        {
+        }
+
+        public override Task Destroy()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override Task Initialize()
+        {
+            return Task.CompletedTask;
+        }
+
+        public override Task Reset()
+        {
+            return Task.CompletedTask;
+        }
+    }
+```
 
 ### Advanced Control Over Infrastructure Resets
 
@@ -356,43 +387,9 @@ Within any **`ConfiguredEnvironment`**, you would use the public property **`Env
 
 > ❗ Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and each infrastructure will edit its own part of the configuration.
 
-One more step is needed so your environment understand how your infrastructures handle configuration.
-
-If your infrastructure will **consume the environment configuration**, then, inherit from **IConfigurationConsumer**
-
-If your infrastructure will **produce environment configuration**, then, inherit from **IConfigurationProducer**.
-
-If it does both, then inherits from both.
-Here's an example :
-
-```csharp
-public class DatabaseInfrastructure : ConfiguredInfrastructure<Configuration>, IConfigurationProducer
-{
-
-    public DatabaseInfrastructure(bool initialize = false) : base(initialize)
-    {
-    }
-
-    public override int Order => 1;
-
-    public override void Destroy(){}
-
-    public override void Initialize()
-    {
-        // We produce a connection string, so we use IConfigurationProducer.
-        Configuration.DatabaseConfiguration = new DatabaseConfiguration()
-        {
-            ConnectionString = "Test"
-        };
-    }
-
-    public override void Reset(){}
-}
-```
-
 ### Web
 
-Within web applications, you will certainly need to add an WebApplication that work in background so your tests can call an actual API.
+Within web applications, you will certainly need to add a WebApplication that work in background so your tests can call an actual API.
 
 **NotoriousTests** provide everything so you donc need to scratch your head too much.
 
@@ -410,7 +407,7 @@ Here you can override everything you need for your app to be fully functional.
 
 Then, let's create an **WebApplicationInfrastructure** and pass our **WebApplication**.
 
-> :information: **WebApplicationInfrastructure** are necessarily a **IConfigurationConsumer**. Configuration passed will be added as configuration on your web app, making it accessible within **IConfiguration** object in _Program.cs_.
+> :information: Within a **WebEnvironment**, creating an infrastructure is optional. You can directly pass a WebApplication. But this can be usefull to add initialization/reset/destroy behaviors.
 
 ```csharp
     internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program, Configuration>
@@ -430,6 +427,8 @@ Then, let's create an **WebApplicationInfrastructure** and pass our **WebApplica
         }
     }
 ```
+
+> :information: Configuration passed will be automaticaly added as configuration on your web app, making it accessible within **IConfiguration** object in _Program.cs_.
 
 Now, within your test, you can start your **WebApplicationInfrastructures** like any other infrastructure, and access **HttpClient**:
 
@@ -468,7 +467,7 @@ public async Task Test2()
     }
 ```
 
-Your web application will start automatically at the start of a test campaign.
+Your web application will start automatically at the start of a test campaign, and configuration produced by infrastructures will automaticaly be added as an **InMemoryCollection** to your WebApplication.
 
 Then, in your test, you can use **GetWebApplication** to access the HttpClient :
 

@@ -9,7 +9,7 @@ using NotoriousTest.Common.Infrastructures.Sync;
 
 namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
 {
-    public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>, IConfigurationProducer
+    public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>
     {
         
         public DatabaseInfrastructure(bool initialize = false): base(initialize)

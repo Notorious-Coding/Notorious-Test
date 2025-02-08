@@ -27,7 +27,15 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - Introduced `ContextId` to uniquely identify infrastructures. For example, you can name your database with it.
   - In standalone mode, `ContextId` will be a random GUID.
   - Within an Environment, `ContextId` will be the environment identifier `Environment.EnvironmentId`
+- Removal of `IConfigurationProducer` and `IConfigurationConsumer`, as it was not necessary.
+- `Order` property is now nullable and thus optional.
 
 ### 🛠 Technical
 
 - Implemented multiple unit tests to enhance reliability.
+- Several changes to improve consistency in package usage (naming, methods, etc.).
+
+### 🐛 Bug Fixes
+
+- Fixed a bug where `EnvironmentId` generated a new GUID on every reference.
+- Fixed a bug where the configuration was erased when using an object as the configuration in `AsyncConfiguredEnvironment<TConfig>`.
