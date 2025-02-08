@@ -32,6 +32,7 @@ namespace NotoriousTest.Common.Environments
         /// <param name="infrastructure"></param>
         public Environment AddInfrastructure(Infrastructure infrastructure)
         {
+            infrastructure.ContextId = EnvironmentId;
             Infrastructures.Add(infrastructure);
             return this;
         }
@@ -51,7 +52,7 @@ namespace NotoriousTest.Common.Environments
             return infrastructure;
         }
 
-        internal void Initialize()
+        public void Initialize()
         {
             foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
             {
@@ -59,7 +60,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        internal void Reset()
+        public void Reset()
         {
             foreach (Infrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
@@ -67,7 +68,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        internal void Destroy()
+        public void Destroy()
         {
             foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
             {
