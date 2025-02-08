@@ -289,7 +289,7 @@ As you can see, this infrastructure will produce configuration after initializin
 Generic type for configuration is not mandatory, Configuration object will be a **Dictionary<string, string>**
 
 ```csharp
-    public class DatabaseInfrastructure : ConfiguredInfrastructure<Configuration>
+    public class DatabaseInfrastructure : ConfiguredInfrastructure
     {
 
         public DatabaseInfrastructure(bool initialize = false) : base(initialize)
@@ -351,7 +351,7 @@ public class SampleEnvironment : ConfiguredEnvironment{
 
 Within any **`ConfiguredEnvironment`**, you would use the public property **`EnvironmentConfiguration`** to access produced configuration from infrastructures.
 
-> :warning: Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and each infrastructure will edit its own part of the configuration.
+> ❗ Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and each infrastructure will edit its own part of the configuration.
 
 One more step is needed so your environment understand how your infrastructures handle configuration.
 
