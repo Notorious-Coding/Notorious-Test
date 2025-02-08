@@ -15,7 +15,7 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
         public DatabaseInfrastructure(bool initialize = false): base(initialize)
         {
         }
-        public override int Order => 1;
+        public override int? Order => 1;
 
         public override Task Destroy()
         {

@@ -6,7 +6,7 @@ namespace NotoriousTest.Common.Environments
 {
     public abstract class AsyncEnvironment : IAsyncLifetime
     {
-        public Guid EnvironmentId => Guid.NewGuid();
+        public Guid EnvironmentId { get; private set; } = Guid.NewGuid();
 
         protected readonly List<AsyncInfrastructure> Infrastructures = new List<AsyncInfrastructure>();
 
@@ -66,11 +66,12 @@ namespace NotoriousTest.Common.Environments
         /// <param name="infrastructure"></param>
         public Task<AsyncEnvironment> AddInfrastructure(AsyncInfrastructure infrastructure)
         {
+            infrastructure.ContextId = EnvironmentId;
             Infrastructures.Add(infrastructure); 
             return Task.FromResult(this);
         } 
 
-        internal async Task Initialize()
+        public async Task Initialize()
         {
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy((i) => i.Order))
             {
@@ -78,7 +79,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        internal async Task Reset()
+        public async Task Reset()
         {
             foreach (AsyncInfrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
@@ -86,7 +87,7 @@ namespace NotoriousTest.Common.Environments
             }
         }
 
-        internal async Task Destroy()
+        public async Task Destroy()
         {
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
