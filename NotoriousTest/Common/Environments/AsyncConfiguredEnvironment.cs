@@ -7,7 +7,7 @@ namespace NotoriousTest.Common.Environments
     {
         public Dictionary<string, string> Configuration { get; set; } = new();
 
-        public async override Task InitializeEnvironmentAsync()
+        public async override Task Initialize()
         {
             await ConfigureEnvironmentAsync();
 
@@ -35,7 +35,7 @@ namespace NotoriousTest.Common.Environments
     {
         public TConfig EnvironmentConfiguration { get; set; } = new();
 
-        public async override Task InitializeEnvironmentAsync()
+        public async override Task Initialize()
         {
             await ConfigureEnvironmentAsync();
 

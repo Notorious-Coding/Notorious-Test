@@ -8,10 +8,8 @@ namespace NotoriousTest.Common.Environments
     {
         protected Dictionary<string, string> Configuration { get; set; } = new();
 
-        public override void InitializeEnvironment()
+        public override void Initialize()
         {
-            ConfigureEnvironment();
-
             foreach (Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
                 // Si l'infrastructure consomme la configuration 
@@ -39,9 +37,8 @@ namespace NotoriousTest.Common.Environments
     {
         public TConfig EnvironmentConfiguration { get; set; } = new();
 
-        public override void InitializeEnvironment()
+        public override void Initialize()
         {
-            ConfigureEnvironment();
 
             foreach(Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
