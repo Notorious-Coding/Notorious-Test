@@ -5,27 +5,22 @@ namespace NotoriousTest.Common.Environments
 {
     public abstract class AsyncConfiguredEnvironment : AsyncEnvironment
     {
-        public Dictionary<string, string> Configuration { get; set; } = new();
+        public Dictionary<string, string> EnvironmentConfiguration { get; set; } = new();
 
         public async override Task Initialize()
         {
-            await ConfigureEnvironmentAsync();
-
             foreach(AsyncInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
-                if(infra is IConfigurationConsumer && infra is AsyncConfiguredInfrastructure consumer)
+                if(infra is AsyncConfiguredInfrastructure consumer)
                 {
-                    consumer.Configuration = Configuration;
-
+                    consumer.Configuration = EnvironmentConfiguration;
                 }
 
                 await infra.Initialize();
 
-                if (infra is IConfigurationProducer && infra is AsyncConfiguredInfrastructure producer)
+                if (infra is AsyncConfiguredInfrastructure producer)
                 {
-                    Configuration = Configuration
-                                        .Concat(producer.Configuration)
-                                        .ToDictionary(x => x.Key, x => x.Value);
+                    EnvironmentConfiguration = producer.Configuration;
                 }
             }
         }
@@ -37,18 +32,16 @@ namespace NotoriousTest.Common.Environments
 
         public async override Task Initialize()
         {
-            await ConfigureEnvironmentAsync();
-
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
-                if (infra is IConfigurationConsumer && infra is AsyncConfiguredInfrastructure<TConfig> consumer)
+                if (infra is AsyncConfiguredInfrastructure<TConfig> consumer)
                 {
                     consumer.Configuration = EnvironmentConfiguration;
                 }
 
                 await infra.Initialize();
                 
-                if (infra is IConfigurationProducer && infra is AsyncConfiguredInfrastructure<TConfig> producer)
+                if (infra is AsyncConfiguredInfrastructure<TConfig> producer)
                 {
                     EnvironmentConfiguration = producer.Configuration;
                 }
