@@ -17,6 +17,7 @@ namespace NotoriousTest.Common.Environments
         /// </summary>
         public async Task InitializeAsync()
         {
+            await ConfigureEnvironmentAsync();
             await Initialize();
         }
 
@@ -28,16 +29,6 @@ namespace NotoriousTest.Common.Environments
             await Destroy();
         }
         #endregion
-
-        /// <summary>
-        /// Initialize environment by creating infrastructure.
-        /// </summary>
-        /// <returns></returns>
-        public virtual async Task InitializeEnvironmentAsync()
-        {
-            await ConfigureEnvironmentAsync();
-            await Initialize();
-        }
 
         /// <summary>
         /// Configure environment with infrastructures. Called before environment initialization.
@@ -73,7 +64,6 @@ namespace NotoriousTest.Common.Environments
 
         public virtual async Task Initialize()
         {
-
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy((i) => i.Order))
             {
                 await infra.Initialize();

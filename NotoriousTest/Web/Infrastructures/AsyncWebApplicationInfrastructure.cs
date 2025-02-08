@@ -11,7 +11,7 @@ namespace NotoriousTest.Web.Infrastructures
     {
 
     }
-    public class AsyncWebApplicationInfrastructure<TEntryPoint, TConfig> : AsyncConfiguredInfrastructure<TConfig>, IConfigurationConsumer
+    public class AsyncWebApplicationInfrastructure<TEntryPoint, TConfig> : AsyncConfiguredInfrastructure<TConfig>
         where TEntryPoint : class
         where TConfig : class, new()
     {
