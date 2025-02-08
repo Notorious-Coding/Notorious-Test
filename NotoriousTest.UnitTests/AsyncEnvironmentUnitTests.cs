@@ -93,7 +93,7 @@ namespace NotoriousTest.UnitTests
 
         }
 
-
+        #region Multiple Infrastructure Test Cases Setup
         static MultipleInfrastructureTestCasesInfrastructure1 _multipleInfrastructureTestCasesInfrastructure1;
         static MultipleInfrastructureTestCasesInfrastructure2 _multipleInfrastructureTestCasesInfrastructure2;
 
@@ -132,7 +132,7 @@ namespace NotoriousTest.UnitTests
 
             }
         }
-
+        #endregion
 
         [Fact]
         public async Task Initialize_Should_CallInfrastructuresInOrder()
@@ -159,6 +159,67 @@ namespace NotoriousTest.UnitTests
 
             A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Reset()).MustNotHaveHappened();
             A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Destroy()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Initialize_Should_CallInfrastructureResetInOrder()
+        {
+            _multipleInfrastructureTestCasesInfrastructure1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
+            _multipleInfrastructureTestCasesInfrastructure2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Order).Returns(1);
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Order).Returns(2);
+
+            var environment = new MultipleInfrastructureTestCasesEnvironment();
+
+            await environment.InitializeAsync();
+            await environment.Reset();
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Initialize())
+                .MustHaveHappenedOnceExactly()
+                .Then(
+                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Initialize())
+                        .MustHaveHappenedOnceExactly()
+                );
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Reset())
+                .MustHaveHappenedOnceExactly()
+                .Then(
+                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Reset())
+                        .MustHaveHappenedOnceExactly()
+                );
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Destroy()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task Initialize_Should_CallInfrastructureDestroyInOrder()
+        {
+            _multipleInfrastructureTestCasesInfrastructure1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
+            _multipleInfrastructureTestCasesInfrastructure2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Order).Returns(1);
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Order).Returns(2);
+
+            var environment = new MultipleInfrastructureTestCasesEnvironment();
+
+            await environment.InitializeAsync();
+            await environment.Destroy();
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Initialize())
+                .MustHaveHappenedOnceExactly()
+                .Then(
+                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Initialize())
+                        .MustHaveHappenedOnceExactly()
+                );
+
+            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Destroy())
+                .MustHaveHappenedOnceExactly()
+                .Then(
+                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Destroy())
+                        .MustHaveHappenedOnceExactly()
+                );
         }
     }
 }
