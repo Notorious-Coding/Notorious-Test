@@ -1,5 +1,6 @@
 using FakeItEasy;
 using NotoriousTest.Common.Environments;
+using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Async;
 
 namespace NotoriousTest.UnitTests
@@ -7,6 +8,7 @@ namespace NotoriousTest.UnitTests
 
     public class AsyncEnvironmentUnitTests
     {
+        #region Unique Infrastructure Test Cases
         #region Unique Infrastructure Test Cases Setup
         static UniqueInfrastructureTestCasesInfrastructure _uniqueInfrastructureTestCasesInfrastructure;
 
@@ -15,7 +17,7 @@ namespace NotoriousTest.UnitTests
 
             public UniqueInfrastructureTestCasesEnvironment()
             {
-                
+
             }
 
             public override Task ConfigureEnvironmentAsync()
@@ -24,13 +26,13 @@ namespace NotoriousTest.UnitTests
 
                 return Task.CompletedTask;
             }
-        }   
+        }
 
         public abstract class UniqueInfrastructureTestCasesInfrastructure : AsyncInfrastructure
         {
             public UniqueInfrastructureTestCasesInfrastructure() : base(false)
             {
-                
+
             }
 
         }
@@ -92,7 +94,8 @@ namespace NotoriousTest.UnitTests
             A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Destroy()).MustHaveHappenedOnceExactly();
 
         }
-
+        #endregion
+        #region Multiple Infrastructures Test Cases
         #region Multiple Infrastructure Test Cases Setup
         static MultipleInfrastructureTestCasesInfrastructure1 _multipleInfrastructureTestCasesInfrastructure1;
         static MultipleInfrastructureTestCasesInfrastructure2 _multipleInfrastructureTestCasesInfrastructure2;
@@ -116,7 +119,7 @@ namespace NotoriousTest.UnitTests
 
         public abstract class MultipleInfrastructureTestCasesInfrastructure1 : AsyncInfrastructure
         {
-            
+
             public MultipleInfrastructureTestCasesInfrastructure1() : base(false)
             {
 
@@ -221,5 +224,177 @@ namespace NotoriousTest.UnitTests
                         .MustHaveHappenedOnceExactly()
                 );
         }
+
+        #endregion
+        #region Configuration Object Test Cases
+        #region Configuration Object Test Cases Setup
+        static ConfigurationObjectTestCasesInfrastructure1 _configurationObjectTestCasesInfrastructure1;
+        static ConfigurationObjectTestCasesInfrastructure2 _configurationObjectTestCasesInfrastructure2;
+
+        public class ConfigurationObjectTestCasesEnvironmentConfiguraton
+        {
+            public string Key1 { get; set; }
+            public string Key2 { get; set; }
+        }
+
+        public class ConfigurationObjectTestCasesEnvironment : AsyncConfiguredEnvironment<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        {
+            public ConfigurationObjectTestCasesEnvironment()
+            {
+            }
+            public override Task ConfigureEnvironmentAsync()
+            {
+                AddInfrastructure(_configurationObjectTestCasesInfrastructure1);
+                AddInfrastructure(_configurationObjectTestCasesInfrastructure2);
+                return Task.CompletedTask;
+            }
+        }
+
+        public class ConfigurationObjectTestCasesInfrastructure1 : AsyncConfiguredInfrastructure<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        {
+            public ConfigurationObjectTestCasesInfrastructure1() : base(false)
+            {
+            }
+
+            public override Task Destroy()
+            {
+                return Task.CompletedTask;
+            }
+
+            public override Task Initialize()
+            {
+                Configuration.Key1 = "Infra1Key1";
+
+                return Task.CompletedTask;
+            }
+
+            public override Task Reset()
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public class ConfigurationObjectTestCasesInfrastructure2 : AsyncConfiguredInfrastructure<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        {
+            public ConfigurationObjectTestCasesInfrastructure2() : base(false)
+            {
+            }
+
+            public override Task Destroy()
+            {
+                return Task.CompletedTask;
+            }
+
+            public override Task Initialize()
+            {
+                Configuration.Key2 = "Infra2Key2";
+
+                return Task.CompletedTask;
+            }
+
+            public override Task Reset()
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+
+        #endregion
+
+        [Fact]
+        public async Task InfrastructureWithinEnvironmentWithObjectConfiguration_Should_ProduceConfigurationCorrectly()
+        {
+            _configurationObjectTestCasesInfrastructure1 = new ConfigurationObjectTestCasesInfrastructure1();
+            _configurationObjectTestCasesInfrastructure2 = new ConfigurationObjectTestCasesInfrastructure2();
+
+            var environment = new ConfigurationObjectTestCasesEnvironment();
+            await environment.InitializeAsync();
+            Assert.Equal("Infra1Key1", environment.EnvironmentConfiguration.Key1);
+            Assert.Equal("Infra2Key2", environment.EnvironmentConfiguration.Key2);
+        }
+
+        #endregion
+        #region Configuration Dictionary Test Cases
+        #region Configuration Dictionary Test Cases Setup
+        static ConfigurationDictionaryTestCasesInfrastructure1 _configurationDictionaryTestCasesInfrastructure1;
+        static ConfigurationDictionaryTestCasesInfrastructure2 _configurationDictionaryTestCasesInfrastructure2;
+
+        public class ConfigurationDictionaryTestCasesEnvironment : AsyncConfiguredEnvironment
+        {
+            public ConfigurationDictionaryTestCasesEnvironment()
+            {
+            }
+            public override Task ConfigureEnvironmentAsync()
+            {
+                AddInfrastructure(_configurationDictionaryTestCasesInfrastructure1);
+                AddInfrastructure(_configurationDictionaryTestCasesInfrastructure2);
+                return Task.CompletedTask;
+            }
+        }
+
+        public class ConfigurationDictionaryTestCasesInfrastructure1 : AsyncConfiguredInfrastructure
+        {
+            public ConfigurationDictionaryTestCasesInfrastructure1() : base(false)
+            {
+            }
+
+            public override Task Destroy()
+            {
+                return Task.CompletedTask;
+            }
+
+            public override Task Initialize()
+            {
+                Configuration.Add("Key1", "Infra1Key1");
+
+                return Task.CompletedTask;
+            }
+
+            public override Task Reset()
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public class ConfigurationDictionaryTestCasesInfrastructure2 : AsyncConfiguredInfrastructure
+        {
+            public ConfigurationDictionaryTestCasesInfrastructure2() : base(false)
+            {
+            }
+
+            public override Task Destroy()
+            {
+                return Task.CompletedTask;
+            }
+
+            public override Task Initialize()
+            {
+                Configuration.Add("Key2", "Infra2Key2");
+
+                return Task.CompletedTask;
+            }
+
+            public override Task Reset()
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+
+        #endregion
+
+        [Fact]
+        public async Task InfrastructureWithinEnvironmentWithDictionaryConfiguration_Should_ProduceConfigurationCorrectly()
+        {
+            _configurationDictionaryTestCasesInfrastructure1 = new ConfigurationDictionaryTestCasesInfrastructure1();
+            _configurationDictionaryTestCasesInfrastructure2 = new ConfigurationDictionaryTestCasesInfrastructure2();
+
+            var environment = new ConfigurationDictionaryTestCasesEnvironment();
+            await environment.InitializeAsync();
+            Assert.Equal("Infra1Key1", environment.EnvironmentConfiguration["Key1"]);
+            Assert.Equal("Infra2Key2", environment.EnvironmentConfiguration["Key2"]);
+        }
+
+        #endregion
     }
 }
