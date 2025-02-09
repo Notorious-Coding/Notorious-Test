@@ -8,7 +8,7 @@ namespace NotoriousTest.TestContainers.Infrastructures
     {
         protected DockerContainerAsyncInfrastructure(bool initialize = false) : base(initialize) { }
 
-        protected abstract IContainer Container { get; init; }
+        protected abstract TContainer Container { get; init; }
 
         public override async Task Destroy()
         {
@@ -23,7 +23,7 @@ namespace NotoriousTest.TestContainers.Infrastructures
 
     public abstract class ConfiguredDockerContainerAsyncInfrastructure<TContainer> : AsyncConfiguredInfrastructure where TContainer : IContainer
     {
-        protected abstract IContainer Container { get; init; }
+        protected abstract TContainer Container { get; init; }
 
         protected ConfiguredDockerContainerAsyncInfrastructure(bool initialize = false) : base(initialize) { }
 
