@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest\NotoriousTest.csproj" />
 	  <ProjectReference Include="..\NotoriousTests.InfrastructuresSamples.TestWebApp\NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />

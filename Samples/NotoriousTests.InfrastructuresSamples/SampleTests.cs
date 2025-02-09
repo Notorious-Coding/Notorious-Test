@@ -20,8 +20,8 @@ namespace NotoriousTests.InfrastructuresSamples
         {
             // You can access an infrastructure directly from the CurrentEnvironment property of the test class.
             // This is useful to access the database connection for example.
-            SqlServerInfrastructures sqlInfrastructure = await CurrentEnvironment.GetInfrastructureAsync<SqlServerInfrastructures>();
-            await using(SqlConnection sql = sqlInfrastructure.GetConnection())
+            SqlServerInfrastructure sqlInfrastructure = await CurrentEnvironment.GetInfrastructureAsync<SqlServerInfrastructure>();
+            await using(SqlConnection sql = sqlInfrastructure.GetDatabaseConnection())
             {
                 // Arrange database
 

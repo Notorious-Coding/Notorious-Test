@@ -40,7 +40,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - Fixed a bug where `EnvironmentId` generated a new GUID on every reference.
 - Fixed a bug where the configuration was erased when using an object as the configuration in `AsyncConfiguredEnvironment<TConfig>`.
 
-## v2.3.1
+## v2.3.0
 
 ### ✨ Features
 

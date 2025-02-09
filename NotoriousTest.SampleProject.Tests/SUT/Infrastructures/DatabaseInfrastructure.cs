@@ -7,11 +7,12 @@ namespace NotoriousTest.SampleProject.Tests.SUT.Infrastructures
     {
         public DatabaseInfrastructure(bool initialize = false): base(initialize)
         {
+            Container = new MsSqlBuilder()
+                .Build();
         }
 
         public override int? Order => 1;
 
-        protected override MsSqlContainer Container { get; init; } = new MsSqlBuilder().Build();
 
         public override async Task Destroy()
         {
