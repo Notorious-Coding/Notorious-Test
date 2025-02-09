@@ -1,5 +1,12 @@
 ## ![Logo](./Documentation/Images/NotoriousTest.png)
 
+[![NuGet](https://img.shields.io/nuget/v/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
+[![License](https://img.shields.io/github/license/Notorious-Coding/Notorious-Test)](https://github.com/Notorious-Coding/Notorious-Test/blob/main/LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-6%2B-blue)](https://dotnet.microsoft.com/)
+[![GitHub stars](https://img.shields.io/github/stars/Notorious-Coding/Notorious-Test?style=social)](https://github.com/Notorious-Coding/Notorious-Test/stargazers)
+
+
 **Notorious Test** provide a simple way to isolate integration tests. Based on XUnit.
 
 ## Contact
@@ -19,6 +26,7 @@ Feel free to tell me if you use the package here : https://github.com/Notorious-
 - [Support](#support)
 - [Features](#features)
 - [Motivation](#motivation)
+- [Changelog](#changelog)
 - [Getting started](#getting-started)
 - [Setup](#setup)
 - [Base functionalities](#base-functionalities)
@@ -49,6 +57,10 @@ Feel free to tell me if you use the package here : https://github.com/Notorious-
 ## Motivation
 
 The goal is to provide a way to make integration tests without worrying about data collision, side effects, and infrastructure sharing.
+
+## Changelog
+
+You can find the changelog [here](./CHANGELOG.md).
 
 ## Setup
 
