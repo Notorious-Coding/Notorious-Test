@@ -49,4 +49,4 @@ For more information, see the [Advanced Functionalities - Advanced control over 
   - For more information, see the [Advanced Functionalities - TestContainers](./README.md#testcontainers).
 - **NotoriousTest.SqlServer** is now available as a separate package.
   - Provide your tests with a SqlServer ready-to-use infrastructure !
-  - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sqlserver).
+  - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sql-server).
