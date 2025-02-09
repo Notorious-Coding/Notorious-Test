@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 using NotoriousTest.Common.Environments;
+using NotoriousTest.SqlServer;
 using NotoriousTest.Web.Environments;
 using NotoriousTests.InfrastructuresSamples.Infrastructures;
 using System;
@@ -18,7 +19,7 @@ namespace NotoriousTests.InfrastructuresSamples.Environments
         {
             // Adding all infrastructure needed for the test
             // Every environment generate an EnvironmentId that is unique for each test campaign
-            await AddInfrastructure(new SqlServerInfrastructures { EnvironmentId = EnvironmentId });
+            await AddInfrastructure(new SqlServerInfrastructure());
 
             // Here, we directly use the WebApplication without infrastructure. 
             // It will be added to a default web application infrastructure

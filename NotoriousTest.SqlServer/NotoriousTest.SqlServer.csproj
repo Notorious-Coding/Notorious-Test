@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Description>A SqlServer integration with NotoriousTest.</Description>
+		<PackageId>NotoriousTest.SqlServer</PackageId>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<VersionPrefix>2.3.0</VersionPrefix>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Authors>Brice SCHUMACHER</Authors>
+		<RepositoryUrl>https://github.com/Notorious-Coding/Notorious-Test/</RepositoryUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<IsPackable>true</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\icon.png" Pack="true" PackagePath="" Visible="False" />
+		<None Include="..\README.md" Pack="true" PackagePath="" Visible="False" />
+		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Respawn" Version="6.2.1" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+  </ItemGroup>
+
+</Project>
