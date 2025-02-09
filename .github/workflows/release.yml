@@ -25,6 +25,6 @@ jobs:
     - name: Test
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
     - name: Pack
-      run: dotnet pack NotoriousTest -c ${{ env.CONFIGURATION }}  -o out"
+      run: dotnet pack NotoriousTest -c ${{ env.CONFIGURATION }} -o out
     - name: Push
       run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
