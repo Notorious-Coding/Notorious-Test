@@ -4,27 +4,8 @@ using NotoriousTest.Common.Infrastructures.Sync;
 
 namespace NotoriousTest.Common.Environments
 {
-    public abstract class ConfiguredEnvironment : Environment
+    public abstract class ConfiguredEnvironment : ConfiguredEnvironment<Dictionary<string, string>>
     {
-        public Dictionary<string, string> EnvironmentConfiguration { get; set; } = new();
-
-        public override void Initialize()
-        {
-            foreach (Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
-            {
-                if (infra is ConfiguredInfrastructure consumer)
-                {
-                    consumer.Configuration = EnvironmentConfiguration;
-                }
-
-                infra.Initialize();
-
-                if (infra is ConfiguredInfrastructure producer)
-                {
-                    EnvironmentConfiguration = producer.Configuration;
-                }
-            }
-        }
     }
 
     public abstract class ConfiguredEnvironment<TConfig> : Environment
