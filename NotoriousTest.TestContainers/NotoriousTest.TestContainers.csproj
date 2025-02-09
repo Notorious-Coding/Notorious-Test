@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<Description>A TestContainers integration with NotoriousTests.</Description>
-		<PackageId>NotoriousTest</PackageId>
+		<PackageId>NotoriousTest.TestContainers</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<VersionPrefix>2.3.0</VersionPrefix>
