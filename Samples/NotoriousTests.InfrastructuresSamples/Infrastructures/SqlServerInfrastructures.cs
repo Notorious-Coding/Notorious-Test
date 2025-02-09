@@ -1,8 +1,5 @@
-﻿using DotNet.Testcontainers.Containers;
-using Microsoft.Data.SqlClient;
-using NotoriousTest.Common.Infrastructures;
-using NotoriousTest.Common.Infrastructures.Async;
-using NotoriousTest.TestContainers.Infrastructures;
+﻿using Microsoft.Data.SqlClient;
+using NotoriousTest.TestContainers;
 using Respawn;
 using Testcontainers.MsSql;
 
