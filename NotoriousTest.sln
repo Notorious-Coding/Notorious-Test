@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest.SampleProject
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest.SampleProject.Tests", "NotoriousTest.SampleProject.Tests\NotoriousTest.SampleProject.Tests.csproj", "{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{DEE908A6-8A85-4C15-9F67-1EE6B2DD7A71}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{DEE908A6-8A85-4C15-9F67-1EE6B2DD7A71}"
 	ProjectSection(SolutionItems) = preProject
 		CHANGELOG.md = CHANGELOG.md
 		NotoriousTest\LICENSE.txt = NotoriousTest\LICENSE.txt
@@ -21,6 +21,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AE5B5A5C-13BA-48C8-8216-F5C85DB68D26}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LiveTest", "LiveTest", "{62E4D68F-207B-48BF-9349-97ECC046B144}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CI", "CI", "{6528729C-A54B-44EA-95DC-675CB118898F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\prerelease.yml = .github\workflows\prerelease.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
