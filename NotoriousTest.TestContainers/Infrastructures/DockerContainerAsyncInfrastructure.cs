@@ -1,7 +1,7 @@
 ﻿using DotNet.Testcontainers.Containers;
 using NotoriousTest.Common.Infrastructures.Async;
 
-namespace NotoriousTest.TestContainers.Infrastructures
+namespace NotoriousTest.TestContainers
 {
 
     public abstract class DockerContainerAsyncInfrastructure<TContainer> : AsyncInfrastructure where TContainer : IContainer
