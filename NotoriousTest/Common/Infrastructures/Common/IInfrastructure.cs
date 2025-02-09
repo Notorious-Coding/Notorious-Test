@@ -21,7 +21,7 @@ namespace NotoriousTest.Common.Infrastructures.Common
         /// <summary>
         /// ContextId is an identfier of the current infrastructure context.
         /// In standalone mode : ContextId is a unique identifier scoped for the infrastructure.
-        /// Withing an environment : ContextId is provided by the environment where the infrastructure is added.
+        /// Withing an environment : ContextId is provided by the environment when the infrastructure is added.
         /// </summary>
         public Guid ContextId { get; set; }
     }
