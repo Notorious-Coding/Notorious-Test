@@ -1,11 +1,16 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: PreRelease Workflow
 
 on:
-  release:
-    types: [created] 
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  
 jobs:
   publish:
     env: 
@@ -23,8 +28,9 @@ jobs:
     - name: Build
       run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
     - name: Pack
-      run: dotnet pack NotoriousTest -c ${{ env.CONFIGURATION }}  -o out
+      run: dotnet pack NotoriousTest -c ${{ env.CONFIGURATION }}  -o out --version-suffix "beta.${{ github.run_number }}"
     - name: Push
-      run: dotnet nuget push out/*.nupkg --source --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+      run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
