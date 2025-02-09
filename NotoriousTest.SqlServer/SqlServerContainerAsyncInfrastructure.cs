@@ -6,6 +6,7 @@ using Testcontainers.MsSql;
 
 namespace NotoriousTest.SqlServer
 {
+    // TODO Simplify generic configuration.
     public class SqlServerContainerAsyncInfrastructure<TConfig> : ConfiguredDockerContainerAsyncInfrastructure<MsSqlContainer, TConfig> where TConfig: new()
     {
         public string DbName { get; init; } = "NotoriousDb";
@@ -39,7 +40,18 @@ namespace NotoriousTest.SqlServer
                 await connection.OpenAsync();
                 await CreateDatabase(connection);
                 _respawner = await Respawner.CreateAsync(connection, RespawnOptions);
+
+                await PopulateDatabase(connection);
             }
+        }
+
+        /// <summary>
+        /// Called after the database is created. Override this method to populate the database with data.
+        /// </summary>
+        /// <param name="connection">A SqlConnection pointing on the newly created database</param>
+        protected virtual Task PopulateDatabase(SqlConnection connection)
+        {
+            return Task.CompletedTask;
         }
 
         public override async Task Reset()
@@ -76,7 +88,6 @@ namespace NotoriousTest.SqlServer
             return connectionString.ToString();
         }
     }
-
     public class SqlServerContainerAsyncInfrastructure : ConfiguredDockerContainerAsyncInfrastructure<MsSqlContainer>
     {
         public string DbName { get; init; } = "NotoriousDb";
@@ -110,7 +121,18 @@ namespace NotoriousTest.SqlServer
                 await connection.OpenAsync();
                 await CreateDatabase(connection);
                 _respawner = await Respawner.CreateAsync(connection, RespawnOptions);
+
+                await PopulateDatabase(connection);
             }
+        }
+
+        /// <summary>
+        /// Called after the database is created. Override this method to populate the database with data.
+        /// </summary>
+        /// <param name="connection">A SqlConnection pointing on the newly created database</param>
+        protected virtual Task PopulateDatabase(SqlConnection connection)
+        {
+            return Task.CompletedTask;
         }
 
         public override async Task Reset()

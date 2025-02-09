@@ -47,3 +47,6 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - **NotoriousTest.TestContainers** is now available as a separate package.
   - Provides a simple way to use TestContainers in your tests.
   - For more information, see the [Advanced Functionalities - TestContainers](./README.md#testcontainers).
+- **NotoriousTest.SqlServer** is now available as a separate package.
+  - Provide your tests with a SqlServer ready-to-use infrastructure !
+  - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sqlserver).
