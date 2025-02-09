@@ -31,4 +31,5 @@ jobs:
     - name: Pack
       run: dotnet pack NotoriousTest -c ${{ env.CONFIGURATION }}  -o out --version-suffix "beta.${{ github.run_number }}"
     - name: Push
+      if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
       run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
