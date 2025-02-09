@@ -1,38 +1,30 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using DotNet.Testcontainers.Containers;
+using Microsoft.Data.SqlClient;
 using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Async;
+using NotoriousTest.TestContainers.Infrastructures;
 using Respawn;
+using Testcontainers.MsSql;
 
 namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 {
-    internal class SqlServerInfrastructures : AsyncConfiguredInfrastructure, IConfigurationProducer
+    internal class SqlServerInfrastructures : ConfiguredDockerContainerAsyncInfrastructure<MsSqlContainer>
     {
-        public override int Order => 1;
         public Guid EnvironmentId { get; set; }
         private string DbName => $"TestDB_{EnvironmentId}";
-
         private Respawner DbRespawner { get; set; }
+        protected override MsSqlContainer Container { get ; init; } = new MsSqlBuilder().Build();
 
         // This method is public so you can access a SQL Connection from your test, directly from the infrastructure.
         public SqlConnection GetConnection() => GetSqlConnection(DbName);
-
-        /// <summary>
-        /// This method is called at the end of the test campaign
-        /// </summary>
-        public override async Task Destroy()
-        {
-            await using (var connection = GetSqlConnection())
-            {
-                await connection.OpenAsync();
-                await CloseAllConnectionAndDestroyDatabase(connection);
-            }
-        }
 
         /// <summary>
         /// This method is called at the beginning of the test campaign
         /// </summary>
         public override async Task Initialize()
         {
+            await base.Initialize();
+            var toto = Container.GetConnectionString();
             await using (var connection = GetSqlConnection())
             {
                 await connection.OpenAsync();
@@ -69,13 +61,21 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 
         private string GetConnectionString(string? dbName = null)
         {
-            SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder($"Server=localhost;User Id=sa;Password=Ttest123test;TrustServerCertificate=True");
+            try
+            {
+
+            
+            SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder(Container.GetConnectionString());
             if (!string.IsNullOrEmpty(dbName))
             {
                 connectionString.InitialCatalog = DbName;
             }
 
             return connectionString.ToString();
+            }catch(Exception e)
+            {
+                throw;
+            }
         }
 
         private SqlConnection GetSqlConnection(string dbName = null) => new SqlConnection(GetConnectionString(dbName));
@@ -96,16 +96,6 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
             using (SqlCommand command = connection.CreateCommand())
             {
                 command.CommandText = sql;
-                await command.ExecuteNonQueryAsync();
-            }
-        }
-
-        private async Task CloseAllConnectionAndDestroyDatabase(SqlConnection sqlConnection)
-        {
-            using (SqlCommand command = sqlConnection.CreateCommand())
-            {
-                command.CommandText = $@"ALTER DATABASE [{DbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                                         DROP DATABASE [{DbName}];";
                 await command.ExecuteNonQueryAsync();
             }
         }

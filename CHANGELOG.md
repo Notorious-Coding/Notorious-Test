@@ -39,3 +39,11 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 - Fixed a bug where `EnvironmentId` generated a new GUID on every reference.
 - Fixed a bug where the configuration was erased when using an object as the configuration in `AsyncConfiguredEnvironment<TConfig>`.
+
+## v2.3.1
+
+### ✨ Features
+
+- **NotoriousTest.TestContainers** is now available as a separate package.
+  - Provides a simple way to use TestContainers in your tests.
+  - For more information, see the [Advanced Functionalities - TestContainers](./README.md#testcontainers).

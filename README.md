@@ -6,7 +6,6 @@
 [![.NET](https://img.shields.io/badge/.NET-6%2B-blue)](https://dotnet.microsoft.com/)
 [![GitHub stars](https://img.shields.io/github/stars/Notorious-Coding/Notorious-Test?style=social)](https://github.com/Notorious-Coding/Notorious-Test/stargazers)
 
-
 **Notorious Test** provide a simple way to isolate integration tests. Based on XUnit.
 
 ## Contact
@@ -41,6 +40,7 @@ Feel free to tell me if you use the package here : https://github.com/Notorious-
   - [Web](#web)
     - [Web Application Infrastructure](#web-application-infrastructure)
     - [Web Environment](#web-environment)
+  - [TestContainers](#testcontainers)
 - [Hand's On examples](#hands-on-examples)
 
 ## Support
@@ -65,7 +65,7 @@ You can find the changelog [here](./CHANGELOG.md).
 
 ## Setup
 
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousClient](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
+First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
 
 ```
 PM> Install-Package NotoriousTest
@@ -502,6 +502,50 @@ public async Task Test2()
 
 Nice ! Good job, now, your integration test are isolated from each other.
 
+### TestContainers
+
+**NotoriousTest.TestContainers** is now available as a separate package.
+
+Install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
+
+```
+PM> Install-Package NotoriousTest.TestContainers
+```
+
+Or from the .NET CLI as:
+
+```
+dotnet add package NotoriousTest.TestContainers
+```
+
+This package provides classes that automatically start and stop the container at the beginning and end of the test campaign!
+It introduces three new classes:
+
+- `DockerContainerAsyncInfrastructure<TContainer>` : Standard infrastructure.
+- `ConfiguredDockerContainerAsyncInfrastructure<TContainer>`: Infrastructure handling configuration as a dictionary.
+- `ConfiguredDockerContainerAsyncInfrastructure<TContainer, TConfiguration>` : Infrastructure handling a configuration object.
+
+> ❗ Since `TestContainers` doesn't support synchronous code, theses classes are only available in an `AsyncEnvironment`.
+
+Here's an example :
+
+```csharp
+
+public class SqlServerContainerInfrastructure : DockerContainerAsyncInfrastructure<GenericContainer>
+{
+    public override Container {get; init;} = new MsSqlBuild().Build();
+
+    public SampleDockerContainer(bool initialize = false) : base(initialize)
+    {
+    }
+
+    public override Task Reset()
+    {
+        return Task.CompletedTask;
+    }
+}
+```
+
 ## Hands-On Examples
 
 Get started quickly with practical examples available in the [Samples](./Samples/NotoriousTests.InfrastructuresSamples/) folder. These examples demonstrate how to set up and use NotoriousTests for real-world scenarios.
@@ -509,7 +553,7 @@ Get started quickly with practical examples available in the [Samples](./Samples
 ### What's included:
 
 - **[SqlServerInfrastructures.cs](./Samples/NotoriousTests.InfrastructuresSamples/Infrastructures/SqlServerInfrastructures.cs)**  
-  Learn how to manage your SQL Server database using Respawn and plain SQL for creating, destroying, and resetting your database seamlessly.
+  Learn how to manage your SQL Server database using Respawn, TestContainers and plain SQL for creating, destroying, and resetting your database seamlessly.
 - **[TestWebApplication.cs](./Samples/NotoriousTests.InfrastructuresSamples/Infrastructures/TestWebApplication.cs)**  
   See how to configure a WebApplicationFactory with in-memory configuration for fast and isolated tests.
 - **[TestEnvironment](./Samples/NotoriousTests.InfrastructuresSamples/Environments/TestEnvironment.cs)**  
