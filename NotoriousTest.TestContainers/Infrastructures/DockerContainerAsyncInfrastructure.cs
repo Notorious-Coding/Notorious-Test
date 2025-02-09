@@ -21,24 +21,6 @@ namespace NotoriousTest.TestContainers
         }
     }
 
-    public abstract class ConfiguredDockerContainerAsyncInfrastructure<TContainer> : AsyncConfiguredInfrastructure where TContainer : IContainer
-    {
-        protected TContainer Container { get; init; }
-
-        protected ConfiguredDockerContainerAsyncInfrastructure(bool initialize = false) : base(initialize) { }
-
-
-        public override Task Destroy()
-        {
-            return Container.StopAsync();
-        }
-
-        public override Task Initialize()
-        {
-            return Container.StartAsync();
-        }
-    }
-
     public abstract class ConfiguredDockerContainerAsyncInfrastructure<TContainer, TConfiguration> : AsyncConfiguredInfrastructure<TConfiguration>
         where TContainer : IContainer
         where TConfiguration : new()
@@ -57,5 +39,9 @@ namespace NotoriousTest.TestContainers
         {
             await Container.StartAsync();
         }
+    }
+
+    public abstract class ConfiguredDockerContainerAsyncInfrastructure<TContainer> : ConfiguredDockerContainerAsyncInfrastructure<TContainer, Dictionary<string, string>> where TContainer : IContainer
+    {
     }
 }
