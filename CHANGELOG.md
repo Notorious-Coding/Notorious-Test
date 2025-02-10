@@ -50,3 +50,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - **NotoriousTest.SqlServer** is now available as a separate package.
   - Provide your tests with a SqlServer ready-to-use infrastructure !
   - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sql-server).
+
+### 🛠 Technical
+
+- Simplified management of generic types in the `AsyncConfiguredInfrastructure` and `AsyncConfiguredEnvironment` classes.
