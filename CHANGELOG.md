@@ -54,3 +54,9 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 ### 🛠 Technical
 
 - Simplified management of generic types in the `AsyncConfiguredInfrastructure` and `AsyncConfiguredEnvironment` classes.
+
+## v2.3.1
+
+### 🐛 Bug Fixes
+
+- Fixed a bug in **NotoriousTest.SqlServer** where the `SqlServerContainerAsyncInfrastructure` did not changes the database connection to point to the newly created database.
