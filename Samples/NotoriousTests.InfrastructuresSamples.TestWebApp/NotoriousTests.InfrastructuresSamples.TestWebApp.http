@@ -1,0 +1,5 @@
+﻿@NotoriousTests.InfrastructuresSamples.TestWebApp_HostAddress = https://localhost:7265
+
+POST {{NotoriousTests.InfrastructuresSamples.TestWebApp_HostAddress}}/users
+
+###

@@ -6,7 +6,7 @@
 [![.NET](https://img.shields.io/badge/.NET-6%2B-blue)](https://dotnet.microsoft.com/)
 [![GitHub stars](https://img.shields.io/github/stars/Notorious-Coding/Notorious-Test?style=social)](https://github.com/Notorious-Coding/Notorious-Test/stargazers)
 
-**Notorious Test** provide a simple way to isolate integration tests. Based on XUnit.
+Clean, isolated, and maintainable integration testing for .NET
 
 ## Contact
 
@@ -22,603 +22,102 @@ Feel free to tell me if you use the package here : https://github.com/Notorious-
 
 ## Summary
 
-- [Support](#support)
-- [Features](#features)
-- [Motivation](#motivation)
-- [Changelog](#changelog)
+- [The problem with integration testing in .NET](#-the-problem-with-integration-testing-in-net)
+- [NotoriousTest: The solution](#-notorioustest-the-solution)
+- [Why use NotoriousTest](#why-use-notorious-test)
 - [Getting started](#getting-started)
-- [Setup](#setup)
-- [Base functionalities](#base-functionalities)
-  - [Infrastructures](#infrastructures)
-  - [Environment](#environment)
-- [Advanced functionalities](#advanced-functionalities)
-  - [Ordering infrastructures execution](#ordering-infrastructures-execution)
-  - [Advanced Control Over Infrastructure Resets](#advanced-control-over-infrastructure-resets)
-  - [Configuration](#configuration)
-    - [Configurable Infrastructures](#configurable-infrastructures)
-    - [Configurable Environment](#configurable-environment)
-  - [Web](#web)
-    - [Web Application Infrastructure](#web-application-infrastructure)
-    - [Web Environment](#web-environment)
-  - [TestContainers](#testcontainers)
-  - [Sql Server](#sql-server)
-    - [Initialization](#initialization)
-    - [Test Usage](#test-usage)
-    - [Populating the database](#populating-the-database)
-    - [Generating configuration](#generating-configuration)
-    - [Configure the container](#configure-the-container)
-    - [Configure respawn settings](#configure-respawn-settings)
-    - [Configure the database name](#configure-the-database-name)
-- [Hand's On examples](#hands-on-examples)
+- [Resources & Community](#ressources-&-community)
+  - [Changelog](#changelog)
+  - [Contact](#contact)
 
-## Support
+## 🚨 The problem with integration testing in .NET
 
-- Net6+
+When testing an application that relies on multiple infrastructures (databases, message buses, blob storage, FTP, SMTP...), the common approach looks like this:
 
-## Features
+- Create a **WebApplicationFactory** and use it as a fixture.
+- Implement `IAsyncLifetime` to initialize and dispose of infrastructures.
+- Manage each infrastructure (SQL Server, RabbitMQ, Redis, MongoDB, etc.) within `Initialize` and Dispose.
+- Add specific setup code inside the test constructors.
 
-- Easy share of test infrastructure.
-- Easy building of test framework.
-- Complete isolation of integration tests.
-- Simple implementation.
-- Based on XUnit.
+👉 This works for small projects, but as complexity increases, it becomes a nightmare:
 
-## Motivation
+🔥 The **`WebApplicationFactory`** turns into an unmanageable beast.\
+🔄 Everything needs to be manually refactored and structured → resulting in messy, hard-to-maintain code. \
+🏗️ Tests become slow to write and complex to maintain. \
+⏳ Setup time skyrockets, reducing productivity.
 
-The goal is to provide a way to make integration tests without worrying about data collision, side effects, and infrastructure sharing.
+And that’s the real problem—**integration tests are meant to ensure the quality of our code**. But if they themselves become unmanageable, **the enemy of our enemy becomes our enemy**.
 
-## Changelog
+## 🚀 **NotoriousTest: The solution**
 
-You can find the changelog [here](./CHANGELOG.md).
+NotoriousTest introduces a modular and structured approach to isolating and managing your test infrastructures effortlessly.
 
-## Setup
+✅ Each infrastructure (database, message bus, etc.) is encapsulated in its own class with a proper lifecycle (Init, Reset, Destroy). \
+✅ Test environments are composable → you assemble infrastructures like Lego blocks. \
+✅ Automatic reset between tests ensures proper isolation. \
+✅ No need to bloat your WebApplicationFactory → each infrastructure is cleanly defined. \
+✅ Works seamlessly with TestContainers, SQL Server, and more.
 
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
+👉 The result? A testing framework that is clean, modular, maintainable, and scalable.
 
+## Why use NotoriousTest
+
+🔹 **Designed for complex integration tests** \
+Seamlessly manage multiple infrastructures like databases, message buses, blob storage, and more, without turning your test setup into a nightmare.
+
+**🔹 Fully isolated and resettable environments** \
+Ensure clean, independent tests by automatically resetting infrastructures between each run—no leftover data, no hidden side effects.
+
+**🔹 Modular & reusable infrastructure components** \
+Define each infrastructure separately and compose test environments like Lego blocks. No more bloated WebApplicationFactories!
+
+**🔹 Effortless setup & minimal boilerplate** \
+Forget complex test initialization logic—NotoriousTest takes care of instantiating, resetting, and destroying your infrastructures automatically.
+
+**🔹 Compatible with TestContainers & SQL Server** \
+Seamlessly integrates with Dockerized test environments, allowing you to spin up databases, message queues, and more in seconds.
+
+**🔹 Powered by XUnit & Async Support** \
+Leverage the flexibility of XUnit’s dependency injection and fully async infrastructure lifecycles for faster and more scalable tests.
+
+## Quickstart
+
+Lets test this feature of my application with **NotoriousTest** :
+
+```csharp
+[HttpPost]
+public void CreateUser()
+{
+    using (var connection = new SqlConnection(_configuration.GetConnectionString("SqlServer")))
+    {
+        connection.Open();
+        CreateUser(connection);
+    }
+}
+
+private void CreateUser(SqlConnection sqlConnection)
+{
+    using (var command = sqlConnection.CreateCommand())
+    {
+        command.Parameters.AddWithValue("@username", "test");
+        command.Parameters.AddWithValue("@email", "example@email.com");
+        command.Parameters.AddWithValue("@password_hash", "password");
+        command.Parameters.AddWithValue("@created_at", DateTime.Now);
+        command.CommandText = "INSERT INTO Users(username, email, password_hash, created_at) VALUES(@username, @email, @password_hash, @created_at);";
+        command.ExecuteNonQuery();
+    }
+}
 ```
-PM> Install-Package NotoriousTest
-```
 
-Or from the .NET CLI as:
+### Setup
 
-```
+First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the .NET CLI as:
+
+```sh
 dotnet add package NotoriousTest
 ```
 
-## Base functionalities
-
-### Infrastructures
-
-An infrastructure is a piece of hardware or software that is necessary for your app to work.
-For example, a SQL Server Database is an infrastructure.
-**NotoriousTests** provide a way to design your infrastructures by creating classes for each of them.
-
-```csharp
-using NotoriousTest.Common.Infrastructures.Sync;
-
-public class SQLServerDBInfrastructure : Infrastructure
-{
-    public SQLServerDBAsyncInfrastructure(bool initialize = false) : base(initialize){}
-    public override void Initialize()
-    {
-        // Here you can create the database
-    }
-
-    public override void Reset()
-    {
-        // Here you can empty the database
-    }
-    public override void Destroy()
-    {
-        // Here you can destroy the database
-    }
-}
-```
-
-Async version :
-
-```csharp
-using NotoriousTest.Common.Infrastructures.Async;
-
-// Async version
-public class SQLServerDBAsyncInfrastructure : AsyncInfrastructure
-{
-    public SQLServerDBAsyncInfrastructure(bool initialize = false) : base(initialize){}
-
-    public override Task Initialize()
-    {
-        // Here you can create the database
-    }
-
-    public override Task Reset()
-    {
-        // Here you can empty the database
-    }
-    public override Task Destroy()
-    {
-        // Here you can destroy the database
-    }
-}
-```
-
-As you can see, an infrastructure is made of 3 main lifecycle method.
-
-- **`Initialize`** : You can call this method **to start an infrastructure** or set the initialize boolean in the constructor at true.
-
-- **`Reset`** : you can call this method **to reset an infrastructure**. Reset mean to put the infrastructure in an empty state without recreating it from scratch (essentialy for perfomances).
-
-- **`Destroy`** : you can call this method **to destroy an infrastructure**, **`Destroy`** mean to completly delete the infrastructure.
-
-Once you made it, you can use this infrastructure as standalone in your tests :
-
-```csharp
-[Fact]
-public async Task Database_Creation()
-{
-    // Dont forget to put initialize at true, so you dont have to call **Initialize**
-    await using (var db = new SQLServerDBAsyncInfrastructure(initialize: true))
-    {
-        // Test logic here...
-    }
-    // Disposing an infrastructure will automatically call Destroy()
-}
-```
-
-Even if using an infrastructures in standalone can be easy, it should be a best practices to use them inside an `Environment`. Let's see why and how.
-
-### Environment
-
-We have seen how we could use an infrastructure directly within a tests, but it will become really difficult to maintain if we do this for every test and for every infrastructure.
-
-That's why we provide this environment feature :
-
-An environment is a collection of infrastructure drived by tests' lifecycle.
-
-![Cycle de vie des infrastructures](./Documentation/Images/Infrastructure%20lifecycle.png)
-
-Let's create an environment :
-
-```csharp
-public class SampleEnvironment : Environment
-{
-    public override void ConfigureEnvironment()
-    {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
-    }
-}
-```
-
-Async version :
-
-```csharp
-public class SampleEnvironment : AsyncEnvironment
-{
-    public override Task ConfigureEnvironmentAsync()
-    {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
-
-        return Task.CompletedTask;
-    }
-}
-```
-
-Then, make your test class inherit from `IntegrationTest`.
-
-```csharp
-public class UnitTest1 : IntegrationTest<SampleEnvironment>
-{
-    public UnitTest1(SampleEnvironment environment) : base(environment)
-    {
-    }
-
-    [Fact]
-    public async void MyTest()
-    {
-        // Access infrastructure by calling
-        SQLServerDBAsyncInfrastructure infrastructure = await CurrentEnvironment.GetInfrastructure<SQLServerDBAsyncInfrastructure>();
-    }
-}
-```
-
-Async version:
-
-```csharp
-public class UnitTest1 : AsyncIntegrationTest<SampleEnvironment>
-{
-    public UnitTest1(SampleEnvironment environment) : base(environment)
-    {
-    }
-
-    [Fact]
-    public async Task MyTest()
-    {
-        // Access infrastructure by calling
-        SQLServerDBAsyncInfrastructure infrastructure = await CurrentEnvironment.GetInfrastructureAsync<SQLServerDBAsyncInfrastructure>();
-    }
-}
-```
-
-## Advanced functionalities
-
-### Ordering infrastructures execution
-
-In certain contexts, the execution order of infrastructures within an environment can be crucial.
-
-To address this, all infrastructures provide an optional `Order` property. This allows specifying the order of initialization, reset, and teardown of infrastructures.
-
-By default, infrastructures without a defined order will be prioritized and executed first.
-
-> ❗ The only exception is WebApplicationInfrastructure, which will ALWAYS be executed last, as it depends on other infrastructures' configuration.
-
-Here's an example :
-
-```csharp
-    public class DatabaseInfrastructure : AsyncConfiguredInfrastructure<Configuration>
-    {
-        // Use this property to order execution.
-        public override int? Order => 1;
-        public DatabaseInfrastructure(bool initialize = false): base(initialize)
-        {
-        }
-
-        public override Task Destroy()
-        {
-            return Task.CompletedTask;
-        }
-
-        public override Task Initialize()
-        {
-            return Task.CompletedTask;
-        }
-
-        public override Task Reset()
-        {
-            return Task.CompletedTask;
-        }
-    }
-```
-
-### Advanced Control Over Infrastructure Resets
-
-By default, infrastructures are reset between each test to ensure data isolation. However, in certain scenarios -such as multi-tenant applications where isolation is ensured by design- automatic resets may not be necessary.
-
-**With the `AutoReset` option, you can disable the automatic reset for a specific infrastructure:**
-
-```csharp
-    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
-    {
-        public override Task ConfigureEnvironmentAsync()
-        {
-            AddInfrastructure(new DatabaseInfrastructure()
-            {
-                AutoReset = false
-            });
-            AddWebApplication(new SampleProjectApp());
-
-            return Task.CompletedTask;
-        }
-    }
-```
-
-When `AutoReset` is set to `false`, the `Reset` method of the specified infrastructure will be skipped during the test lifecycle. This can save significant time and resources in scenarios where resetting is unnecessary.
-
-> :warning: Note: Use this option carefully. Ensure that tests are designed to avoid dependencies on leftover data unless explicitly intended.
-
-### Configuration
-
-In some cases, you will need to handle configuration from your infrastructures, such as connection string, or secrets, etc. **Notorious Tests** provides a nice way to produce and consume configuration within infrastructures.
-
-Here's how :
-
-#### Configurable Infrastructures
-
-To create a configurable infrastructure, the only thing you need to do is to inherits from **ConfiguredInfrastructure** or **AsyncConfiguredInfrastructure**.
-
-```csharp
-    public class DatabaseInfrastructure : ConfiguredInfrastructure<Configuration>
-    {
-
-        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
-        {
-        }
-
-        public override int Order => 1;
-
-        public override void Destroy(){}
-
-        public override void Initialize()
-        {
-            /// Initialize sql server.
-            Configuration.DatabaseConfiguration = new DatabaseConfiguration()
-            {
-                ConnectionString = "Test"
-            };
-        }
-
-        public override void Reset(){}
-    }
-```
-
-As you can see, this infrastructure will produce configuration after initializing the sql server.
-**Configuration** is available as public so you can then access it when using this infrastructure.
-
-Generic type for configuration is not mandatory, Configuration object will be a **Dictionary<string, string>**
-
-```csharp
-    public class DatabaseInfrastructure : ConfiguredInfrastructure
-    {
-
-        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
-        {
-        }
-
-        public override int Order => 1;
-
-        public override void Destroy(){}
-
-        public override void Initialize()
-        {
-            /// Initialize sql server.
-            Configuration.Add("DatabaseConfiguration.ConnectionString", "Test");
-        }
-
-        public override void Reset(){}
-    }
-```
-
-Now, you can access your infrastructure configuration directly within a test :
-
-```csharp
-[Fact]
-public async Task Test2()
-{
-    await using (var db =  new DatabaseInfrastructure(initialize: true))
-    {
-        var cs = db.Configuration.DatabaseConfiguration.ConnectionString;
-    }
-}
-```
-
-#### Configurable Environment
-
-You could use **`ConfiguredInfrastructure`** within **Environment**.
-
-First, inherit from **`ConfiguredEnvironment`** instead of **Environment**.
-(from **AsyncConfiguredEnvironment** instead of **AsyncEnvironment**).
-
-```csharp
-public class SampleEnvironment : ConfiguredEnvironment<Configuration>
-{
-    public override void ConfigureEnvironment()
-    {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
-    }
-}
-// Or without generic type
-public class SampleEnvironment : ConfiguredEnvironment{
-    public override void ConfigureEnvironment()
-    {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
-    }
-}
-```
-
-Within any **`ConfiguredEnvironment`**, you would use the public property **`EnvironmentConfiguration`** to access produced configuration from infrastructures.
-
-> ❗ Inside an environment, **configuration object should represent the whole app configuration**. It will move from infrastructures to infrastructures, and each infrastructure will edit its own part of the configuration.
-
-### Web
-
-Within web applications, you will certainly need to add a WebApplication that work in background so your tests can call an actual API.
-
-**NotoriousTests** provide everything so you donc need to scratch your head too much.
-
-#### Web Application Infrastructure
-
-First, you will need to create an **WebApplication**.
-
-```csharp
-internal class SampleProjectApp : WebApplication<Program>{}
-```
-
-This is actually a **WebApplicationFactory** provided by .NET ([See microsoft doc for more information.](https://learn.microsoft.com/fr-fr/aspnet/core/test/integration-tests?view=aspnetcore-8.0))
-
-Here you can override everything you need for your app to be fully functional.
-
-Then, let's create an **WebApplicationInfrastructure** and pass our **WebApplication**.
-
-> :information: Within a **WebEnvironment**, creating an infrastructure is optional. You can directly pass a WebApplication. But this can be usefull to add initialization/reset/destroy behaviors.
-
-```csharp
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program, Configuration>
-    {
-        public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration)
-            : base(new SampleProjectApp())
-        {
-        }
-    }
-
-    // Without a generic type, configuration will be a Dictionary<string, string>.
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
-    {
-        public SampleProjectWebApplicationInfrastructure(Dictionary<string, string> configuration)
-            : base(new SampleProjectApp())
-        {
-        }
-    }
-```
-
-> :information: Configuration passed will be automaticaly added as configuration on your web app, making it accessible within **IConfiguration** object in _Program.cs_.
-
-Now, within your test, you can start your **WebApplicationInfrastructures** like any other infrastructure, and access **HttpClient**:
-
-```csharp
-[Fact]
-public async Task Test2()
-{
-    await using (var app = new SampleProjectWebApplicationInfrastructure())
-    {
-        HttpClient? client = app.HttpClient;
-
-        HttpResponseMessage response = await client!.GetAsync("api/weather");
-        Assert.True(response.IsSuccessStatusCode);
-
-        string content = await response.Content.ReadAsStringAsync();
-    }
-}
-```
-
-#### Web Environment
-
-**WebApplication** or **WebApplicationInfrastructure** can be used within **WebEnvironment**.
-
-```csharp
-    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
-    {
-        public override Task ConfigureEnvironmentAsync()
-        {
-            AddInfrastructure(new DatabaseInfrastructure());
-            AddWebApplication(new SampleProjectApp());
-            // OR
-            AddWebApplication(new SampleProjectWebApplicationInfrastructure());
-
-            return Task.CompletedTask;
-        }
-    }
-```
-
-Your web application will start automatically at the start of a test campaign, and configuration produced by infrastructures will automaticaly be added as an **InMemoryCollection** to your WebApplication.
-
-Then, in your test, you can use **GetWebApplication** to access the HttpClient :
-
-```csharp
-[Fact]
-public async Task Test2()
-{
-    HttpClient? client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
-
-    HttpResponseMessage response = await client!.GetAsync("api/weather");
-    Assert.True(response.IsSuccessStatusCode);
-
-    string content = await response.Content.ReadAsStringAsync();
-}
-```
-
-Nice ! Good job, now, your integration test are isolated from each other.
-
-### TestContainers
-
-**NotoriousTest.TestContainers** is now available as a separate package.
-
-Install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
-
-```
-PM> Install-Package NotoriousTest.TestContainers
-```
-
-Or from the .NET CLI as:
-
-```
-dotnet add package NotoriousTest.TestContainers
-```
-
-This package provides classes that automatically start and stop the container at the beginning and end of the test campaign!
-It introduces three new classes:
-
-- `DockerContainerAsyncInfrastructure<TContainer>` : Standard infrastructure.
-- `ConfiguredDockerContainerAsyncInfrastructure<TContainer>`: Infrastructure handling configuration as a dictionary.
-- `ConfiguredDockerContainerAsyncInfrastructure<TContainer, TConfiguration>` : Infrastructure handling a configuration object.
-
-> ❗ Since `TestContainers` doesn't support synchronous code, theses classes are only available in an `AsyncEnvironment`.
-
-Here's an example :
-
-```csharp
-
-public class SqlServerContainerInfrastructure : DockerContainerAsyncInfrastructure<GenericContainer>
-{
-    public override Container {get; init;} = new MsSqlBuild().Build();
-
-    public SampleDockerContainer(bool initialize = false) : base(initialize)
-    {
-    }
-
-    public override Task Reset()
-    {
-        return Task.CompletedTask;
-    }
-}
-```
-
-### Sql Server
-
-#### Initialization
-
-**NotoriousTest.SqlServer** is now available as a separate package.
-
-Install [NotoriousTest.SqlServer](https://www.nuget.org/packages/NotoriousTest.SqlServer/) from the package manager console:
-
-```
-PM> Install-Package NotoriousTest.SqlServer
-```
-
-Or from the .NET CLI as:
-
-```
-dotnet add package NotoriousTest.SqlServer
-```
-
-You can now simply use the SqlServerContainerAsyncInfrastructure to start a SQL Server database.
-
-It will automatically start at the beginning of the test campaign, stop at the end, and reset between each test, powered by TestContainers and Respawn.
-
-Here's an example:
-
-```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
-    {
-        public SqlServerInfrastructure()
-        {
-        }
-    }
-```
-
-This infrastructure performs several tasks:
-
-- **On initialization:**
-  - Starts a SQL Server Docker container, powered by TestContainers.
-  - Creates a unique database.
-- **On reset:**
-  - Empties the database, powered by Respawn.
-- **On destruction:**
-  - Stops the container.
-
-#### Test Usage
-
-The infrastructure provides two methods:
-
-- **`GetDatabaseConnection`** – Returns a `SqlConnection` pointing to the newly created database for your test.
-- **`GetDatabaseConnectionString`** – Returns a connection string pointing to the newly created database for your test.
-
-```csharp
-[Fact]
-public async Task Test1()
-{
-    SqlServerInfrastructure sqlInfrastructure = await CurrentEnvironment.GetInfrastructureAsync<SqlServerInfrastructure>();
-    await using(SqlConnection sql = sqlInfrastructure.GetDatabaseConnection())
-    {
-        // Arrange your database here.
-    }
-}
-```
-
-#### Populating the database
-
-You can populate the database by overriding the `PopulateDatabase` method :
+### Create and populate the database
 
 ```csharp
    public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
@@ -630,20 +129,19 @@ You can populate the database by overriding the `PopulateDatabase` method :
         protected override async Task PopulateDatabase(SqlConnection connection)
         {
             // Play all your migrations script here, use DBUp or any other migration tool
-            await CreateTables(connection);
-        }
-    }
-```
-
-#### Generating configuration
-
-You can generate configuration for your web application by overriding the `Initialize` method :
-
-```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
-    {
-        public SqlServerInfrastructure()
-        {
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                string sql = @"CREATE TABLE Users (
+                                    user_id INT IDENTITY(1,1) PRIMARY KEY,
+                                    username NVARCHAR(50) NOT NULL UNIQUE,
+                                    email NVARCHAR(100) NOT NULL UNIQUE,
+                                    password_hash NVARCHAR(255) NOT NULL,
+                                    created_at DATETIME DEFAULT GETDATE()
+                                );
+                               ";
+                command.CommandText = sql;
+                await command.ExecuteNonQueryAsync();
+            }
         }
 
         public override async Task Initialize()
@@ -655,73 +153,52 @@ You can generate configuration for your web application by overriding the `Initi
     }
 ```
 
-#### Configure the container
-
-You can configure the container by overriding the `ConfigureSqlContainer` method :
+### Create the WebApplication
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
-    {
-        public SqlServerInfrastructure()
-        {
-        }
+    public class SampleProjectApp : WebApplication<Program>{}
+```
 
-        protected override MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder)
+### Create the environment
+
+```csharp
+    public class TestEnvironment : AsyncWebEnvironment<Program>
+    {
+        public override async Task ConfigureEnvironmentAsync()
         {
-            // Configure the builder to override image, host, password, port, etc.
-            return builder.WithPassword("NotoriousStrong(!)Password6");
+            await AddInfrastructure(new SqlServerInfrastructure());
+            await AddWebApplication(new TestWebApplication());
         }
     }
 ```
 
-#### Configure respawn settings
-
-To configure respawn settings, you can assign RespawnOptions property. They will be used by respawn to reset the database.
+### Run the tests
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+[Fact]
+public async Task Test1()
+{
+    HttpClient client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
+    HttpResponseMessage response = await client.PostAsync("users", null);
+    Assert.True(response.IsSuccessStatusCode);
+
+    SqlServerInfrastructure sqlInfrastructure = await CurrentEnvironment.GetInfrastructureAsync<SqlServerInfrastructure>();
+    await using(SqlConnection sql = sqlInfrastructure.GetDatabaseConnection())
     {
-        public SqlServerInfrastructure()
+        await sql.OpenAsync();
+        using (SqlCommand command = sql.CreateCommand())
         {
-            RespawnOptions = new RespawnerOptions
-            {
-                TablesToIgnore = new Table[] { "MyMigrationTable" }
-            };
+            command.CommandText = "SELECT COUNT(*) FROM Users";
+            int count = (int)await command.ExecuteScalarAsync();
+            Assert.Equal(1, count);
         }
     }
+}
 ```
 
-#### Configure the database name
+## Changelog
 
-By default, Database name will be `NotoriousDb` concatened with the `ContextId`.
-You can override `NotoriousDb` by your custom name by setting the property `DbName`.
-
-```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
-    {
-        public SqlServerInfrastructure()
-        {
-            DbName = "TestDb";
-        }
-    }
-```
-
-## Hands-On Examples
-
-Get started quickly with practical examples available in the [Samples](./Samples/NotoriousTests.InfrastructuresSamples/) folder. These examples demonstrate how to set up and use NotoriousTests for real-world scenarios.
-
-### What's included:
-
-- **[SqlServerInfrastructures.cs](./Samples/NotoriousTests.InfrastructuresSamples/Infrastructures/SqlServerInfrastructures.cs)**  
-  Learn how to manage your SQL Server database using Respawn, TestContainers and plain SQL for creating, destroying, and resetting your database seamlessly.
-- **[TestWebApplication.cs](./Samples/NotoriousTests.InfrastructuresSamples/Infrastructures/TestWebApplication.cs)**  
-  See how to configure a WebApplicationFactory with in-memory configuration for fast and isolated tests.
-- **[TestEnvironment](./Samples/NotoriousTests.InfrastructuresSamples/Environments/TestEnvironment.cs)**  
-  Understand how to set up environments to manage multiple infrastructures effortlessly.
-- **[SampleTests.cs](./Samples/NotoriousTests.InfrastructuresSamples/SampleTests.cs)**  
-  Dive into this file to see how to access infrastructures and use them in your tests.
-- **[Program.cs](./Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/Program.cs)**  
-  Explore how the SqlServerInfrastructure generates configuration for the Web Application.
+You can find the changelog [here](./CHANGELOG.md).
 
 ## Other nugets i'm working on
 

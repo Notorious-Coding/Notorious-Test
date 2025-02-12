@@ -11,16 +11,6 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
     {
         public SqlServerInfrastructure()
         {
-            DbName = "TestDb";
-            RespawnOptions = new RespawnerOptions
-            {
-                TablesToIgnore = new Table[] { "MyMigrationTable" }
-            };
-        }
-
-        protected override MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder)
-        {
-            return builder.WithPassword("NotoriousStrong(!)Password6");
         }
 
         protected override async Task PopulateDatabase(SqlConnection connection)
@@ -39,7 +29,14 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 
         private async Task CreateTables(SqlConnection connection)
         {
-            var sql = File.ReadAllText("Tables.sql");
+            string sql = @"CREATE TABLE Users (
+                                user_id INT IDENTITY(1,1) PRIMARY KEY,
+                                username NVARCHAR(50) NOT NULL UNIQUE,
+                                email NVARCHAR(100) NOT NULL UNIQUE,
+                                password_hash NVARCHAR(255) NOT NULL,
+                                created_at DATETIME DEFAULT GETDATE()
+                            );
+                            ";
 
             using (SqlCommand command = connection.CreateCommand())
             {
