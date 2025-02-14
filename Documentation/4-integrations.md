@@ -22,16 +22,15 @@ dotnet add package NotoriousTest.TestContainers
 This package provides classes that automatically start and stop the container at the beginning and end of the test campaign!
 It introduces three new classes:
 
-- `DockerContainerAsyncInfrastructure<TContainer>` : Standard infrastructure.
-- `ConfiguredDockerContainerAsyncInfrastructure<TContainer>`: Infrastructure handling configuration as a dictionary.
-- `ConfiguredDockerContainerAsyncInfrastructure<TContainer, TConfiguration>` : Infrastructure handling a configuration object.
+- **`DockerContainerAsyncInfrastructure<TContainer>`** : Standard infrastructure.
+- **`ConfiguredDockerContainerAsyncInfrastructure<TContainer>`** : Infrastructure handling configuration as a dictionary.
+- **`ConfiguredDockerContainerAsyncInfrastructure<TContainer, TConfiguration>`** : Infrastructure handling a configuration object.
 
 > ❗ Since `TestContainers` doesn't support synchronous code, theses classes are only available in an `AsyncEnvironment`.
 
 Here's an example :
 
 ```csharp
-
 public class SqlServerContainerInfrastructure : DockerContainerAsyncInfrastructure<GenericContainer>
 {
     public override Container {get; init;} = new MsSqlBuild().Build();

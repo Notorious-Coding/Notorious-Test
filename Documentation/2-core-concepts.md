@@ -72,7 +72,7 @@ NotoriousTest manages your test lifecycle automatically to ensure clean and isol
 Infrastructures are initialized (Initialize()).
 
 **Before Each Test** \
-Infrastructures are reset (Reset()). \
+Infrastructures are reset (Reset()).
 
 **Test Runs** \
 The test executes in an isolated environment.
@@ -83,7 +83,7 @@ Infrastructures are destroyed (Destroy()).
 🔥 **Why is this important?** \
 ✅ Guarantees clean data for each test (no unwanted side effects). \
 ✅ Prevents state leaks between tests. \
-✅ Eliminates manual setup/teardown code in test classes. \
+✅ Eliminates manual setup/teardown code in test classes.
 
 ## 🔌 How to Access Infrastructures in Tests
 
