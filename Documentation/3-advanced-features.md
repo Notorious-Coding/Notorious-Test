@@ -128,7 +128,7 @@ Here, you can override anything necessary to make your app fully functional.
 
 Next, let's create a **`WebApplicationInfrastructure`** and pass our **`WebApplication`** to it.
 
-> :information: In a **`WebEnvironment`**, creating a dedicated infrastructure is optional—you can pass a **`WebApplication`** directly. However, using an infrastructure can be useful if you need additional initialization, reset, or teardown logic.
+> ❗ In a **`WebEnvironment`**, creating a dedicated infrastructure is optional—you can pass a **`WebApplication`** directly. However, using an infrastructure can be useful if you need additional initialization, reset, or teardown logic.
 
 ```csharp
     internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program, Configuration>
@@ -149,7 +149,7 @@ Next, let's create a **`WebApplicationInfrastructure`** and pass our **`WebAppli
     }
 ```
 
-> :information: The provided configuration will automatically be applied to your web app, making it accessible through the **`IConfiguration`** object in Program.cs.
+> ❗ The provided configuration will automatically be applied to your web app, making it accessible through the **`IConfiguration`** object in Program.cs.
 
 Now, in your tests, you can start your **`WebApplicationInfrastructure`** just like any other infrastructure and access the `HttpClient`:
 
