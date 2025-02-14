@@ -217,7 +217,7 @@ To handle this, all infrastructures include an optional **`Order`** property, al
 
 By default, infrastructures without a specified order are prioritized and executed first.
 
-❗ The only exception is **`WebApplicationInfrastructure`**, which is ALWAYS executed last, as it depends on configurations from other infrastructures.
+> ❗ The only exception is **`WebApplicationInfrastructure`**, which is ALWAYS executed last, as it depends on configurations from other infrastructures.
 
 Here's an example:
 
