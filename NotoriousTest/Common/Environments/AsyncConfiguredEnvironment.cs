@@ -1,4 +1,5 @@
-﻿using NotoriousTest.Common.Infrastructures;
+﻿using NotoriousTest.Common.Configuration;
+using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Async;
 
 namespace NotoriousTest.Common.Environments
@@ -7,24 +8,24 @@ namespace NotoriousTest.Common.Environments
     {
     }
 
-    public abstract class AsyncConfiguredEnvironment<TConfig> : AsyncEnvironment where TConfig : class, new()
+    public abstract class AsyncConfiguredEnvironment<TConfig> : AsyncEnvironment, IConfigurable<TConfig> where TConfig : class, new()
     {
-        public TConfig EnvironmentConfiguration { get; set; } = new();
+        public TConfig Configuration { get; set; } = new();
 
         public async override Task Initialize()
         {
             foreach (AsyncInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
-                if (infra is AsyncConfiguredInfrastructure<TConfig> consumer)
+                if (infra is IConfigurable<TConfig> consumer)
                 {
-                    consumer.Configuration = EnvironmentConfiguration;
+                    consumer.Configuration = Configuration;
                 }
 
                 await infra.Initialize();
                 
-                if (infra is AsyncConfiguredInfrastructure<TConfig> producer)
+                if (infra is IConfigurable<TConfig> producer)
                 {
-                    EnvironmentConfiguration = producer.Configuration;
+                    Configuration = producer.Configuration;
                 }
             }
         }

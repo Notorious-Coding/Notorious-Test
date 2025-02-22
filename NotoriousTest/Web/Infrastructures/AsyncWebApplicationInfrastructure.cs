@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using NotoriousTest.Common.Configuration;
 using NotoriousTest.Common.Helpers;
 using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Async;
@@ -11,13 +12,15 @@ namespace NotoriousTest.Web.Infrastructures
     {
 
     }
-    public class AsyncWebApplicationInfrastructure<TEntryPoint, TConfig> : AsyncConfiguredInfrastructure<TConfig>
+    public class AsyncWebApplicationInfrastructure<TEntryPoint, TConfig> : AsyncInfrastructure, IConfigurable<TConfig>
         where TEntryPoint : class
         where TConfig : class, new()
     {
         private WebApplicationFactory<TEntryPoint> _webApplicationFactory;
         public HttpClient? HttpClient;
         public override int? Order => 999;
+
+        public TConfig Configuration { get; set; } = new();
 
         public AsyncWebApplicationInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory) : base()
         {
@@ -36,7 +39,7 @@ namespace NotoriousTest.Web.Infrastructures
 
         public override Task Initialize()
         {
-            if(_webApplicationFactory is IConfigurableApplication configurableApplication)
+            if(_webApplicationFactory is IConfigurable configurableApplication)
             {
                 configurableApplication.Configuration = Configuration.ToDictionary();
             }

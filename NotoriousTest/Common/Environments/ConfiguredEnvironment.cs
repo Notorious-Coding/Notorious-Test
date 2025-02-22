@@ -1,4 +1,5 @@
-﻿using NotoriousTest.Common.Helpers;
+﻿using NotoriousTest.Common.Configuration;
+using NotoriousTest.Common.Helpers;
 using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Sync;
 
@@ -8,25 +9,25 @@ namespace NotoriousTest.Common.Environments
     {
     }
 
-    public abstract class ConfiguredEnvironment<TConfig> : Environment
+    public abstract class ConfiguredEnvironment<TConfig> : Environment, IConfigurable<TConfig>
         where TConfig: class, new()
     {
-        public TConfig EnvironmentConfiguration { get; set; } = new();
+        public TConfig Configuration { get; set; } = new();
 
         public override void Initialize()
         {
             foreach(Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
-                if(infra is ConfiguredInfrastructure<TConfig> consumer)
+                if(infra is IConfigurable<TConfig> consumer)
                 {
-                    consumer.Configuration = EnvironmentConfiguration;
+                    consumer.Configuration = Configuration;
                 }
 
                 infra.Initialize();
 
-                if (infra is ConfiguredInfrastructure<TConfig> producer)
+                if (infra is IConfigurable<TConfig> producer)
                 {
-                    EnvironmentConfiguration = producer.Configuration;
+                    Configuration = producer.Configuration;
                 }
             }
         }
