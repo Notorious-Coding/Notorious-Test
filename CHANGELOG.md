@@ -60,3 +60,13 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 ### 🐛 Bug Fixes
 
 - Fixed a bug in **NotoriousTest.SqlServer** where the `SqlServerContainerAsyncInfrastructure` did not changes the database connection to point to the newly created database.
+
+## v3.0.0
+
+### ✨ Features
+
+- `ConfiguredInfrastructure` and `AsyncConfiguredInfrastructure` are replaced with `IConfigurableInfrastructure` interfaces. Every infrastructures can be marked as configurable juste by implementing this interface.
+
+### 🛠 Technical
+
+- Added C4 model architecture schema

@@ -43,7 +43,7 @@ dotnet add package NotoriousTest
 ### Create and populate the database
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure, IConfigurable
     {
         public SqlServerInfrastructure()
         {
