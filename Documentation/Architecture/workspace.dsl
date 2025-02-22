@@ -7,21 +7,14 @@ workspace "Notorious Test Framework" "Software architecture for the Notorious Te
         ntcore = softwareSystem "NotoriousTest Core" "Core of the framework."{
             environments = container "Environments" "Environments are used to manage the lifecycle of infrastructures."{
                 base = component "BaseEnvironment" "Base environment is used to manage the lifecycle of infrastructures."
-                configured = component "ConfiguredEnvironment" "Configured environment handle configuration transit between infrastructures."
-            
+                configured = component "ConfiguredEnvironment" "Configured environment handle configuration transit between configurable infrastructures."
                 web = component "WebEnvironment" "Web Environment manage an API withing infrastructure's lifecycle."
             }
 
             infrastructures = container "Infrastructures" "Infrastructures initialize, reset and dispose a software like databases, message queues, web api, necessary for the tests."{
-
-                group "Base"{
-                    base = component "BaseInfrastructure" "Base infrastructure have the basics feature to initialize, reset and dispose a software."
-                    configured = component "ConfiguredInfrastructure" "Configured infrastructure include configuration generation and consumption."                
-                }
-
-                group "Web"{
-                    web = component "WebApplicationInfrastructure" "Web infrastructure create a inmemory API configured with the environment configuration."
-                }
+                base = component "BaseInfrastructure" "Base infrastructure have the basics feature to initialize, reset and dispose a software."
+                configurable = component "IConfigurableInfrastructure" "Make a base infrastructure able to handle configuration generation and consumption."                
+                web = component "WebApplicationInfrastructure" "Web infrastructure create a inmemory API configured with the environment configuration."
             }
 
             tests = container "Tests" "Tests are used to write the tests."{
@@ -74,20 +67,33 @@ workspace "Notorious Test Framework" "Software architecture for the Notorious Te
 
         // Environments
         ntcore.environments.base -> ntcore.infrastructures.base "Manage lifecycle of"
-        ntcore.environments.configured -> ntcore.infrastructures.configured "Manage lifecycle and transit configuration"
+        ntcore.environments.configured -> ntcore.infrastructures.configurable "Transit configuration to"
         ntcore.environments.web -> ntcore.infrastructures.web "Start API at the end of the test campaign with"
 
-        ntcore.environments.configured -> ntcore.environments.base "Inherit from"
-        ntcore.environments.web -> ntcore.environments.configured "Inherit from"
+        ntcore.environments.configured -> ntcore.environments.base "Inherit from"{
+            tags "Inheritance"
+        }
+        ntcore.environments.web -> ntcore.environments.configured "Inherit from"{
+            tags "Inheritance"
+        }
         
         // Infrastructures
-        ntcore.infrastructures.configured -> ntcore.infrastructures.base "Inherit from"
-        ntsqlserver.infrastructures.sqlserver -> ntcore.infrastructures.configured  "Inherit from"
+        ntcore.infrastructures.base -> ntcore.infrastructures.configurable "Can be marked as"
+        ntsqlserver.infrastructures.sqlserver -> ntcore.infrastructures.base  "Inherit from"{
+            tags "Inheritance"
+        }
+
         ntsqlserver.infrastructures.sqlserver -> respawn "Reset database with"
         ntsqlserver.infrastructures.sqlserver -> nttestcontainers.infrastructures.docker "Start and stop SQL Server with"
-        nttestcontainers.infrastructures.docker -> ntcore.infrastructures.configured "Inherit from"
+        nttestcontainers.infrastructures.docker -> ntcore.infrastructures.configurable "Is marked as"
+        nttestcontainers.infrastructures.docker -> ntcore.infrastructures.base "Inherit from"{
+            tags "Inheritance"
+        }
         nttestcontainers.infrastructures.docker -> testcontainers "Manage docker containers with"
-        ntcore.infrastructures.web -> ntcore.infrastructures.configured "Inherit from"
+        ntcore.infrastructures.web -> ntcore.infrastructures.configurable "Is marked as"
+        ntcore.infrastructures.web -> ntcore.infrastructures.base "Inherit from"{
+            tags "Inheritance"
+        }
         ntcore.infrastructures.web -> ntcore.webapp "Configure and Start API with"
 
         ntcore.webapp -> netcore.webappfactory "Create web application with"
@@ -118,7 +124,7 @@ workspace "Notorious Test Framework" "Software architecture for the Notorious Te
             include ntcore.environments.configured
             include ntcore.environments.web
             include ntcore.infrastructures.base
-            include ntcore.infrastructures.configured
+            include ntcore.infrastructures.configurable
             include ntcore.infrastructures.web
             include nttestcontainers.infrastructures.docker
             include ntcore.tests.integration
@@ -132,20 +138,20 @@ workspace "Notorious Test Framework" "Software architecture for the Notorious Te
         styles {
             element "Element" {
                 color #000000
-                background #ba1e25
+                background #9437ff
             }
             element "Person" {
-                background #9b191f
+                background #9437ff
                 shape person
             }
-            element "Software System" {
-                background #ba1e25
+
+            relationship "Relationship" {
+                dashed false
+                thickness 2
             }
-            element "Container" {
-                background #d9232b
-            }
-            element "Database" {
-                shape cylinder
+            relationship "Inheritance" {
+                dashed true
+                thickness 3
             }
         }
     }
