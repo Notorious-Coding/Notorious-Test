@@ -97,7 +97,7 @@ For now, we’ll define an empty infrastructure to illustrate the setup.
 You can replace `MyInfrastructure` with any real infrastructure later.
 
 ```csharp
-public class MyInfrastructure : AsyncConfiguredInfrastructure
+public class MyInfrastructure : AsyncInfrastructure
 {
     public override Task Initialize()
     {
