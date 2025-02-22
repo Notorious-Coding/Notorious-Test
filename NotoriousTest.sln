@@ -5,10 +5,6 @@ VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest", "NotoriousTest\NotoriousTest.csproj", "{053731D2-ECD8-42F8-8CAA-4AA81F50284E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest.SampleProject", "NotoriousTest.SampleProject\NotoriousTest.SampleProject.csproj", "{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest.SampleProject.Tests", "NotoriousTest.SampleProject.Tests\NotoriousTest.SampleProject.Tests.csproj", "{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{DEE908A6-8A85-4C15-9F67-1EE6B2DD7A71}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\2-core-concepts.md = Documentation\2-core-concepts.md
@@ -19,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{DEE908A6-8
 		CHANGELOG.md = CHANGELOG.md
 		NotoriousTest\LICENSE.txt = NotoriousTest\LICENSE.txt
 		README.md = README.md
+		Documentation\Architecture\workspace.dsl = Documentation\Architecture\workspace.dsl
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotoriousTest.UnitTests", "NotoriousTest.UnitTests\NotoriousTest.UnitTests.csproj", "{7F79448A-2487-4CBF-8879-0D8D45C90E0F}"
@@ -51,14 +48,6 @@ Global
 		{053731D2-ECD8-42F8-8CAA-4AA81F50284E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{053731D2-ECD8-42F8-8CAA-4AA81F50284E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{053731D2-ECD8-42F8-8CAA-4AA81F50284E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7F79448A-2487-4CBF-8879-0D8D45C90E0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7F79448A-2487-4CBF-8879-0D8D45C90E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F79448A-2487-4CBF-8879-0D8D45C90E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -84,8 +73,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A3191AF8-2FF3-4DF4-BBEE-DF4B6C650953} = {62E4D68F-207B-48BF-9349-97ECC046B144}
-		{A3CB1378-5964-4C6C-98A5-BA62C99EDFC1} = {62E4D68F-207B-48BF-9349-97ECC046B144}
 		{7F79448A-2487-4CBF-8879-0D8D45C90E0F} = {AE5B5A5C-13BA-48C8-8216-F5C85DB68D26}
 		{244098E1-23D8-4DB3-82F0-0A0EE3D7F9D1} = {62E4D68F-207B-48BF-9349-97ECC046B144}
 		{9929089A-D40C-486E-94EE-10D870FC1767} = {62E4D68F-207B-48BF-9349-97ECC046B144}
