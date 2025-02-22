@@ -65,7 +65,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 ### ✨ Features
 
-- `ConfiguredInfrastructure` and `AsyncConfiguredInfrastructure` are replaced with `IConfigurableInfrastructure` interfaces. Every infrastructures can be marked as configurable juste by implementing this interface.
+- `ConfiguredInfrastructure` and `AsyncConfiguredInfrastructure` are replaced with `IConfigurableInfrastructure` interfaces. Every infrastructures can be marked as configurable just by implementing this interface.
 
 ### 🛠 Technical
 

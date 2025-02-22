@@ -29,7 +29,7 @@ Here's an example :
 ```csharp
 public class SqlServerContainerInfrastructure : DockerContainerAsyncInfrastructure<MsSqlContainer>
 {
-    public override Container {get; init;} = new MsSqlBuild().Build();
+    public override MsSqlContainer Container {get; init;} = new MsSqlBuild().Build();
 
     public SampleDockerContainer(bool initialize = false) : base(initialize)
     {
