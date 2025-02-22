@@ -341,3 +341,8 @@ healthchecksdb
 
 # Local settings 
 .Local.json
+
+#Structurizr
+
+.structurizr/
+workspace.json
