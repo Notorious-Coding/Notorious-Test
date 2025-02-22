@@ -6,7 +6,7 @@ using Testcontainers.MsSql;
 
 namespace NotoriousTest.SqlServer
 {
-    public class SqlServerContainerAsyncInfrastructure<TConfig> : ConfiguredDockerContainerAsyncInfrastructure<MsSqlContainer, TConfig> where TConfig: new()
+    public class SqlServerContainerAsyncInfrastructure : DockerContainerAsyncInfrastructure<MsSqlContainer>
     {
         public string DbName { get; init; } = "NotoriousDb";
         public RespawnerOptions? RespawnOptions { get; set; } = null;
@@ -87,8 +87,5 @@ namespace NotoriousTest.SqlServer
 
             return connectionString.ToString();
         }
-    }
-    public class SqlServerContainerAsyncInfrastructure : SqlServerContainerAsyncInfrastructure<Dictionary<string, string>>
-    {
     }
 }

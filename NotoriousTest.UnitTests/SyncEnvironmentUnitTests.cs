@@ -3,6 +3,8 @@ using NotoriousTest.Common.Infrastructures.Sync;
 using Environment = NotoriousTest.Common.Environments.Environment;
 using FakeItEasy;
 using NotoriousTest.Common.Infrastructures.Async;
+using NotoriousTest.Common.Configuration;
+
 namespace NotoriousTest.UnitTests
 {
 
@@ -234,11 +236,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructure1 : ConfiguredInfrastructure<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesInfrastructure1 : Infrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesInfrastructure1() : base(false)
             {
             }
+
+            public ConfigurationObjectTestCasesEnvironmentConfiguraton Configuration { get; set; }
 
             public override void Destroy()
             {
@@ -254,11 +258,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructure2 : ConfiguredInfrastructure<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesInfrastructure2 : Infrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesInfrastructure2() : base(false)
             {
             }
+
+            public ConfigurationObjectTestCasesEnvironmentConfiguraton Configuration { get; set; }
 
             public override void Destroy()
             {
@@ -284,8 +290,8 @@ namespace NotoriousTest.UnitTests
             _configurationObjectTestCasesInfrastructure2 = new ConfigurationObjectTestCasesInfrastructure2();
 
             var environment = new ConfigurationObjectTestCasesEnvironment();
-            Assert.Equal("Infra1Key1", environment.EnvironmentConfiguration.Key1);
-            Assert.Equal("Infra2Key2", environment.EnvironmentConfiguration.Key2);
+            Assert.Equal("Infra1Key1", environment.Configuration.Key1);
+            Assert.Equal("Infra2Key2", environment.Configuration.Key2);
         }
 
         #endregion
@@ -306,11 +312,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationDictionaryTestCasesInfrastructure1 : ConfiguredInfrastructure
+        public class ConfigurationDictionaryTestCasesInfrastructure1 : Infrastructure, IConfigurable
         {
             public ConfigurationDictionaryTestCasesInfrastructure1() : base(false)
             {
             }
+
+            public Dictionary<string, string> Configuration { get; set; }
 
             public override void Destroy()
             {
@@ -326,11 +334,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationDictionaryTestCasesInfrastructure2 : ConfiguredInfrastructure
+        public class ConfigurationDictionaryTestCasesInfrastructure2 : Infrastructure, IConfigurable
         {
             public ConfigurationDictionaryTestCasesInfrastructure2() : base(false)
             {
             }
+
+            public Dictionary<string, string> Configuration { get; set; }
 
             public override void Destroy()
             {
@@ -356,8 +366,8 @@ namespace NotoriousTest.UnitTests
             _configurationDictionaryTestCasesInfrastructure2 = new ConfigurationDictionaryTestCasesInfrastructure2();
 
             var environment = new ConfigurationDictionaryTestCasesEnvironment();
-            Assert.Equal("Infra1Key1", environment.EnvironmentConfiguration["Key1"]);
-            Assert.Equal("Infra2Key2", environment.EnvironmentConfiguration["Key2"]);
+            Assert.Equal("Infra1Key1", environment.Configuration["Key1"]);
+            Assert.Equal("Infra2Key2", environment.Configuration["Key2"]);
         }
 
         #endregion

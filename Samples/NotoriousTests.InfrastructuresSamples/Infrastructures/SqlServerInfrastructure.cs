@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using NotoriousTest.Common.Configuration;
 using NotoriousTest.SqlServer;
 using NotoriousTest.TestContainers;
 using Respawn;
@@ -7,8 +8,10 @@ using Testcontainers.MsSql;
 
 namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 {
-    public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+    public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure, IConfigurable
     {
+        public Dictionary<string, string> Configuration { get; set; }
+
         public SqlServerInfrastructure()
         {
         }
