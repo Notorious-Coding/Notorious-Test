@@ -7,6 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotoriousTest", "NotoriousT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{DEE908A6-8A85-4C15-9F67-1EE6B2DD7A71}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Documentation\2-core-concepts.md = Documentation\2-core-concepts.md
 		Documentation\3-advanced-features.md = Documentation\3-advanced-features.md
 		Documentation\4-integrations.md = Documentation\4-integrations.md
