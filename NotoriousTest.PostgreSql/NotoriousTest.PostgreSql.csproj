@@ -15,15 +15,21 @@
 		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Npgsql" Version="9.0.3" />
-    <PackageReference Include="Respawn" Version="6.2.1" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="4.7.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\icon.png" Pack="true" PackagePath="" Visible="False" />
+		<None Include="..\README.md" Pack="true" PackagePath="" Visible="False" />
+		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
-    <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Npgsql" Version="9.0.3" />
+		<PackageReference Include="Respawn" Version="6.2.1" />
+		<PackageReference Include="Testcontainers.PostgreSql" Version="4.7.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+		<ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
+	</ItemGroup>
 
 </Project>
