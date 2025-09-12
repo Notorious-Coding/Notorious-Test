@@ -25,13 +25,13 @@ public class PostgreContainerAsyncInfrastructure : DockerContainerAsyncInfrastru
     }
 
     /// <summary>
-    /// Returns a SQL Server connection connected to the current infrastructure's database.
+    /// Returns a PostgreSQL connection connected to the current infrastructure's database.
     /// </summary>
-    /// <returns>A SqlConnection instance connected to the current infrastructure's database.</returns>
+    /// <returns>A NpgsqlConnection instance connected to the current infrastructure's database.</returns>
     public NpgsqlConnection GetDatabaseConnection() => new NpgsqlConnection(GetConnectionString(FullDbName));
 
     /// <summary>
-    /// Returns a SQL Server connection string pointing to the current infrastructure's database.
+    /// Returns a PostgreSQL connection string pointing to the current infrastructure's database.
     /// </summary>
     /// <returns>A SqlConnection instance pointing to the current infrastructure's database.</returns>
     public string GetDatabaseConnectionString() => GetConnectionString(FullDbName);
@@ -55,7 +55,7 @@ public class PostgreContainerAsyncInfrastructure : DockerContainerAsyncInfrastru
     /// <summary>
     /// Called after the database is created. Override this method to populate the database with data.
     /// </summary>
-    /// <param name="connection">A SqlConnection pointing on the newly created database</param>
+    /// <param name="connection">A NpgsqlConnection pointing on the newly created database</param>
     protected virtual Task PopulateDatabase(NpgsqlConnection connection)
     {
         return Task.CompletedTask;

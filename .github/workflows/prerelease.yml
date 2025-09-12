@@ -15,7 +15,7 @@ jobs:
   publish:
     env: 
       CONFIGURATION: 'Release'
-      DOTNET_VERSION: '6.0'
+      DOTNET_VERSION: '9.0'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
