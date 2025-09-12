@@ -1,7 +1,7 @@
 using FakeItEasy;
+
 using NotoriousTest.Common.Configuration;
 using NotoriousTest.Common.Environments;
-using NotoriousTest.Common.Infrastructures;
 using NotoriousTest.Common.Infrastructures.Async;
 
 namespace NotoriousTest.UnitTests
@@ -45,7 +45,7 @@ namespace NotoriousTest.UnitTests
             _uniqueInfrastructureTestCasesInfrastructure = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
             var environment = new UniqueInfrastructureTestCasesEnvironment();
             await environment.InitializeAsync();
-            UniqueInfrastructureTestCasesInfrastructure infra = await environment.GetInfrastructureAsync<UniqueInfrastructureTestCasesInfrastructure>();
+            UniqueInfrastructureTestCasesInfrastructure infra = environment.GetInfrastructure<UniqueInfrastructureTestCasesInfrastructure>();
 
             Assert.NotNull(infra);
             Assert.Equal(environment.EnvironmentId, infra.ContextId);
