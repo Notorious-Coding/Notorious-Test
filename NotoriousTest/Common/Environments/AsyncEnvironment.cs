@@ -1,5 +1,6 @@
 ﻿using NotoriousTest.Common.Exceptions;
 using NotoriousTest.Common.Infrastructures.Async;
+
 using Xunit;
 
 namespace NotoriousTest.Common.Environments
@@ -35,20 +36,20 @@ namespace NotoriousTest.Common.Environments
         /// </summary>
         public abstract Task ConfigureEnvironmentAsync();
 
-       
+
         /// <summary>
         /// Get an infrastructure within environment.
         /// </summary>
         /// <typeparam name="T">Infrastructure type</typeparam>
         /// <returns>Infrastructure of type <typeparamref name="T"/></returns>
         /// <exception cref="InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
-        public Task<T> GetInfrastructureAsync<T>() where T : AsyncInfrastructure
+        public T GetInfrastructure<T>() where T : AsyncInfrastructure
         {
             T? infrastructure = Infrastructures.OfType<T>().FirstOrDefault();
 
             if (infrastructure == null) throw new InfrastructureNotFoundException($"L'infrastructure persistante de type {typeof(T)} n'éxiste pas, veuillez vérififer la méthode ${nameof(ConfigureEnvironmentAsync)}");
 
-            return Task.FromResult(infrastructure);
+            return infrastructure;
         }
 
         /// <summary>
@@ -58,9 +59,9 @@ namespace NotoriousTest.Common.Environments
         public Task<AsyncEnvironment> AddInfrastructure(AsyncInfrastructure infrastructure)
         {
             infrastructure.ContextId = EnvironmentId;
-            Infrastructures.Add(infrastructure); 
+            Infrastructures.Add(infrastructure);
             return Task.FromResult(this);
-        } 
+        }
 
         public virtual async Task Initialize()
         {

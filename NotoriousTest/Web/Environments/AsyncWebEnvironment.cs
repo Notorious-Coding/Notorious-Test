@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+
 using NotoriousTest.Common.Environments;
 using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
@@ -30,9 +31,9 @@ namespace NotoriousTest.Web.Environments
             return Task.CompletedTask;
         }
 
-        public Task<AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>> GetWebApplication()
+        public AsyncWebApplicationInfrastructure<TEntryPoint, TConfig> GetWebApplication()
         {
-            return GetInfrastructureAsync<AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>>();
+            return GetInfrastructure<AsyncWebApplicationInfrastructure<TEntryPoint, TConfig>>();
         }
     }
 }

@@ -59,7 +59,7 @@ namespace NotoriousTest.Common.Environments
         {
             foreach (Infrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
-                if(infrastructure.AutoReset) infrastructure.Reset();
+                if (infrastructure.AutoReset) infrastructure.Reset();
             }
         }
 

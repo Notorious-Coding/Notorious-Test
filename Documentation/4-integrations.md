@@ -193,3 +193,157 @@ You can override `NotoriousDb` by your custom name by setting the property `DbNa
         }
     }
 ```
+
+
+### PostgreSQL
+
+#### Initialization
+
+**NotoriousTest.PostgreSql** is now available as a separate package.
+
+Install [NotoriousTest.PostgreSql](https://www.nuget.org/packages/NotoriousTest.PostgreSql/) from the package manager console:
+
+```
+PM> Install-Package NotoriousTest.PostgreSql
+```
+
+Or from the .NET CLI as:
+
+```
+dotnet add package NotoriousTest.PostgreSql
+```
+
+You can now simply use the SqlServerContainerAsyncInfrastructure to start a SQL Server database.
+
+It will automatically start at the beginning of the test campaign, stop at the end, and reset between each test, powered by TestContainers and Respawn.
+
+Here's an example:
+
+```csharp
+   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure
+    {
+        public PostgreSqlInfrastructure()
+        {
+        }
+    }
+```
+
+This infrastructure performs several tasks:
+
+- **On initialization:**
+  - Starts a PostgreSql Docker container, powered by TestContainers.
+  - Creates a unique database.
+- **On reset:**
+  - Empties the database, powered by Respawn.
+- **On destruction:**
+  - Stops the container.
+
+#### Test Usage
+
+The infrastructure provides two methods:
+
+- **`GetDatabaseConnection`** – Returns a `NpgsqlConnection` pointing to the newly created database for your test.
+- **`GetDatabaseConnectionString`** – Returns a connection string pointing to the newly created database for your test.
+
+```csharp
+[Fact]
+public async Task Test1()
+{
+    PostgreSqlInfrastructure postgreInfrastructure = await CurrentEnvironment.GetInfrastructure<PostgreSqlInfrastructure>();
+    await using(NpgsqlConnection sql = postgreInfrastructure.GetDatabaseConnection())
+    {
+        // Arrange your database here.
+    }
+}
+```
+
+#### Populating the database
+
+You can populate the database by overriding the `PopulateDatabase` method :
+
+```csharp
+   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure
+    {
+        public PostgreSqlInfrastructure()
+        {
+        }
+
+        protected override async Task PopulateDatabase(NpgsqlConnection connection)
+        {
+            // Play all your migrations script here, use DBUp or any other migration tool
+            await CreateTables(connection);
+        }
+    }
+```
+
+#### Generating configuration
+
+You can generate configuration for your web application by overriding the `Initialize` method :
+
+```csharp
+   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure, IConfigurable
+    {
+        public PostgreSqlInfrastructure()
+        {
+        }
+
+        public override async Task Initialize()
+        {
+            await base.Initialize();
+            // We can add the connection string to the configuration.
+            Configuration.Add("ConnectionStrings:PostgreSql", GetDatabaseConnectionString());
+        }
+    }
+```
+
+#### Configure the container
+
+You can configure the container by overriding the `ConfigureSqlContainer` method :
+
+```csharp
+   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure
+    {
+        public PostgreSqlInfrastructure()
+        {
+        }
+
+        protected override PostgreSqlBuilder ConfigureSqlContainer(PostgreSqlBuilder builder)
+        {
+            // Configure the builder to override image, host, password, port, etc.
+            return builder.WithPassword("NotoriousStrong(!)Password6");
+        }
+    }
+```
+
+#### Configure respawn settings
+
+To configure respawn settings, you can assign RespawnOptions property. They will be used by respawn to reset the database.
+
+```csharp
+   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure
+    {
+        public PostgreSqlInfrastructure()
+        {
+            RespawnOptions = new RespawnerOptions
+            {
+                TablesToIgnore = new Table[] { "MyMigrationTable" },
+                DbAdapter = DbAdapter.Postgres // Remind to set DB Adapter to Postgre.
+            };
+        }
+    }
+```
+
+#### Configure the database name
+
+By default, Database name will be `NotoriousDb` concatened with the `ContextId`.
+You can override `NotoriousDb` by your custom name by setting the property `DbName`.
+
+```csharp
+   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure
+    {
+        public SqlServerInfrastructure()
+        {
+            DbName = "TestDb";
+        }
+    }
+```
