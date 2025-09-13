@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
-		<Description>A SqlServer integration with NotoriousTest.</Description>
-		<PackageId>NotoriousTest.SqlServer</PackageId>
+		<Description>A PostgreSql integration with NotoriousTest.</Description>
+		<PackageId>NotoriousTest.PostgreSql</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<VersionPrefix>3.0.0</VersionPrefix>
@@ -21,13 +21,15 @@
 		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
 	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Respawn" Version="6.2.1" />
-    <PackageReference Include="Testcontainers.MsSql" Version="4.1.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Npgsql" Version="9.0.3" />
+		<PackageReference Include="Respawn" Version="6.2.1" />
+		<PackageReference Include="Testcontainers.PostgreSql" Version="4.7.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+		<ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
+	</ItemGroup>
 
 </Project>
