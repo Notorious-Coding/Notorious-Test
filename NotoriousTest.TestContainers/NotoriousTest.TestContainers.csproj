@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
 		<Description>A TestContainers integration with NotoriousTest.</Description>
 		<PackageId>NotoriousTest.TestContainers</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>

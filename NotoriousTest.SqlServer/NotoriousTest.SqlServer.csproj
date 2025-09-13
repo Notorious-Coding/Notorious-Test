@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
 		<Description>A SqlServer integration with NotoriousTest.</Description>
 		<PackageId>NotoriousTest.SqlServer</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
