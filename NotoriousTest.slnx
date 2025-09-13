@@ -1,0 +1,28 @@
+<Solution>
+  <Folder Name="/CI/">
+    <File Path=".github/workflows/prerelease.yml" />
+    <File Path=".github/workflows/release.yml" />
+  </Folder>
+  <Folder Name="/Docs/">
+    <File Path=".gitignore" />
+    <File Path="CHANGELOG.md" />
+    <File Path="Documentation/2-core-concepts.md" />
+    <File Path="Documentation/3-advanced-features.md" />
+    <File Path="Documentation/4-integrations.md" />
+    <File Path="Documentation/5-example.md" />
+    <File Path="Documentation/Architecture/workspace.dsl" />
+    <File Path="NotoriousTest/LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/LiveTest/">
+    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
+    <Project Path="Samples/NotoriousTests.InfrastructuresSamples/NotoriousTests.InfrastructuresSamples.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
+  </Folder>
+  <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj" />
+  <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj" />
+  <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
+  <Project Path="NotoriousTest/NotoriousTest.csproj" />
+</Solution>

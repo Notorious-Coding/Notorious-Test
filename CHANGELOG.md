@@ -70,3 +70,14 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 ### 🛠 Technical
 
 - Added C4 model architecture schema
+
+## 3.1.0 
+
+### ✨ Features
+
+- Added PostgreSql integration
+
+### 🛠 Technical
+
+- `GetInfrastructuresAsync` in AsyncEnvironment is no longer Async
+- Migrate to slnx
