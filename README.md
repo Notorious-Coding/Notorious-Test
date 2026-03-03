@@ -1,5 +1,8 @@
 ## ![Logo](./Documentation/Images/NotoriousTest.png)
 
+
+__Clean, isolated, and maintainable integration testing for .NET__
+
 [![NuGet](https://img.shields.io/nuget/v/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
 [![License](https://img.shields.io/github/license/Notorious-Coding/Notorious-Test)](https://github.com/Notorious-Coding/Notorious-Test/blob/master/LICENSE.txt)
@@ -7,15 +10,10 @@
 [![Build Status](https://github.com/Notorious-Coding/Notorious-Test/actions/workflows/release.yml/badge.svg)](https://github.com/Notorious-Coding/Notorious-Test/actions/workflows/release.yml)
 [![GitHub stars](https://img.shields.io/github/stars/Notorious-Coding/Notorious-Test?style=social)](https://github.com/Notorious-Coding/Notorious-Test/stargazers)
 
-Clean, isolated, and maintainable integration testing for .NET
-
 If you plan to use this NuGet package, let me know in the [Tell me if you use that package !](https://github.com/Notorious-Coding/Notorious-Test/discussions/1) discussion on Github ! Gaining insight into its usage is very important to me!
 
 ## Summary
-
-- [The problem with integration testing in .NET](#-the-problem-with-integration-testing-in-net)
-- [NotoriousTest: The solution](#-notorioustest-the-solution)
-- [Why use NotoriousTest](#why-use-notorious-test)
+- [Purpose](#purpose)
 - [Hello World](#hello-word)
 - [Resources & Community](#resources--community)
   - [Documentation](#documentation)
@@ -23,55 +21,20 @@ If you plan to use this NuGet package, let me know in the [Tell me if you use th
   - [Contact](#contact)
 - [Other packages i'm working on](#other-nugets-im-working-on)
 
-## 🚨 The problem with integration testing in .NET
+## Purpose
 
-When testing an application that relies on multiple infrastructures (databases, message buses, blob storage, FTP, SMTP...), the common approach looks like this:
+Have you ever had to write and rewrite boilerplate code to set up a database, reset data between each test, or tear down containers?
+All that setup required to keep your integration tests fully isolated, and ensure their maintainability, reproducibility, and efficiency.
 
-- Create a **WebApplicationFactory** and use it as a fixture.
-- Implement `IAsyncLifetime` to initialize and dispose of infrastructures.
-- Manage each infrastructure (SQL Server, RabbitMQ, Redis, MongoDB, etc.) within `Initialize` and Dispose.
-- Add specific setup code inside the test constructors.
+**NotoriousTests** removes the need to build all of that yourself.
 
-👉 This works for small projects, but as complexity increases, it becomes a nightmare:
+The concept is simple:
 
-🔥 The **`WebApplicationFactory`** turns into an unmanageable beast.\
-🔄 Everything needs to be manually refactored and structured → resulting in messy, hard-to-maintain code. \
-🏗️ Tests become slow to write and complex to maintain. \
-⏳ Setup time skyrockets, reducing productivity.
+1. Create an **infrastructure** and implement its _initialization_, _reset_, and _destruction_ logic.
+2. Add it to an **environment**.
+3. Access it directly from your **integration tests**.
 
-And that’s the real problem—**integration tests are meant to ensure the quality of our code**. But if they themselves become unmanageable, **the enemy of our enemy becomes our enemy**.
-
-## 🚀 **NotoriousTest: The solution**
-
-NotoriousTest introduces a modular and structured approach to isolating and managing your test infrastructures effortlessly.
-
-✅ Each infrastructure (database, message bus, etc.) is encapsulated in its own class with a proper lifecycle (Init, Reset, Destroy). \
-✅ Test environments are composable → you assemble infrastructures like Lego blocks. \
-✅ Automatic reset between tests ensures proper isolation. \
-✅ No need to bloat your WebApplicationFactory → each infrastructure is cleanly defined. \
-✅ Works seamlessly with TestContainers, SQL Server, and more.
-
-👉 The result? A testing framework that is clean, modular, maintainable, and scalable.
-
-## Why use NotoriousTest
-
-🔹 **Designed for complex integration tests** \
-Seamlessly manage multiple infrastructures like databases, message buses, blob storage, and more, without turning your test setup into a nightmare.
-
-**🔹 Fully isolated and resettable environments** \
-Ensure clean, independent tests by automatically resetting infrastructures between each run—no leftover data, no hidden side effects.
-
-**🔹 Modular & reusable infrastructure components** \
-Define each infrastructure separately and compose test environments like Lego blocks. No more bloated WebApplicationFactories!
-
-**🔹 Effortless setup & minimal boilerplate** \
-Forget complex test initialization logic—NotoriousTest takes care of instantiating, resetting, and destroying your infrastructures automatically.
-
-**🔹 Compatible with TestContainers & SQL Server** \
-Seamlessly integrates with Dockerized test environments, allowing you to spin up databases, message queues, and more in seconds.
-
-**🔹 Powered by XUnit & Async Support** \
-Leverage the flexibility of XUnit’s dependency injection and fully async infrastructure lifecycles for faster and more scalable tests.
+**NotoriousTests** will automatically manage the **lifecycle of your infrastructures.**
 
 ## Hello World
 
