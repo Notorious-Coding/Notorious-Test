@@ -25,6 +25,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+	  <ProjectReference Include="..\..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest\NotoriousTest.csproj" />
 	  <ProjectReference Include="..\NotoriousTests.InfrastructuresSamples.TestWebApp\NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
 	</ItemGroup>
@@ -32,6 +33,9 @@
 	<ItemGroup>
 	  <None Update="Tables.sql">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	  <None Update="tests.appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 

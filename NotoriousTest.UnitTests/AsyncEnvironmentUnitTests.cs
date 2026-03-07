@@ -1,8 +1,8 @@
 using FakeItEasy;
 
-using NotoriousTest.Common.Configuration;
-using NotoriousTest.Common.Environments;
-using NotoriousTest.Common.Infrastructures.Async;
+using NotoriousTest.Configuration;
+using NotoriousTest.Environments;
+using NotoriousTest.Infrastructures.Async;
 
 namespace NotoriousTest.UnitTests
 {
@@ -251,13 +251,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructure1 : AsyncInfrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesInfrastructure1 : AsyncInfrastructure, IConfigurableInfrastructure<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesInfrastructure1() : base(false)
             {
             }
 
-            public ConfigurationObjectTestCasesEnvironmentConfiguraton Configuration { get; set; }
+            public ConfigurationObjectTestCasesEnvironmentConfiguraton OutputConfiguration { get; set; }
 
             public override Task Destroy()
             {
@@ -266,7 +266,7 @@ namespace NotoriousTest.UnitTests
 
             public override Task Initialize()
             {
-                Configuration.Key1 = "Infra1Key1";
+                OutputConfiguration.Key1 = "Infra1Key1";
 
                 return Task.CompletedTask;
             }
@@ -277,13 +277,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructure2 : AsyncInfrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesInfrastructure2 : AsyncInfrastructure, IConfigurableInfrastructure<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesInfrastructure2() : base(false)
             {
             }
 
-            public ConfigurationObjectTestCasesEnvironmentConfiguraton Configuration { get; set; }
+            public ConfigurationObjectTestCasesEnvironmentConfiguraton OutputConfiguration { get; set; }
 
             public override Task Destroy()
             {
@@ -292,7 +292,7 @@ namespace NotoriousTest.UnitTests
 
             public override Task Initialize()
             {
-                Configuration.Key2 = "Infra2Key2";
+                OutputConfiguration.Key2 = "Infra2Key2";
 
                 return Task.CompletedTask;
             }
@@ -314,8 +314,8 @@ namespace NotoriousTest.UnitTests
 
             var environment = new ConfigurationObjectTestCasesEnvironment();
             await environment.InitializeAsync();
-            Assert.Equal("Infra1Key1", environment.Configuration.Key1);
-            Assert.Equal("Infra2Key2", environment.Configuration.Key2);
+            Assert.Equal("Infra1Key1", environment.OutputConfiguration.Key1);
+            Assert.Equal("Infra2Key2", environment.OutputConfiguration.Key2);
         }
 
         #endregion
@@ -337,13 +337,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationDictionaryTestCasesInfrastructure1 : AsyncInfrastructure, IConfigurable
+        public class ConfigurationDictionaryTestCasesInfrastructure1 : AsyncInfrastructure, IDictionaryConfigurableInfrastructure
         {
             public ConfigurationDictionaryTestCasesInfrastructure1() : base(false)
             {
             }
 
-            public Dictionary<string, string> Configuration { get; set; }
+            public Dictionary<string, string> OutputConfiguration { get; set; }
 
             public override Task Destroy()
             {
@@ -352,7 +352,7 @@ namespace NotoriousTest.UnitTests
 
             public override Task Initialize()
             {
-                Configuration.Add("Key1", "Infra1Key1");
+                OutputConfiguration.Add("Key1", "Infra1Key1");
 
                 return Task.CompletedTask;
             }
@@ -363,13 +363,13 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationDictionaryTestCasesInfrastructure2 : AsyncInfrastructure, IConfigurable
+        public class ConfigurationDictionaryTestCasesInfrastructure2 : AsyncInfrastructure, IDictionaryConfigurableInfrastructure
         {
             public ConfigurationDictionaryTestCasesInfrastructure2() : base(false)
             {
             }
 
-            public Dictionary<string, string> Configuration { get; set; }
+            public Dictionary<string, string> OutputConfiguration { get; set; }
 
             public override Task Destroy()
             {
@@ -378,7 +378,7 @@ namespace NotoriousTest.UnitTests
 
             public override Task Initialize()
             {
-                Configuration.Add("Key2", "Infra2Key2");
+                OutputConfiguration.Add("Key2", "Infra2Key2");
 
                 return Task.CompletedTask;
             }
@@ -400,8 +400,8 @@ namespace NotoriousTest.UnitTests
 
             var environment = new ConfigurationDictionaryTestCasesEnvironment();
             await environment.InitializeAsync();
-            Assert.Equal("Infra1Key1", environment.Configuration["Key1"]);
-            Assert.Equal("Infra2Key2", environment.Configuration["Key2"]);
+            Assert.Equal("Infra1Key1", environment.OutputConfiguration["Key1"]);
+            Assert.Equal("Infra2Key2", environment.OutputConfiguration["Key2"]);
         }
 
         #endregion

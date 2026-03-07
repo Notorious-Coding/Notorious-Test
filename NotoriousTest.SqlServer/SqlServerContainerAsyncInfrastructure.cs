@@ -1,7 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
+
 using NotoriousTest.TestContainers;
+
 using Respawn;
-using System.Xml.Linq;
+
 using Testcontainers.MsSql;
 
 namespace NotoriousTest.SqlServer

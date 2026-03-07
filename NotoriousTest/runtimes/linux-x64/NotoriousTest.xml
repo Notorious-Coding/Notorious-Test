@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NotoriousTest</name>
+    </assembly>
+    <members>
+        <member name="T:NotoriousTest.Configuration.IConfigurable`1">
+            <summary>
+            Make a class able to produce or consume configuration
+            </summary>
+            <typeparam name="T">Configuration type.</typeparam>
+        </member>
+        <member name="P:NotoriousTest.Configuration.IConfigurable`1.Configuration">
+            <summary>
+            Gets or sets the configuration.
+            </summary>
+            <value>
+            The configuration.
+            </value>
+        </member>
+        <member name="T:NotoriousTest.Configuration.IConfigurable">
+            <inheritdoc/>
+        </member>
+        <member name="M:NotoriousTest.Environments.AsyncEnvironment.InitializeAsync">
+            <summary>
+            Initialize environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+            </summary>
+        </member>
+        <member name="M:NotoriousTest.Environments.AsyncEnvironment.DisposeAsync">
+            <summary>
+            Destroy environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+            </summary>
+        </member>
+        <member name="M:NotoriousTest.Environments.AsyncEnvironment.ConfigureEnvironmentAsync">
+            <summary>
+            Configure environment with infrastructures. Called before environment initialization.
+            </summary>
+        </member>
+        <member name="M:NotoriousTest.Environments.AsyncEnvironment.GetInfrastructure``1">
+            <summary>
+            Get an infrastructure within environment.
+            </summary>
+            <typeparam name="T">Infrastructure type</typeparam>
+            <returns>Infrastructure of type <typeparamref name="T"/></returns>
+            <exception cref="T:NotoriousTest.Exceptions.InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
+        </member>
+        <member name="M:NotoriousTest.Environments.AsyncEnvironment.AddInfrastructure(NotoriousTest.Infrastructures.Async.AsyncInfrastructure)">
+            <summary>
+            Add an infrastructure within environment.
+            </summary>
+            <param name="infrastructure"></param>
+        </member>
+        <member name="M:NotoriousTest.Environments.Environment.ConfigureEnvironment">
+            <summary>
+            Configure environment with infrastructures. Called before environment initialization.
+            </summary>
+        </member>
+        <member name="M:NotoriousTest.Environments.Environment.AddInfrastructure(NotoriousTest.Infrastructures.Sync.Infrastructure)">
+            <summary>
+            Add an infrastructure within environment.
+            </summary>
+            <param name="infrastructure"></param>
+        </member>
+        <member name="M:NotoriousTest.Environments.Environment.GetInfrastructure``1">
+            <summary>
+            Get an infrastructure within environment.
+            </summary>
+            <typeparam name="T">Infrastructure type</typeparam>
+            <returns>Infrastructure of type <typeparamref name="T"/></returns>
+            <exception cref="T:NotoriousTest.Exceptions.InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
+        </member>
+        <member name="M:NotoriousTest.Environments.Environment.Dispose">
+            <summary>
+            Destroy every created infrastructure. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+            </summary>
+        </member>
+        <member name="T:NotoriousTest.Infrastructures.Async.AsyncInfrastructure">
+            <summary>
+            AsyncInfrastructure is a base class to define a test infrastructure.
+            </summary>
+        </member>
+        <member name="M:NotoriousTest.Infrastructures.Async.AsyncInfrastructure.InitializeAsync">
+            <summary>
+            Called by xunit
+            </summary>
+        </member>
+        <member name="P:NotoriousTest.Infrastructures.Common.IInfrastructure.Order">
+            <summary>
+            Allows defining the order in which the infrastructure will be executed within the environment.
+            </summary>
+        </member>
+        <member name="P:NotoriousTest.Infrastructures.Common.IInfrastructure.AutoReset">
+            <summary>
+            AutoReset is a flag to reset the infrastructure after each test. Default is true.
+            </summary>
+        </member>
+        <member name="P:NotoriousTest.Infrastructures.Common.IInfrastructure.ContextId">
+            <summary>
+            ContextId is an identfier of the current infrastructure context.
+            In standalone mode : ContextId is a unique identifier scoped for the infrastructure.
+            Withing an environment : ContextId is provided by the environment when the infrastructure is added.
+            </summary>
+        </member>
+        <member name="T:NotoriousTest.Infrastructures.Sync.Infrastructure">
+            <summary>
+            Infrastructure is a base class to define a test infrastructure.
+            </summary>
+        </member>
+    </members>
+</doc>

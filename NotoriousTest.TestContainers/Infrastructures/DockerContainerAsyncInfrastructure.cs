@@ -1,7 +1,6 @@
 ﻿using DotNet.Testcontainers.Containers;
-using Microsoft.Extensions.Configuration;
-using NotoriousTest.Common.Infrastructures.Async;
-using NotoriousTest.Common.Infrastructures.Common;
+
+using NotoriousTest.Infrastructures.Async;
 
 namespace NotoriousTest.TestContainers
 {

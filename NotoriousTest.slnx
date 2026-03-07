@@ -21,8 +21,10 @@
   <Folder Name="/Tests/">
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
+  <Project Path="NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj" Id="fbd991eb-4e89-4ed5-b50c-9172507c8ada" />
   <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj" />
   <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj" />
   <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
+  <Project Path="NotoriousTest.Web/NotoriousTest.Web.csproj" Id="36963c50-5eb5-4464-b380-b842b51692c0" />
   <Project Path="NotoriousTest/NotoriousTest.csproj" />
 </Solution>

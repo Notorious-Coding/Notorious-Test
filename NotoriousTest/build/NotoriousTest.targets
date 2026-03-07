@@ -1,0 +1,18 @@
+<Project>
+  <Target Name="CopyNotoriousWatchdog" AfterTargets="Build">
+    <PropertyGroup>
+      <WatchdogFile Condition="$([MSBuild]::IsOSPlatform('Windows'))">NotoriousTest.DoggyDog.exe</WatchdogFile>
+      <WatchdogFile Condition="!$([MSBuild]::IsOSPlatform('Windows'))">NotoriousTest.DoggyDog</WatchdogFile>
+      <WatchdogRID Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</WatchdogRID>
+      <WatchdogRID Condition="!$([MSBuild]::IsOSPlatform('Windows'))">linux-x64</WatchdogRID>
+    </PropertyGroup>
+
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)../runtimes/$(WatchdogRID)/$(TargetFramework)/$(WatchdogFile)"
+          DestinationFolder="$(OutputPath)"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(MSBuildThisFileDirectory)../runtimes/$(WatchdogRID)/$(TargetFramework)/$(WatchdogFile)')" />
+
+    <Warning Condition="!Exists('$(MSBuildThisFileDirectory)../runtimes/$(WatchdogRID)/$(TargetFramework)/$(WatchdogFile)')"
+             Text="NotoriousTest: watchdog not found for $(WatchdogRID)/$(TargetFramework). CleanUp on kill will not be available." />
+  </Target>
+</Project>
