@@ -27,12 +27,12 @@ namespace NotoriousTest.Infrastructures
         /// <summary>
         /// Called by xunit
         /// </summary>
-        public async Task InitializeAsync()
+        public async ValueTask InitializeAsync()
         {
             if (_initialize) await Initialize();
         }
 
-        public async Task DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
             await Destroy();
         }

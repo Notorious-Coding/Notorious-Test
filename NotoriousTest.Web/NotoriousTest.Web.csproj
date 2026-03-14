@@ -15,7 +15,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="xunit" Version="2.5.0" />
+		<PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
@@ -37,6 +37,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
 	  <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
 	</ItemGroup>
 </Project>

@@ -12,12 +12,11 @@ namespace NotoriousTest
             CurrentEnvironment = environment;
         }
 
-        public Task InitializeAsync()
+        public async ValueTask InitializeAsync()
         {
-            return Task.CompletedTask;
         }
 
-        public async Task DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
             await CurrentEnvironment.Reset();
         }

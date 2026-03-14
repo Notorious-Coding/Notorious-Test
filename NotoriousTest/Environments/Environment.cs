@@ -16,7 +16,7 @@ namespace NotoriousTest.Environments
         /// <summary>
         /// Initialize environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
         /// </summary>
-        public async Task InitializeAsync()
+        public async ValueTask InitializeAsync()
         {
             await ConfigureEnvironment();
             await Initialize();
@@ -25,7 +25,7 @@ namespace NotoriousTest.Environments
         /// <summary>
         /// Destroy environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
         /// </summary>
-        public async Task DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
             await Destroy();
         }
