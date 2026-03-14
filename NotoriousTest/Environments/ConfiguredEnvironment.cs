@@ -1,7 +1,7 @@
-﻿using NotoriousTest.Common.Configuration;
-using NotoriousTest.Common.Infrastructures;
+﻿using NotoriousTest.Configuration;
+using NotoriousTest.Infrastructures;
 
-namespace NotoriousTest.Common.Environments
+namespace NotoriousTest.Environments
 {
     public abstract class ConfiguredEnvironment : ConfiguredEnvironment<Dictionary<string, string>>
     {

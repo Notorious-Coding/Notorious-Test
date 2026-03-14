@@ -1,4 +1,4 @@
-﻿namespace NotoriousTest.Common.Infrastructures
+﻿namespace NotoriousTest.Infrastructures
 {
     public interface IInfrastructure
     {

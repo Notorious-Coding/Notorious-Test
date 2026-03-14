@@ -1,8 +1,8 @@
 using FakeItEasy;
 
-using NotoriousTest.Common.Configuration;
-using NotoriousTest.Common.Environments;
-using NotoriousTest.Common.Infrastructures;
+using NotoriousTest.Configuration;
+using NotoriousTest.Environments;
+using NotoriousTest.Infrastructures;
 
 namespace NotoriousTest.UnitTests
 {
@@ -13,7 +13,7 @@ namespace NotoriousTest.UnitTests
         #region Unique Infrastructure Test Cases Setup
         static UniqueInfrastructureTestCasesInfrastructure _uniqueInfrastructureTestCasesInfrastructure;
 
-        public class UniqueInfrastructureTestCasesEnvironment : Common.Environments.Environment
+        public class UniqueInfrastructureTestCasesEnvironment : Environments.Environment
         {
 
             public UniqueInfrastructureTestCasesEnvironment()
@@ -101,7 +101,7 @@ namespace NotoriousTest.UnitTests
         static MultipleInfrastructureTestCasesInfrastructure1 _multipleInfrastructureTestCasesInfrastructure1;
         static MultipleInfrastructureTestCasesInfrastructure2 _multipleInfrastructureTestCasesInfrastructure2;
 
-        public class MultipleInfrastructureTestCasesEnvironment : Common.Environments.Environment
+        public class MultipleInfrastructureTestCasesEnvironment : Environments.Environment
         {
 
             public MultipleInfrastructureTestCasesEnvironment()

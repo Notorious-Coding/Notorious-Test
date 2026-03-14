@@ -85,6 +85,8 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 ## 4.0.0
 
-### Features
+### 🛠 Technical
 
 - Synchronous classes are no longer available, all async classes have been renamed.
+- .NET 6 is no longer supported.
+- NotoriousTest is now in .net standard 2.1, web support has been moved to NotoriousTest.Web

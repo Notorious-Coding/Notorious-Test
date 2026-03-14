@@ -1,4 +1,4 @@
-﻿namespace NotoriousTest.Common.Configuration
+﻿namespace NotoriousTest.Configuration
 {
     /// <summary>
     /// Make a class able to produce or consume configuration

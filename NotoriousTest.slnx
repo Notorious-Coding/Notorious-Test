@@ -24,5 +24,6 @@
   <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj" />
   <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj" />
   <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
+  <Project Path="NotoriousTest.Web/NotoriousTest.Web.csproj" Id="5a2ebcfc-d429-4f2a-be6c-c7680a4ee8b7" />
   <Project Path="NotoriousTest/NotoriousTest.csproj" />
 </Solution>
