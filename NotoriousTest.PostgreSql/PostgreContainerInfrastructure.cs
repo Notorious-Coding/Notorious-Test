@@ -9,7 +9,7 @@ using Testcontainers.PostgreSql;
 
 namespace NotoriousTest.PostgreSql;
 
-public class PostgreContainerAsyncInfrastructure : DockerContainerAsyncInfrastructure<PostgreSqlContainer>
+public class PostgreContainerInfrastructure : DockerContainerInfrastructure<PostgreSqlContainer>
 {
     public string DbName { get; init; } = "NotoriousDb";
     public RespawnerOptions? RespawnOptions { get; set; } = new RespawnerOptions
@@ -19,7 +19,7 @@ public class PostgreContainerAsyncInfrastructure : DockerContainerAsyncInfrastru
 
     protected string FullDbName;
     private Respawner _respawner;
-    public PostgreContainerAsyncInfrastructure(bool initialize = false) : base(initialize)
+    public PostgreContainerInfrastructure(bool initialize = false) : base(initialize)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
     }

@@ -1,21 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using NotoriousTest.Common.Environments;
-using NotoriousTest.SqlServer;
-using NotoriousTest.Web.Environments;
+﻿using NotoriousTest.Web.Environments;
+
 using NotoriousTests.InfrastructuresSamples.Infrastructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NotoriousTests.InfrastructuresSamples.Environments
 {
     // In fact, this is a test fixture (xUnit terminology).
-    public class TestEnvironment : AsyncWebEnvironment<Program>
+    public class TestEnvironment : WebEnvironment<Program>
     {
         // This is called at the start of the test campaign
-        public override async Task ConfigureEnvironmentAsync()
+        public override async Task ConfigureEnvironment()
         {
             // Adding all infrastructure needed for the test
             // Every environment generate an EnvironmentId that is unique for each test campaign

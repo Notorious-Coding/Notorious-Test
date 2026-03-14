@@ -1,25 +1,56 @@
 ﻿using NotoriousTest.Common.Exceptions;
-using NotoriousTest.Common.Infrastructures.Sync;
+using NotoriousTest.Common.Infrastructures;
+
+using Xunit;
 
 namespace NotoriousTest.Common.Environments
 {
-    public abstract class Environment : IDisposable
+    public abstract class Environment : IAsyncLifetime
     {
         public Guid EnvironmentId { get; private set; } = Guid.NewGuid();
 
         protected readonly List<Infrastructure> Infrastructures = new List<Infrastructure>();
 
-        public Environment()
+        #region IAsyncLifetime Implementation
+
+        /// <summary>
+        /// Initialize environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+        /// </summary>
+        public async Task InitializeAsync()
         {
-            // Called before test campaign
-            ConfigureEnvironment();
-            Initialize();
+            await ConfigureEnvironment();
+            await Initialize();
         }
+
+        /// <summary>
+        /// Destroy environment. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
+        /// </summary>
+        public async Task DisposeAsync()
+        {
+            await Destroy();
+        }
+        #endregion
 
         /// <summary>
         /// Configure environment with infrastructures. Called before environment initialization.
         /// </summary>
-        public abstract void ConfigureEnvironment();
+        public abstract Task ConfigureEnvironment();
+
+
+        /// <summary>
+        /// Get an infrastructure within environment.
+        /// </summary>
+        /// <typeparam name="T">Infrastructure type</typeparam>
+        /// <returns>Infrastructure of type <typeparamref name="T"/></returns>
+        /// <exception cref="InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
+        public T GetInfrastructure<T>() where T : Infrastructure
+        {
+            T? infrastructure = Infrastructures.OfType<T>().FirstOrDefault();
+
+            if (infrastructure == null) throw new InfrastructureNotFoundException($"L'infrastructure persistante de type {typeof(T)} n'éxiste pas, veuillez vérififer la méthode ${nameof(ConfigureEnvironment)}");
+
+            return infrastructure;
+        }
 
         /// <summary>
         /// Add an infrastructure within environment.
@@ -32,51 +63,28 @@ namespace NotoriousTest.Common.Environments
             return this;
         }
 
-        /// <summary>
-        /// Get an infrastructure within environment.
-        /// </summary>
-        /// <typeparam name="T">Infrastructure type</typeparam>
-        /// <returns>Infrastructure of type <typeparamref name="T"/></returns>
-        /// <exception cref="InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
-        public T GetInfrastructure<T>() where T : Infrastructure
+        public virtual async Task Initialize()
         {
-            T? infrastructure = Infrastructures.OfType<T>().FirstOrDefault();
-
-            if (infrastructure == null) throw new InfrastructureNotFoundException($"L'infrastructure persistante de type {nameof(T)} n'éxiste pas, veuillez vérififer la méthode ${nameof(ConfigureEnvironment)}");
-
-            return infrastructure;
-        }
-
-        public virtual void Initialize()
-        {
-            foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
+            foreach (Infrastructure infra in Infrastructures.OrderBy((i) => i.Order))
             {
-                infra.Initialize();
+                await infra.Initialize();
             }
         }
 
-        public virtual void Reset()
+        public virtual async Task Reset()
         {
             foreach (Infrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
             {
-                if (infrastructure.AutoReset) infrastructure.Reset();
+                if (infrastructure.AutoReset) await infrastructure.Reset();
             }
         }
 
-        public virtual void Destroy()
+        public virtual async Task Destroy()
         {
-            foreach (Infrastructure infra in Infrastructures.OrderBy(pi => pi.Order))
+            foreach (Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
-                infra.Destroy();
+                await infra.Destroy();
             }
-        }
-
-        /// <summary>
-        /// Destroy every created infrastructure. THIS METHOD IS CALLED BY XUNIT, DO NOT USE IT.
-        /// </summary>
-        public void Dispose()
-        {
-            Destroy();
         }
     }
 }

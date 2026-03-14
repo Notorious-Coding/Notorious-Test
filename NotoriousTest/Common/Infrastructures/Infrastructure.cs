@@ -1,12 +1,11 @@
-﻿using NotoriousTest.Common.Infrastructures.Common;
-using Xunit;
+﻿using Xunit;
 
-namespace NotoriousTest.Common.Infrastructures.Async
+namespace NotoriousTest.Common.Infrastructures
 {
     /// <summary>
     /// AsyncInfrastructure is a base class to define a test infrastructure.
     /// </summary>
-    public abstract class AsyncInfrastructure : IInfrastructure, IAsyncLifetime, IAsyncDisposable
+    public abstract class Infrastructure : IInfrastructure, IAsyncLifetime, IAsyncDisposable
     {
         public virtual int? Order { get; }
 
@@ -16,7 +15,7 @@ namespace NotoriousTest.Common.Infrastructures.Async
 
         private bool _initialize = false;
 
-        public AsyncInfrastructure(bool initialize = false)
+        public Infrastructure(bool initialize = false)
         {
             _initialize = initialize;
         }
@@ -43,7 +42,7 @@ namespace NotoriousTest.Common.Infrastructures.Async
             await DisposeAsync();
         }
 
-        ~AsyncInfrastructure()
+        ~Infrastructure()
         {
             Destroy().Wait();
         }

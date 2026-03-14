@@ -93,7 +93,7 @@ Once a test environment is configured, you can retrieve any registered infrastru
 
 ```csharp
 
-public class MyIntegrationTests : AsyncIntegrationTest<MyTestEnvironment>
+public class MyIntegrationTests : IntegrationTest<MyTestEnvironment>
 {
     public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
 

@@ -20,14 +20,14 @@ dotnet add package NotoriousTest.TestContainers
 ```
 
 This package provides an infrastructure that automatically start and stop the container at the beginning and end of the test campaign!
-Simply inherit from **`DockerContainerAsyncInfrastructure<TContainer>`**.
+Simply inherit from **`DockerContainerInfrastructure<TContainer>`**.
 
 > ❗ Since `TestContainers` doesn't support synchronous code, theses classes are only available in an `AsyncEnvironment`.
 
 Here's an example :
 
 ```csharp
-public class SqlServerContainerInfrastructure : DockerContainerAsyncInfrastructure<MsSqlContainer>
+public class SqlServerContainerInfrastructure : DockerContainerInfrastructure<MsSqlContainer>
 {
     public override MsSqlContainer Container {get; init;} = new MsSqlBuild().Build();
 
@@ -67,7 +67,7 @@ It will automatically start at the beginning of the test campaign, stop at the e
 Here's an example:
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+   public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
         public SqlServerInfrastructure()
         {
@@ -96,7 +96,7 @@ The infrastructure provides two methods:
 [Fact]
 public async Task Test1()
 {
-    SqlServerInfrastructure sqlInfrastructure = await CurrentEnvironment.GetInfrastructureAsync<SqlServerInfrastructure>();
+    SqlServerInfrastructure sqlInfrastructure = await CurrentEnvironment.GetInfrastructure<SqlServerInfrastructure>();
     await using(SqlConnection sql = sqlInfrastructure.GetDatabaseConnection())
     {
         // Arrange your database here.
@@ -109,7 +109,7 @@ public async Task Test1()
 You can populate the database by overriding the `PopulateDatabase` method :
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+   public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
         public SqlServerInfrastructure()
         {
@@ -128,7 +128,7 @@ You can populate the database by overriding the `PopulateDatabase` method :
 You can generate configuration for your web application by overriding the `Initialize` method :
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure, IConfigurable
+   public class SqlServerInfrastructure : SqlServerContainerInfrastructure, IConfigurable
     {
         public SqlServerInfrastructure()
         {
@@ -148,7 +148,7 @@ You can generate configuration for your web application by overriding the `Initi
 You can configure the container by overriding the `ConfigureSqlContainer` method :
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+   public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
         public SqlServerInfrastructure()
         {
@@ -167,7 +167,7 @@ You can configure the container by overriding the `ConfigureSqlContainer` method
 To configure respawn settings, you can assign RespawnOptions property. They will be used by respawn to reset the database.
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+   public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
         public SqlServerInfrastructure()
         {
@@ -185,7 +185,7 @@ By default, Database name will be `NotoriousDb` concatened with the `ContextId`.
 You can override `NotoriousDb` by your custom name by setting the property `DbName`.
 
 ```csharp
-   public class SqlServerInfrastructure : SqlServerContainerAsyncInfrastructure
+   public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
         public SqlServerInfrastructure()
         {
@@ -213,14 +213,14 @@ Or from the .NET CLI as:
 dotnet add package NotoriousTest.PostgreSql
 ```
 
-You can now simply use the SqlServerContainerAsyncInfrastructure to start a SQL Server database.
+You can now simply use the PostgreContainerInfrastructure to start a Postgre database.
 
 It will automatically start at the beginning of the test campaign, stop at the end, and reset between each test, powered by TestContainers and Respawn.
 
 Here's an example:
 
 ```csharp
-   public class PostgreSqlInfrastructure : PostgreContainerAsyncInfrastructure
+   public class PostgreSqlInfrastructure : PostgreContainerInfrastructure
     {
         public PostgreSqlInfrastructure()
         {

@@ -1,14 +1,13 @@
 ﻿using DotNet.Testcontainers.Containers;
-using Microsoft.Extensions.Configuration;
-using NotoriousTest.Common.Infrastructures.Async;
-using NotoriousTest.Common.Infrastructures.Common;
+
+using NotoriousTest.Common.Infrastructures;
 
 namespace NotoriousTest.TestContainers
 {
 
-    public abstract class DockerContainerAsyncInfrastructure<TContainer> : AsyncInfrastructure where TContainer : IContainer
+    public abstract class DockerContainerInfrastructure<TContainer> : Infrastructure where TContainer : IContainer
     {
-        protected DockerContainerAsyncInfrastructure(bool initialize = false) : base(initialize) { }
+        protected DockerContainerInfrastructure(bool initialize = false) : base(initialize) { }
 
         protected TContainer Container { get; init; }
 

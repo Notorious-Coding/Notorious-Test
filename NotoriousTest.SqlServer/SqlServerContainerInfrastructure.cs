@@ -1,18 +1,20 @@
 ﻿using Microsoft.Data.SqlClient;
+
 using NotoriousTest.TestContainers;
+
 using Respawn;
-using System.Xml.Linq;
+
 using Testcontainers.MsSql;
 
 namespace NotoriousTest.SqlServer
 {
-    public class SqlServerContainerAsyncInfrastructure : DockerContainerAsyncInfrastructure<MsSqlContainer>
+    public class SqlServerContainerInfrastructure : DockerContainerInfrastructure<MsSqlContainer>
     {
         public string DbName { get; init; } = "NotoriousDb";
         public RespawnerOptions? RespawnOptions { get; set; } = null;
         protected string FullDbName;
         private Respawner _respawner;
-        public SqlServerContainerAsyncInfrastructure(bool initialize = false) : base(initialize)
+        public SqlServerContainerInfrastructure(bool initialize = false) : base(initialize)
         {
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
         }
