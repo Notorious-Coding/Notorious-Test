@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+
 using NotoriousTest.Common.Configuration;
 using NotoriousTest.Common.Helpers;
-using NotoriousTest.Common.Infrastructures.Sync;
-using NotoriousTest.Web.Applications;
+using NotoriousTest.Common.Infrastructures;
 
 namespace NotoriousTest.Web.Infrastructures
 {
     public class WebApplicationInfrastructure<TEntryPoint> : WebApplicationInfrastructure<TEntryPoint, Dictionary<string, string>>
-    where TEntryPoint : class
+        where TEntryPoint : class
     {
-    }
 
+    }
     public class WebApplicationInfrastructure<TEntryPoint, TConfig> : Infrastructure, IConfigurable<TConfig>
         where TEntryPoint : class
         where TConfig : class, new()
@@ -31,13 +31,12 @@ namespace NotoriousTest.Web.Infrastructures
             _webApplicationFactory = new WebApplicationFactory<TEntryPoint>();
         }
 
-
-        public override void Destroy()
+        public override async Task Destroy()
         {
-            _webApplicationFactory.Dispose();
+            await _webApplicationFactory.DisposeAsync();
         }
 
-        public override void Initialize()
+        public override Task Initialize()
         {
             if (_webApplicationFactory is IConfigurable configurableApplication)
             {
@@ -45,11 +44,12 @@ namespace NotoriousTest.Web.Infrastructures
             }
 
             HttpClient = _webApplicationFactory.CreateDefaultClient();
+            return Task.CompletedTask;
         }
 
-        public override void Reset()
+        public override Task Reset()
         {
-            
+            return Task.CompletedTask;
         }
     }
 }

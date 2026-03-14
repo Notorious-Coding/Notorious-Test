@@ -1,9 +1,10 @@
-﻿using Xunit;
-using Environment = NotoriousTest.Common.Environments.Environment;
+﻿using NotoriousTest.Common.Environments;
+
+using Xunit;
 
 namespace NotoriousTest.Common
 {
-    public abstract class IntegrationTest<T> : IClassFixture<T>, IDisposable where T : Environment
+    public abstract class IntegrationTest<T> : IClassFixture<T>, IAsyncLifetime where T : Environments.Environment
     {
         protected readonly T CurrentEnvironment;
 
@@ -13,10 +14,14 @@ namespace NotoriousTest.Common
             CurrentEnvironment = environment;
         }
 
-        public void Dispose()
+        public Task InitializeAsync()
         {
-            // Called after each tests
-            CurrentEnvironment.Reset();
+            return Task.CompletedTask;
+        }
+
+        public async Task DisposeAsync()
+        {
+            await CurrentEnvironment.Reset();
         }
     }
 }

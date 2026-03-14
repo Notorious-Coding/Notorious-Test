@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NotoriousTest.Common.Infrastructures.Common
+﻿namespace NotoriousTest.Common.Infrastructures
 {
     public interface IInfrastructure
     {
@@ -21,7 +15,7 @@ namespace NotoriousTest.Common.Infrastructures.Common
         /// <summary>
         /// ContextId is an identfier of the current infrastructure context.
         /// In standalone mode : ContextId is a unique identifier scoped for the infrastructure.
-        /// Withing an environment : ContextId is provided by the environment when the infrastructure is added.
+        /// Within an environment : ContextId is provided by the environment when the infrastructure is added.
         /// </summary>
         public Guid ContextId { get; set; }
     }

@@ -1,5 +1,5 @@
 ﻿using NotoriousTest.Common.Configuration;
-using NotoriousTest.Common.Infrastructures.Sync;
+using NotoriousTest.Common.Infrastructures;
 
 namespace NotoriousTest.Common.Environments
 {
@@ -7,12 +7,11 @@ namespace NotoriousTest.Common.Environments
     {
     }
 
-    public abstract class ConfiguredEnvironment<TConfig> : Environment, IConfigurable<TConfig>
-        where TConfig : class, new()
+    public abstract class ConfiguredEnvironment<TConfig> : Environment, IConfigurable<TConfig> where TConfig : class, new()
     {
         public TConfig Configuration { get; set; } = new();
 
-        public override void Initialize()
+        public async override Task Initialize()
         {
             foreach (Infrastructure infra in Infrastructures.OrderBy(i => i.Order))
             {
@@ -21,7 +20,7 @@ namespace NotoriousTest.Common.Environments
                     consumer.Configuration = Configuration;
                 }
 
-                infra.Initialize();
+                await infra.Initialize();
 
                 if (infra is IConfigurable<TConfig> producer)
                 {

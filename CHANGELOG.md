@@ -82,3 +82,9 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - `GetInfrastructuresAsync` in AsyncEnvironment is no longer Async
 - Migrate to slnx
 - Extended target frameworks: NotoriousTest now builds for .NET 6, .NET 8, and .NET 9 (previously only .NET 6)
+
+## 4.0.0
+
+### Features
+
+- Synchronous classes are no longer available, all async classes have been renamed.

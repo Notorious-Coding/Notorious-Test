@@ -2,7 +2,7 @@ using FakeItEasy;
 
 using NotoriousTest.Common.Configuration;
 using NotoriousTest.Common.Environments;
-using NotoriousTest.Common.Infrastructures.Async;
+using NotoriousTest.Common.Infrastructures;
 
 namespace NotoriousTest.UnitTests
 {
@@ -13,7 +13,7 @@ namespace NotoriousTest.UnitTests
         #region Unique Infrastructure Test Cases Setup
         static UniqueInfrastructureTestCasesInfrastructure _uniqueInfrastructureTestCasesInfrastructure;
 
-        public class UniqueInfrastructureTestCasesEnvironment : AsyncEnvironment
+        public class UniqueInfrastructureTestCasesEnvironment : Common.Environments.Environment
         {
 
             public UniqueInfrastructureTestCasesEnvironment()
@@ -21,7 +21,7 @@ namespace NotoriousTest.UnitTests
 
             }
 
-            public override Task ConfigureEnvironmentAsync()
+            public override Task ConfigureEnvironment()
             {
                 AddInfrastructure(_uniqueInfrastructureTestCasesInfrastructure);
 
@@ -29,7 +29,7 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public abstract class UniqueInfrastructureTestCasesInfrastructure : AsyncInfrastructure
+        public abstract class UniqueInfrastructureTestCasesInfrastructure : Infrastructure
         {
             public UniqueInfrastructureTestCasesInfrastructure() : base(false)
             {
@@ -101,7 +101,7 @@ namespace NotoriousTest.UnitTests
         static MultipleInfrastructureTestCasesInfrastructure1 _multipleInfrastructureTestCasesInfrastructure1;
         static MultipleInfrastructureTestCasesInfrastructure2 _multipleInfrastructureTestCasesInfrastructure2;
 
-        public class MultipleInfrastructureTestCasesEnvironment : AsyncEnvironment
+        public class MultipleInfrastructureTestCasesEnvironment : Common.Environments.Environment
         {
 
             public MultipleInfrastructureTestCasesEnvironment()
@@ -109,7 +109,7 @@ namespace NotoriousTest.UnitTests
 
             }
 
-            public override Task ConfigureEnvironmentAsync()
+            public override Task ConfigureEnvironment()
             {
                 AddInfrastructure(_multipleInfrastructureTestCasesInfrastructure1);
                 AddInfrastructure(_multipleInfrastructureTestCasesInfrastructure2);
@@ -118,7 +118,7 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public abstract class MultipleInfrastructureTestCasesInfrastructure1 : AsyncInfrastructure
+        public abstract class MultipleInfrastructureTestCasesInfrastructure1 : Infrastructure
         {
 
             public MultipleInfrastructureTestCasesInfrastructure1() : base(false)
@@ -128,7 +128,7 @@ namespace NotoriousTest.UnitTests
 
         }
 
-        public abstract class MultipleInfrastructureTestCasesInfrastructure2 : AsyncInfrastructure
+        public abstract class MultipleInfrastructureTestCasesInfrastructure2 : Infrastructure
         {
 
             public MultipleInfrastructureTestCasesInfrastructure2() : base(false)
@@ -238,12 +238,12 @@ namespace NotoriousTest.UnitTests
             public string Key2 { get; set; }
         }
 
-        public class ConfigurationObjectTestCasesEnvironment : AsyncConfiguredEnvironment<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesEnvironment : ConfiguredEnvironment<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesEnvironment()
             {
             }
-            public override Task ConfigureEnvironmentAsync()
+            public override Task ConfigureEnvironment()
             {
                 AddInfrastructure(_configurationObjectTestCasesInfrastructure1);
                 AddInfrastructure(_configurationObjectTestCasesInfrastructure2);
@@ -251,7 +251,7 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructure1 : AsyncInfrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesInfrastructure1 : Infrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesInfrastructure1() : base(false)
             {
@@ -277,7 +277,7 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructure2 : AsyncInfrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
+        public class ConfigurationObjectTestCasesInfrastructure2 : Infrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
         {
             public ConfigurationObjectTestCasesInfrastructure2() : base(false)
             {
@@ -324,12 +324,12 @@ namespace NotoriousTest.UnitTests
         static ConfigurationDictionaryTestCasesInfrastructure1 _configurationDictionaryTestCasesInfrastructure1;
         static ConfigurationDictionaryTestCasesInfrastructure2 _configurationDictionaryTestCasesInfrastructure2;
 
-        public class ConfigurationDictionaryTestCasesEnvironment : AsyncConfiguredEnvironment
+        public class ConfigurationDictionaryTestCasesEnvironment : ConfiguredEnvironment
         {
             public ConfigurationDictionaryTestCasesEnvironment()
             {
             }
-            public override Task ConfigureEnvironmentAsync()
+            public override Task ConfigureEnvironment()
             {
                 AddInfrastructure(_configurationDictionaryTestCasesInfrastructure1);
                 AddInfrastructure(_configurationDictionaryTestCasesInfrastructure2);
@@ -337,7 +337,7 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationDictionaryTestCasesInfrastructure1 : AsyncInfrastructure, IConfigurable
+        public class ConfigurationDictionaryTestCasesInfrastructure1 : Infrastructure, IConfigurable
         {
             public ConfigurationDictionaryTestCasesInfrastructure1() : base(false)
             {
@@ -363,7 +363,7 @@ namespace NotoriousTest.UnitTests
             }
         }
 
-        public class ConfigurationDictionaryTestCasesInfrastructure2 : AsyncInfrastructure, IConfigurable
+        public class ConfigurationDictionaryTestCasesInfrastructure2 : Infrastructure, IConfigurable
         {
             public ConfigurationDictionaryTestCasesInfrastructure2() : base(false)
             {

@@ -7,7 +7,7 @@ using NotoriousTests.InfrastructuresSamples.Infrastructures;
 
 namespace NotoriousTests.InfrastructuresSamples
 {
-    public class SampleTests : AsyncIntegrationTest<TestEnvironment>
+    public class SampleTests : IntegrationTest<TestEnvironment>
     {
         public SampleTests(TestEnvironment environment) : base(environment)
         {
