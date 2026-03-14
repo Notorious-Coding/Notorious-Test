@@ -15,6 +15,8 @@ namespace NotoriousTest.Environments
 
         protected readonly List<AsyncInfrastructure> Infrastructures = new List<AsyncInfrastructure>();
 
+        private Process _doggyDogProcess;
+
         #region IAsyncLifetime Implementation
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace NotoriousTest.Environments
             var currentPid = Process.GetCurrentProcess().Id;
             var assemblyPath = CurrentAssembly.Location;
 
-            Process.Start(new ProcessStartInfo
+            _doggyDogProcess = Process.Start(new ProcessStartInfo
             {
                 FileName = watchdogPath,
                 Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\" --config \"{configPath}\"",
@@ -50,6 +52,7 @@ namespace NotoriousTest.Environments
         public async Task DisposeAsync()
         {
             await Destroy();
+            _doggyDogProcess.Kill();
         }
         #endregion
 

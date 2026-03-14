@@ -15,7 +15,7 @@
         public TOutput OutputConfiguration { get; set; }
     }
 
-    public interface IConfigurableInfrastructure<TOutput, TInput> : IConfigurableInfrastructure<TOutput> where TOutput : class where TInput : class
+    public interface IConfigurableInfrastructure<TInput, TOutput> : IConfigurableInfrastructure<TOutput> where TOutput : class where TInput : class
     {
         /// <summary>
         /// Gets or sets the configuration produced.
