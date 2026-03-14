@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace NotoriousTest.Common.Infrastructures
+namespace NotoriousTest.Infrastructures
 {
     /// <summary>
     /// AsyncInfrastructure is a base class to define a test infrastructure.

@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
-using NotoriousTest.Common.Configuration;
+
+using NotoriousTest.Configuration;
 
 namespace NotoriousTest.Web.Applications
 {

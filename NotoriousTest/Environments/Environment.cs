@@ -1,9 +1,9 @@
-﻿using NotoriousTest.Common.Exceptions;
-using NotoriousTest.Common.Infrastructures;
+﻿using NotoriousTest.Exceptions;
+using NotoriousTest.Infrastructures;
 
 using Xunit;
 
-namespace NotoriousTest.Common.Environments
+namespace NotoriousTest.Environments
 {
     public abstract class Environment : IAsyncLifetime
     {

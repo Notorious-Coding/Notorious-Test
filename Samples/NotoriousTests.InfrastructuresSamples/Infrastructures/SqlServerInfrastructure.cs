@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-using NotoriousTest.Common.Configuration;
+using NotoriousTest.Configuration;
 using NotoriousTest.SqlServer;
 
 namespace NotoriousTests.InfrastructuresSamples.Infrastructures

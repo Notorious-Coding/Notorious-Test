@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<Description>A simple way to handle integration tests environment, with complete isolation of every tests.</Description>
 		<PackageId>NotoriousTest</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -13,6 +13,7 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<IsPackable>true</IsPackable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<LangVersion>10</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

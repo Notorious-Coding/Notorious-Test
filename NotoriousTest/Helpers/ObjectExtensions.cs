@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-namespace NotoriousTest.Common.Helpers
+namespace NotoriousTest.Helpers
 {
     public static class ObjectExtensions
     {

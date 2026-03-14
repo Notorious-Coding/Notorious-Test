@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 
-using NotoriousTest.Common.Configuration;
-using NotoriousTest.Common.Helpers;
-using NotoriousTest.Common.Infrastructures;
-
+using NotoriousTest.Configuration;
+using NotoriousTest.Helpers;
+using NotoriousTest.Infrastructures;
 namespace NotoriousTest.Web.Infrastructures
 {
     public class WebApplicationInfrastructure<TEntryPoint> : WebApplicationInfrastructure<TEntryPoint, Dictionary<string, string>>

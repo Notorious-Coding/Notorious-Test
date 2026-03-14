@@ -1,6 +1,6 @@
 ﻿using DotNet.Testcontainers.Containers;
 
-using NotoriousTest.Common.Infrastructures;
+using NotoriousTest.Infrastructures;
 
 namespace NotoriousTest.TestContainers
 {

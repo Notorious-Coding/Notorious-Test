@@ -1,4 +1,4 @@
-﻿namespace NotoriousTest.Common.Exceptions
+﻿namespace NotoriousTest.Exceptions
 {
     public class InfrastructureNotFoundException : Exception
     {
