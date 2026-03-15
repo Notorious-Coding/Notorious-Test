@@ -1,43 +1,12 @@
 using FakeItEasy;
 
-using NotoriousTest.Configuration;
-using NotoriousTest.Environments;
-using NotoriousTest.Infrastructures;
-
 namespace NotoriousTest.UnitTests
 {
 
-    public class AsyncEnvironmentUnitTests
+    public partial class AsyncEnvironmentUnitTests
     {
         #region Unique Infrastructure Test Cases
-        #region Unique Infrastructure Test Cases Setup
         static UniqueInfrastructureTestCasesInfrastructure _uniqueInfrastructureTestCasesInfrastructure;
-
-        public class UniqueInfrastructureTestCasesEnvironment : Environments.Environment
-        {
-
-            public UniqueInfrastructureTestCasesEnvironment()
-            {
-
-            }
-
-            public override Task ConfigureEnvironment()
-            {
-                AddInfrastructure(_uniqueInfrastructureTestCasesInfrastructure);
-
-                return Task.CompletedTask;
-            }
-        }
-
-        public abstract class UniqueInfrastructureTestCasesInfrastructure : Infrastructure
-        {
-            public UniqueInfrastructureTestCasesInfrastructure() : base(false)
-            {
-
-            }
-
-        }
-        #endregion
 
         [Fact]
         public async Task GetInfrastructure_Should_ReturnProperInfrastructure()
@@ -97,46 +66,8 @@ namespace NotoriousTest.UnitTests
         }
         #endregion
         #region Multiple Infrastructures Test Cases
-        #region Multiple Infrastructure Test Cases Setup
         static MultipleInfrastructureTestCasesInfrastructure1 _multipleInfrastructureTestCasesInfrastructure1;
         static MultipleInfrastructureTestCasesInfrastructure2 _multipleInfrastructureTestCasesInfrastructure2;
-
-        public class MultipleInfrastructureTestCasesEnvironment : Environments.Environment
-        {
-
-            public MultipleInfrastructureTestCasesEnvironment()
-            {
-
-            }
-
-            public override Task ConfigureEnvironment()
-            {
-                AddInfrastructure(_multipleInfrastructureTestCasesInfrastructure1);
-                AddInfrastructure(_multipleInfrastructureTestCasesInfrastructure2);
-
-                return Task.CompletedTask;
-            }
-        }
-
-        public abstract class MultipleInfrastructureTestCasesInfrastructure1 : Infrastructure
-        {
-
-            public MultipleInfrastructureTestCasesInfrastructure1() : base(false)
-            {
-
-            }
-
-        }
-
-        public abstract class MultipleInfrastructureTestCasesInfrastructure2 : Infrastructure
-        {
-
-            public MultipleInfrastructureTestCasesInfrastructure2() : base(false)
-            {
-
-            }
-        }
-        #endregion
 
         [Fact]
         public async Task Initialize_Should_CallInfrastructuresInOrder()
@@ -228,169 +159,37 @@ namespace NotoriousTest.UnitTests
 
         #endregion
         #region Configuration Object Test Cases
-        #region Configuration Object Test Cases Setup
         static ConfigurationObjectTestCasesInfrastructure1 _configurationObjectTestCasesInfrastructure1;
-        static ConfigurationObjectTestCasesInfrastructure2 _configurationObjectTestCasesInfrastructure2;
+        static ConfigurationObjectTestCasesInfrastructureWithSection2 _configurationObjectTestCasesInfrastructure2;
 
-        public class ConfigurationObjectTestCasesEnvironmentConfiguraton
+        public class ConfigurationObjectTestCasesInfrastructureConfiguraton1
         {
             public string Key1 { get; set; }
+        }
+
+        public class ConfigurationObjectTestCasesInfrastructureConfiguraton2
+        {
             public string Key2 { get; set; }
         }
-
-        public class ConfigurationObjectTestCasesEnvironment : ConfiguredEnvironment<ConfigurationObjectTestCasesEnvironmentConfiguraton>
-        {
-            public ConfigurationObjectTestCasesEnvironment()
-            {
-            }
-            public override Task ConfigureEnvironment()
-            {
-                AddInfrastructure(_configurationObjectTestCasesInfrastructure1);
-                AddInfrastructure(_configurationObjectTestCasesInfrastructure2);
-                return Task.CompletedTask;
-            }
-        }
-
-        public class ConfigurationObjectTestCasesInfrastructure1 : Infrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
-        {
-            public ConfigurationObjectTestCasesInfrastructure1() : base(false)
-            {
-            }
-
-            public ConfigurationObjectTestCasesEnvironmentConfiguraton Configuration { get; set; }
-
-            public override Task Destroy()
-            {
-                return Task.CompletedTask;
-            }
-
-            public override Task Initialize()
-            {
-                Configuration.Key1 = "Infra1Key1";
-
-                return Task.CompletedTask;
-            }
-
-            public override Task Reset()
-            {
-                return Task.CompletedTask;
-            }
-        }
-
-        public class ConfigurationObjectTestCasesInfrastructure2 : Infrastructure, IConfigurable<ConfigurationObjectTestCasesEnvironmentConfiguraton>
-        {
-            public ConfigurationObjectTestCasesInfrastructure2() : base(false)
-            {
-            }
-
-            public ConfigurationObjectTestCasesEnvironmentConfiguraton Configuration { get; set; }
-
-            public override Task Destroy()
-            {
-                return Task.CompletedTask;
-            }
-
-            public override Task Initialize()
-            {
-                Configuration.Key2 = "Infra2Key2";
-
-                return Task.CompletedTask;
-            }
-
-            public override Task Reset()
-            {
-                return Task.CompletedTask;
-            }
-        }
-
-
-        #endregion
 
         [Fact]
         public async Task InfrastructureWithinEnvironmentWithObjectConfiguration_Should_ProduceConfigurationCorrectly()
         {
             _configurationObjectTestCasesInfrastructure1 = new ConfigurationObjectTestCasesInfrastructure1();
-            _configurationObjectTestCasesInfrastructure2 = new ConfigurationObjectTestCasesInfrastructure2();
+            _configurationObjectTestCasesInfrastructure2 = new ConfigurationObjectTestCasesInfrastructureWithSection2();
 
             var environment = new ConfigurationObjectTestCasesEnvironment();
             await environment.InitializeAsync();
-            Assert.Equal("Infra1Key1", environment.Configuration.Key1);
-            Assert.Equal("Infra2Key2", environment.Configuration.Key2);
+            var config1 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationObjectTestCasesInfrastructureConfiguraton1")?.Value as ConfigurationObjectTestCasesInfrastructureConfiguraton1;
+            var config2 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "Toto")?.Value as ConfigurationObjectTestCasesInfrastructureConfiguraton2;
+            Assert.Equal("Infra1Key1", config1?.Key1);
+            Assert.Equal("Infra2Key2", config2?.Key2);
         }
 
         #endregion
         #region Configuration Dictionary Test Cases
-        #region Configuration Dictionary Test Cases Setup
         static ConfigurationDictionaryTestCasesInfrastructure1 _configurationDictionaryTestCasesInfrastructure1;
         static ConfigurationDictionaryTestCasesInfrastructure2 _configurationDictionaryTestCasesInfrastructure2;
-
-        public class ConfigurationDictionaryTestCasesEnvironment : ConfiguredEnvironment
-        {
-            public ConfigurationDictionaryTestCasesEnvironment()
-            {
-            }
-            public override Task ConfigureEnvironment()
-            {
-                AddInfrastructure(_configurationDictionaryTestCasesInfrastructure1);
-                AddInfrastructure(_configurationDictionaryTestCasesInfrastructure2);
-                return Task.CompletedTask;
-            }
-        }
-
-        public class ConfigurationDictionaryTestCasesInfrastructure1 : Infrastructure, IConfigurable
-        {
-            public ConfigurationDictionaryTestCasesInfrastructure1() : base(false)
-            {
-            }
-
-            public Dictionary<string, string> Configuration { get; set; }
-
-            public override Task Destroy()
-            {
-                return Task.CompletedTask;
-            }
-
-            public override Task Initialize()
-            {
-                Configuration.Add("Key1", "Infra1Key1");
-
-                return Task.CompletedTask;
-            }
-
-            public override Task Reset()
-            {
-                return Task.CompletedTask;
-            }
-        }
-
-        public class ConfigurationDictionaryTestCasesInfrastructure2 : Infrastructure, IConfigurable
-        {
-            public ConfigurationDictionaryTestCasesInfrastructure2() : base(false)
-            {
-            }
-
-            public Dictionary<string, string> Configuration { get; set; }
-
-            public override Task Destroy()
-            {
-                return Task.CompletedTask;
-            }
-
-            public override Task Initialize()
-            {
-                Configuration.Add("Key2", "Infra2Key2");
-
-                return Task.CompletedTask;
-            }
-
-            public override Task Reset()
-            {
-                return Task.CompletedTask;
-            }
-        }
-
-
-        #endregion
 
         [Fact]
         public async Task InfrastructureWithinEnvironmentWithDictionaryConfiguration_Should_ProduceConfigurationCorrectly()
@@ -400,8 +199,11 @@ namespace NotoriousTest.UnitTests
 
             var environment = new ConfigurationDictionaryTestCasesEnvironment();
             await environment.InitializeAsync();
-            Assert.Equal("Infra1Key1", environment.Configuration["Key1"]);
-            Assert.Equal("Infra2Key2", environment.Configuration["Key2"]);
+
+            var config1 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationDictionaryTestCasesInfrastructure1:Key1")?.Value as string;
+            var config2 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationDictionaryTestCasesInfrastructure2:Key2")?.Value as string;
+            Assert.Equal("Infra1Key1", config1);
+            Assert.Equal("Infra2Key2", config2);
         }
 
         #endregion

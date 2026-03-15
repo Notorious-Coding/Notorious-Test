@@ -2,275 +2,146 @@
 
 - [Configuration](#configuration)
 - [Web Testing](#web-testing)
-- [Miscellenaous](#miscellenaous)
+- [Miscellaneous](#miscellaneous)
 
 ### Configuration
 
-In some cases, you may need to manage configurations from your infrastructure, such as connection strings, secrets, and other settings. Notorious Tests provides a seamless way to generate and consume configurations within your infrastructure.
+In some cases, infrastructures need to produce configuration values — connection strings, secrets, ports, etc. NotoriousTest provides a typed, composable system to produce and consume configuration across infrastructures.
 
-Here’s how it works:
+#### How it works
 
-#### Configurable Infrastructures
+Each infrastructure can produce a list of `ConfigurationEntry<T>`, where `T` is the type of your choice. The environment aggregates all entries and passes them to consumers (e.g. a `WebApplication`) which are responsible for converting them to the format they need.
 
-To create a configurable infrastructure, simply implements **`IConfigurable<T>`** or **`IConfigurable`**.
+#### Producing configuration
 
-```csharp
-    public class DatabaseInfrastructure : Infrastructure, IConfigurable<Configuration>
-    {
-        public Configuration Configuration {get; set;}
-        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
-        {
-        }
-
-        public override int Order => 1;
-
-        public override void Destroy(){}
-
-        public override void Initialize()
-        {
-            /// Initialize sql server.
-            Configuration.DatabaseConfiguration = new DatabaseConfiguration()
-            {
-                ConnectionString = "Test"
-            };
-        }
-
-        public override void Reset(){}
-    }
-```
-
-As you can see, this infrastructure generates a configuration after initializing the SQL Server.
-The **`Configuration`** property is publicly accessible, allowing you to retrieve it when using this infrastructure.
-
-Specifying a generic type for the configuration is optional. By default, the **`Configuration`** object is a **`Dictionary<string, string>`**.
+To produce configuration, call `AddOutputConfigurationEntry` inside `Initialize()`.
+The key will be used by the consumer to determine where to place this section of the config.
+e.g. `WebApplication` uses it as a path for appsettings replacement (`Key:Key:Key`).
 
 ```csharp
-    public class DatabaseInfrastructure : Infrastructure, IConfigurable
-    {
-        public Dictonary<string, string> Configuration {get; set;}
-
-        public DatabaseInfrastructure(bool initialize = false) : base(initialize)
-        {
-        }
-
-        public override int Order => 1;
-
-        public override void Destroy(){}
-
-        public override void Initialize()
-        {
-            /// Initialize sql server.
-            Configuration.Add("DatabaseConfiguration.ConnectionString", "Test");
-        }
-
-        public override void Reset(){}
-    }
-```
-
-Now, you can directly access your infrastructure's configuration within a test:
-
-```csharp
-[Fact]
-public async Task Test2()
+public class SqlServerInfrastructure : Infrastructure<LanaeDatabase>
 {
-    await using (var db =  new DatabaseInfrastructure(initialize: true))
+    public override async Task Initialize()
     {
-        var cs = db.Configuration.DatabaseConfiguration.ConnectionString;
+        // Start your container, get the connection string...
+        AddOutputConfigurationEntry("Databases:Lanae", new LanaeDatabase
+        {
+            ConnectionString = "Server=localhost;..."
+        });
     }
+
+    public override Task Reset() => Task.CompletedTask;
+    public override Task Destroy() => Task.CompletedTask;
 }
 ```
 
-#### Configurable Environment
-
-You could use **`IConfigurable`** infrastructures within an **`Environment`**.
-These infrastructures will be provided with the environment configuration and will be able to modify it.
-
-To do this, inherit from **`ConfiguredEnvironment`** instead of **`Environment`** (or from **`AsyncConfiguredEnvironment`** instead of **`AsyncEnvironment`**).
+If you don't need a typed object, `Infrastructure` (without generic) accepts `object` directly:
 
 ```csharp
-public class SampleEnvironment : ConfiguredEnvironment<Configuration>
+public class RedisInfrastructure : Infrastructure
 {
-    public override void ConfigureEnvironment()
+    public override async Task Initialize()
     {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
-    }
-}
-// Or without generic type
-public class SampleEnvironment : ConfiguredEnvironment{
-    public override void ConfigureEnvironment()
-    {
-        // Add all your infrastructure here.
-        AddInfrastructure(new DatabaseInfrastructure());
+        AddOutputConfigurationEntry("Cache:Redis:Host", "localhost");
     }
 }
 ```
 
-In a **`ConfiguredEnvironment`**, you can access the generated configuration from infrastructures using the public **`Configuration`** property.
+#### Consuming configuration from another infrastructure
 
-> ❗ Inside an environment, **configuration object should represent the whole app configuration**. It will transition into **`IConfigurable`** infrastructures, with each infrastructure modifying its respective part of the configuration.
+An infrastructure can consume the configuration produced by previously initialized infrastructures by implementing `IConfigurationConsumer`.
+
+```csharp
+public class MyInfrastructure : Infrastructure, IConfigurationConsumer
+{
+    public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; } = new();
+
+    public override Task Initialize()
+    {
+        var redisHost = ConsumedConfiguration
+            .FirstOrDefault(e => e.Key == "Cache:Redis:Host")?.Value?.ToString();
+
+        // Use redisHost...
+        return Task.CompletedTask;
+    }
+}
+```
+
+> ❗ An infrastructure can only consume configuration from infrastructures that were initialized before it. Order of declaration in `ConfigureEnvironment` determines availability.
 
 ### Web Testing
 
-When working with web applications, you'll often need to run a WebApplication in the background so your tests can interact with a real API.
+#### Web Application
 
-**NotoriousTests** provides everything you need, so you don't have to overthink it.
-
-#### Web Application Infrastructure
-
-First, you need to create an **WebApplication**.
+Create a `WebApplication<TEntryPoint>` to wrap your `WebApplicationFactory`:
 
 ```csharp
-internal class SampleProjectApp : WebApplication<Program>{}
+internal class SampleProjectApp : WebApplication<Program> { }
 ```
 
-This is essentially a WebApplicationFactory, a built-in .NET feature. ([See microsoft doc for more information.](https://learn.microsoft.com/fr-fr/aspnet/core/test/integration-tests?view=aspnetcore-8.0))
-
-Here, you can override anything necessary to make your app fully functional.
-
-Next, let's create a **`WebApplicationInfrastructure`** and pass our **`WebApplication`** to it.
-
-> ❗ In a **`WebEnvironment`**, creating a dedicated infrastructure is optional—you can pass a **`WebApplication`** directly. However, using an infrastructure can be useful if you need additional initialization, reset, or teardown logic.
-
-```csharp
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program, Configuration>
-    {
-        public SampleProjectWebApplicationInfrastructure()
-            : base(new SampleProjectApp())
-        {
-        }
-    }
-
-    // Without a generic type, configuration will be a Dictionary<string, string>.
-    internal class SampleProjectWebApplicationInfrastructure : WebApplicationInfrastructure<Program>
-    {
-        public SampleProjectWebApplicationInfrastructure()
-            : base(new SampleProjectApp())
-        {
-        }
-    }
-```
-
-> ❗ The provided configuration will automatically be applied to your web app, making it accessible through the **`IConfiguration`** object in Program.cs.
-
-Now, in your tests, you can start your **`WebApplicationInfrastructure`** just like any other infrastructure and access the `HttpClient`:
-
-```csharp
-[Fact]
-public async Task Test2()
-{
-    await using (var app = new SampleProjectWebApplicationInfrastructure())
-    {
-        HttpClient? client = app.HttpClient;
-
-        HttpResponseMessage response = await client!.GetAsync("api/weather");
-        Assert.True(response.IsSuccessStatusCode);
-
-        string content = await response.Content.ReadAsStringAsync();
-    }
-}
-```
+`WebApplication` automatically receives the aggregated configuration from all producer infrastructures and injects it as an `InMemoryCollection` into your app's `IConfiguration`.
 
 #### Web Environment
 
-You can use either **`WebApplication`** or **`WebApplicationInfrastructure`** inside a **`WebEnvironment`**.
-
 ```csharp
-    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
-    {
-        public override Task ConfigureEnvironmentAsync()
-        {
-            AddInfrastructure(new DatabaseInfrastructure());
-            AddWebApplication(new SampleProjectApp());
-            // OR
-            AddWebApplication(new SampleProjectWebApplicationInfrastructure());
-
-            return Task.CompletedTask;
-        }
-    }
-```
-
-Your web application will start automatically at the beginning of a test campaign, and any configuration generated by **`IConfigurable`** infrastructures will be added as an `InMemoryCollection` to your **`WebApplication`**.
-
-Then, in your tests, you can use **`GetWebApplication`** to access the `HttpClient`:
-
-```csharp
-[Fact]
-public async Task Test2()
+public class SampleEnvironment : AsyncWebEnvironment
 {
-    HttpClient? client = (await CurrentEnvironment.GetWebApplication()).HttpClient;
+    public override Task ConfigureEnvironmentAsync()
+    {
+        AddInfrastructure(new SqlServerInfrastructure());
+        AddInfrastructure(new RedisInfrastructure());
+        AddWebApplication(new SampleProjectApp());
 
-    HttpResponseMessage response = await client!.GetAsync("api/weather");
-    Assert.True(response.IsSuccessStatusCode);
-
-    string content = await response.Content.ReadAsStringAsync();
+        return Task.CompletedTask;
+    }
 }
 ```
 
-Nice! Well done—your integration tests are now fully isolated from each other.
+The `WebApplication` is always initialized last — it depends on the configuration produced by all other infrastructures.
 
-### Miscellenaous
-
-#### Ordering infrastructures execution
-
-In some cases, the execution order of infrastructures within an environment is critical.
-
-To handle this, all infrastructures include an optional **`Order`** property, allowing you to define the sequence for initialization, reset, and teardown.
-
-By default, infrastructures without a specified order are prioritized and executed first.
-
-> ❗ The only exception is **`WebApplicationInfrastructure`**, which is ALWAYS executed last, as it depends on configurations from other infrastructures.
-
-Here's an example:
+In your tests, access the `HttpClient` via `GetWebApplication`:
 
 ```csharp
-    public class DatabaseInfrastructure : AsyncInfrastructure
-    {
-        // Use this property to order execution.
-        public override int? Order => 1;
-        public DatabaseInfrastructure(bool initialize = false): base(initialize)
-        {
-        }
+[Fact]
+public async Task ShouldReturnWeather()
+{
+    HttpClient client = (await CurrentEnvironment.GetWebApplication()).HttpClient!;
 
-        public override Task Destroy()
-        {
-            return Task.CompletedTask;
-        }
-
-        public override Task Initialize()
-        {
-            return Task.CompletedTask;
-        }
-
-        public override Task Reset()
-        {
-            return Task.CompletedTask;
-        }
-    }
+    HttpResponseMessage response = await client.GetAsync("api/weather");
+    Assert.True(response.IsSuccessStatusCode);
+}
 ```
 
-#### Advanced Control Over Infrastructure Resets
+### Miscellaneous
 
-By default, infrastructures are reset between each test to ensure data isolation. However, in certain scenarios -such as multi-tenant applications where isolation is ensured by design- automatic resets may not be necessary.
+#### Ordering infrastructure execution
 
-**With the `AutoReset` option, you can disable the automatic reset for a specific infrastructure:**
+Use the `Order` property to control initialization, reset, and teardown sequence:
 
 ```csharp
-    public class SampleEnvironment : AsyncWebEnvironment<Program, Configuration>
-    {
-        public override Task ConfigureEnvironmentAsync()
-        {
-            AddInfrastructure(new DatabaseInfrastructure()
-            {
-                AutoReset = false
-            });
-            AddWebApplication(new SampleProjectApp());
-
-            return Task.CompletedTask;
-        }
-    }
+public class SqlServerInfrastructure : Infrastructure
+{
+    public override int? Order => 1;
+}
 ```
 
-When **`AutoReset`** is set to `false`, the **`Reset`** method of the specified infrastructure will be skipped during the test lifecycle. This can save significant time and resources in scenarios where resetting is unnecessary.
+Infrastructures without an `Order` are executed first by default. `WebApplicationInfrastructure` is always executed last.
 
-> ❗ Note: Use this option carefully. Ensure that tests are designed to avoid dependencies on leftover data unless explicitly intended.
+#### Disabling automatic reset
+
+By default, all infrastructures are reset between each test. You can disable this per infrastructure:
+
+```csharp
+public class SampleEnvironment : AsyncWebEnvironment
+{
+    public override Task ConfigureEnvironmentAsync()
+    {
+        AddInfrastructure(new SqlServerInfrastructure { AutoReset = false });
+        AddWebApplication(new SampleProjectApp());
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+> ❗ Use this carefully — tests must not depend on leftover state unless explicitly intended.

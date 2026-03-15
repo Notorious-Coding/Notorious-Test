@@ -1,13 +1,11 @@
 ﻿using Microsoft.Data.SqlClient;
 
-using NotoriousTest.Configuration;
 using NotoriousTest.SqlServer;
 
 namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 {
-    public class SqlServerInfrastructure : SqlServerContainerInfrastructure, IConfigurable
+    public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
-        public Dictionary<string, string> Configuration { get; set; }
 
         public SqlServerInfrastructure()
         {
@@ -24,7 +22,8 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
         {
             await base.Initialize();
             // We can add the connection string to the configuration, it will provide a SqlConnection. 
-            Configuration.Add("ConnectionStrings:SqlServer", GetDatabaseConnectionString());
+
+            AddOutputConfigurationEntry("ConnectionStrings:SqlServer", GetDatabaseConnectionString());
         }
 
         private async Task CreateTables(SqlConnection connection)
