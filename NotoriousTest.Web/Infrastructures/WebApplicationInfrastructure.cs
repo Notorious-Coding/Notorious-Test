@@ -1,24 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 
 using NotoriousTest.Configuration;
-using NotoriousTest.Helpers;
 using NotoriousTest.Infrastructures;
 namespace NotoriousTest.Web.Infrastructures
 {
-    public class WebApplicationInfrastructure<TEntryPoint> : WebApplicationInfrastructure<TEntryPoint, Dictionary<string, string>>
+    public class WebApplicationInfrastructure<TEntryPoint> : Infrastructure, IConfigurationConsumer
         where TEntryPoint : class
-    {
-
-    }
-    public class WebApplicationInfrastructure<TEntryPoint, TConfig> : Infrastructure, IConfigurable<TConfig>
-        where TEntryPoint : class
-        where TConfig : class, new()
     {
         private WebApplicationFactory<TEntryPoint> _webApplicationFactory;
         public HttpClient? HttpClient;
         public override int? Order => 999;
 
-        public TConfig Configuration { get; set; } = new();
+        public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
 
         public WebApplicationInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory) : base()
         {
@@ -37,9 +30,9 @@ namespace NotoriousTest.Web.Infrastructures
 
         public override Task Initialize()
         {
-            if (_webApplicationFactory is IConfigurable configurableApplication)
+            if (_webApplicationFactory is IConfigurationConsumer configurableApplication)
             {
-                configurableApplication.Configuration = Configuration.ToDictionary();
+                configurableApplication.ConsumedConfiguration = ConsumedConfiguration;
             }
 
             HttpClient = _webApplicationFactory.CreateDefaultClient();

@@ -1,5 +1,7 @@
-﻿using System.Collections;
-namespace NotoriousTest.Helpers
+﻿using NotoriousTest.Web.Helpers;
+
+using System.Collections;
+namespace NotoriousTest.Web.Helpers
 {
     public static class ObjectExtensions
     {
@@ -8,9 +10,12 @@ namespace NotoriousTest.Helpers
             string name = "")
         {
 
-            if (obj is Dictionary <string, string> dict)
+            if (obj is Dictionary<string, string> dict)
             {
-                return dict;
+                return dict.ToDictionary(
+                    kvp => string.IsNullOrEmpty(name) ? kvp.Key : $"{name}:{kvp.Key}",
+                    kvp => kvp.Value
+                );
             }
 
             var dictionary = new Dictionary<string, string?>();
@@ -58,7 +63,7 @@ namespace NotoriousTest.Helpers
                         property.GetValue(obj),
                         string.IsNullOrEmpty(prefix)
                             ? property.Name
-                            : $"{prefix}.{property.Name}");
+                            : $"{prefix}:{property.Name}");
                 }
             }
         }

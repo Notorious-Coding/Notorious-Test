@@ -71,7 +71,7 @@ dotnet add package NotoriousTest
         {
             await base.Initialize();
             // We can add the connection string to the configuration.
-            Configuration.Add("ConnectionStrings:SqlServer", GetDatabaseConnectionString());
+            AddConfigurationEntry("ConnectionStrings:SqlServer", GetDatabaseConnectionString());
         }
     }
 ```

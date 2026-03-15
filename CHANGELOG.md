@@ -83,7 +83,18 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - Migrate to slnx
 - Extended target frameworks: NotoriousTest now builds for .NET 6, .NET 8, and .NET 9 (previously only .NET 6)
 
-## 4.0.0
+## 4.0.0 - Configuration update !
+
+### ✨ Features
+
+- Full rework on configuration system :
+
+#### Output configuration
+- Environment no longer depends on configuration type
+- `IConfiguration` no longer exist, replaced by `IConfigurationProducer<T>`, Infrastructure now produce their own configuration type and doesn't rely on a global configuration object.
+  They all produce a list of `ConfigurationEntry<T>` or `ConfigurationEntry<object>` that will be used by `IConfigurationConsumer`.
+- `IConfigurationConsumer` will be provided with all configuration from previously initialized infrastructures as a list of `ConfigurationEntry<object>`.
+- `WebApplication` now convert `ConfigurationEntry<object>` as a `IConfiguration` key-value pair to override configuration.
 
 ### 🛠 Technical
 

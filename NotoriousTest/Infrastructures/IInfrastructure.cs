@@ -13,10 +13,14 @@
         bool AutoReset { get; set; }
 
         /// <summary>
-        /// ContextId is an identfier of the current infrastructure context.
+        /// ContextId is an identifier of the current infrastructure context.
         /// In standalone mode : ContextId is a unique identifier scoped for the infrastructure.
         /// Within an environment : ContextId is provided by the environment when the infrastructure is added.
         /// </summary>
         public Guid ContextId { get; set; }
+
+        Task Initialize();
+        Task Reset();
+        Task Destroy();
     }
 }
