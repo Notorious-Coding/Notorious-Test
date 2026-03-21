@@ -1,32 +1,28 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using NotoriousTest.SqlServer;
 
-using NotoriousTest.SqlServer;
+using System.Data.Common;
 
 namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 {
     public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
-
         public SqlServerInfrastructure()
         {
         }
 
-        protected override async Task PopulateDatabase(SqlConnection connection)
-        {
-            // Play all your migrations script here, use DBUp or any other migration tool
-            // You can also use EF Core to create the database schema, apply migrations, etc.
-            await CreateTables(connection);
-        }
-
+        protected override string ConnectionStringKey => "ConnectionStrings:SqlServer";
         public override async Task Initialize()
         {
             await base.Initialize();
             // We can add the connection string to the configuration, it will provide a SqlConnection. 
 
-            AddOutputConfigurationEntry("ConnectionStrings:SqlServer", GetDatabaseConnectionString());
+            using var connection = GetDatabaseConnection();
+            await connection.OpenAsync();
+            await CreateTables(connection);
+
         }
 
-        private async Task CreateTables(SqlConnection connection)
+        private async Task CreateTables(DbConnection connection)
         {
             string sql = @"CREATE TABLE Users (
                                 user_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -37,7 +33,7 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
                             );
                             ";
 
-            using (SqlCommand command = connection.CreateCommand())
+            using (DbCommand command = connection.CreateCommand())
             {
                 command.CommandText = sql;
                 await command.ExecuteNonQueryAsync();

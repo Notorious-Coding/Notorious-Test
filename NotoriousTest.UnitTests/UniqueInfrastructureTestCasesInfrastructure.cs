@@ -1,17 +1,6 @@
-using NotoriousTest.Infrastructures;
+namespace NotoriousTest.UnitTests;
 
-namespace NotoriousTest.UnitTests
+public partial class AsyncEnvironmentUnitTests
 {
-
-    public partial class AsyncEnvironmentUnitTests
-    {
-        public abstract class UniqueInfrastructureTestCasesInfrastructure : Infrastructure
-        {
-            public UniqueInfrastructureTestCasesInfrastructure() : base(false)
-            {
-
-            }
-
-        }
-    }
+    public abstract class UniqueInfrastructureTestCasesInfrastructure : FakeInfrastructure { }
 }

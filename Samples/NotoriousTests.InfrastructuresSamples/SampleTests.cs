@@ -1,9 +1,9 @@
-using Microsoft.Data.SqlClient;
-
 using NotoriousTest;
 
 using NotoriousTests.InfrastructuresSamples.Environments;
 using NotoriousTests.InfrastructuresSamples.Infrastructures;
+
+using System.Data.Common;
 
 namespace NotoriousTests.InfrastructuresSamples
 {
@@ -29,14 +29,14 @@ namespace NotoriousTests.InfrastructuresSamples
             Assert.True(response.IsSuccessStatusCode);
 
             SqlServerInfrastructure sqlInfrastructure = CurrentEnvironment.GetInfrastructure<SqlServerInfrastructure>();
-            await using (SqlConnection sql = sqlInfrastructure.GetDatabaseConnection())
+            await using (DbConnection sql = sqlInfrastructure.GetDatabaseConnection())
             {
                 // Then act with a call to the API
-                await sql.OpenAsync();
-                using (SqlCommand command = sql.CreateCommand())
+                await sql.OpenAsync(TestContext.Current.CancellationToken);
+                using (DbCommand command = sql.CreateCommand())
                 {
                     command.CommandText = "SELECT COUNT(*) FROM Users";
-                    int count = (int)await command.ExecuteScalarAsync();
+                    int count = (int)await command.ExecuteScalarAsync(TestContext.Current.CancellationToken);
                     Assert.Equal(1, count);
                 }
             }

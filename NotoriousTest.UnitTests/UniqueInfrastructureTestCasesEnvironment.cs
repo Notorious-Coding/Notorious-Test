@@ -1,22 +1,22 @@
-namespace NotoriousTest.UnitTests
+using NotoriousTest.Infrastructures;
+
+namespace NotoriousTest.UnitTests;
+
+public partial class AsyncEnvironmentUnitTests
 {
-
-    public partial class AsyncEnvironmentUnitTests
+    public class UniqueInfrastructureTestCasesEnvironment : Environments.Environment
     {
-        public class UniqueInfrastructureTestCasesEnvironment : Environments.Environment
+        private readonly Infrastructure _infra;
+
+        public UniqueInfrastructureTestCasesEnvironment(Infrastructure infra)
         {
+            _infra = infra;
+        }
 
-            public UniqueInfrastructureTestCasesEnvironment()
-            {
-
-            }
-
-            public override Task ConfigureEnvironment()
-            {
-                AddInfrastructure(_uniqueInfrastructureTestCasesInfrastructure);
-
-                return Task.CompletedTask;
-            }
+        public override Task ConfigureEnvironment()
+        {
+            AddInfrastructure(_infra);
+            return Task.CompletedTask;
         }
     }
 }

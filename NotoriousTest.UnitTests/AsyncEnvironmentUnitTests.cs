@@ -2,172 +2,144 @@ using FakeItEasy;
 
 namespace NotoriousTest.UnitTests
 {
-
     public partial class AsyncEnvironmentUnitTests
     {
         #region Unique Infrastructure Test Cases
-        static UniqueInfrastructureTestCasesInfrastructure _uniqueInfrastructureTestCasesInfrastructure;
 
         [Fact]
         public async Task GetInfrastructure_Should_ReturnProperInfrastructure()
         {
-            _uniqueInfrastructureTestCasesInfrastructure = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
-            var environment = new UniqueInfrastructureTestCasesEnvironment();
+            var infra = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
+            var environment = new UniqueInfrastructureTestCasesEnvironment(infra);
             await environment.InitializeAsync();
-            UniqueInfrastructureTestCasesInfrastructure infra = environment.GetInfrastructure<UniqueInfrastructureTestCasesInfrastructure>();
 
-            Assert.NotNull(infra);
-            Assert.Equal(environment.EnvironmentId, infra.ContextId);
+            var result = environment.GetInfrastructure<UniqueInfrastructureTestCasesInfrastructure>();
+
+            Assert.NotNull(result);
+            Assert.Equal(environment.EnvironmentId, result.ContextId);
         }
 
         [Fact]
         public async Task EnvironmentCreation_Should_CallInfrastructureInitialization()
         {
-            _uniqueInfrastructureTestCasesInfrastructure = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
-
-            var environment = new UniqueInfrastructureTestCasesEnvironment();
+            var infra = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
+            var environment = new UniqueInfrastructureTestCasesEnvironment(infra);
 
             await environment.InitializeAsync();
 
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Initialize()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Reset()).MustNotHaveHappened();
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => infra.Initialize()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => infra.Reset()).MustNotHaveHappened();
+            A.CallTo(() => infra.Destroy()).MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Reset_Should_CallInfrastructureReset()
         {
-            _uniqueInfrastructureTestCasesInfrastructure = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
-
-            var environment = new UniqueInfrastructureTestCasesEnvironment();
+            var infra = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
+            var environment = new UniqueInfrastructureTestCasesEnvironment(infra);
 
             await environment.InitializeAsync();
             await environment.Reset();
 
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Initialize()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Reset()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => infra.Initialize()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => infra.Reset()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => infra.Destroy()).MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Destroy_Should_CallInfrastructureDestroy()
         {
-            _uniqueInfrastructureTestCasesInfrastructure = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
-
-            var environment = new UniqueInfrastructureTestCasesEnvironment();
+            var infra = A.Fake<UniqueInfrastructureTestCasesInfrastructure>();
+            var environment = new UniqueInfrastructureTestCasesEnvironment(infra);
 
             await environment.InitializeAsync();
             await environment.Destroy();
 
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Initialize()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Reset()).MustNotHaveHappened();
-            A.CallTo(() => _uniqueInfrastructureTestCasesInfrastructure.Destroy()).MustHaveHappenedOnceExactly();
-
+            A.CallTo(() => infra.Initialize()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => infra.Reset()).MustNotHaveHappened();
+            A.CallTo(() => infra.Destroy()).MustHaveHappenedOnceExactly();
         }
+
         #endregion
+
         #region Multiple Infrastructures Test Cases
-        static MultipleInfrastructureTestCasesInfrastructure1 _multipleInfrastructureTestCasesInfrastructure1;
-        static MultipleInfrastructureTestCasesInfrastructure2 _multipleInfrastructureTestCasesInfrastructure2;
 
         [Fact]
         public async Task Initialize_Should_CallInfrastructuresInOrder()
         {
-            _multipleInfrastructureTestCasesInfrastructure1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
-            _multipleInfrastructureTestCasesInfrastructure2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+            var infra1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
+            var infra2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+            A.CallTo(() => infra1.Order).Returns(1);
+            A.CallTo(() => infra2.Order).Returns(2);
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Order).Returns(1);
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Order).Returns(2);
-
-            var environment = new MultipleInfrastructureTestCasesEnvironment();
-
+            var environment = new MultipleInfrastructureTestCasesEnvironment(infra1, infra2);
             await environment.InitializeAsync();
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Initialize())
+            A.CallTo(() => infra1.Initialize())
                 .MustHaveHappenedOnceExactly()
-                .Then(
-                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Initialize())
-                        .MustHaveHappenedOnceExactly()
-                );
+                .Then(A.CallTo(() => infra2.Initialize()).MustHaveHappenedOnceExactly());
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Reset()).MustNotHaveHappened();
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Destroy()).MustNotHaveHappened();
-
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Reset()).MustNotHaveHappened();
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => infra1.Reset()).MustNotHaveHappened();
+            A.CallTo(() => infra1.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => infra2.Reset()).MustNotHaveHappened();
+            A.CallTo(() => infra2.Destroy()).MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Initialize_Should_CallInfrastructureResetInOrder()
         {
-            _multipleInfrastructureTestCasesInfrastructure1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
-            _multipleInfrastructureTestCasesInfrastructure2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+            var infra1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
+            var infra2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+            A.CallTo(() => infra1.Order).Returns(1);
+            A.CallTo(() => infra2.Order).Returns(2);
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Order).Returns(1);
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Order).Returns(2);
-
-            var environment = new MultipleInfrastructureTestCasesEnvironment();
-
+            var environment = new MultipleInfrastructureTestCasesEnvironment(infra1, infra2);
             await environment.InitializeAsync();
             await environment.Reset();
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Initialize())
+            A.CallTo(() => infra1.Initialize())
                 .MustHaveHappenedOnceExactly()
-                .Then(
-                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Initialize())
-                        .MustHaveHappenedOnceExactly()
-                );
+                .Then(A.CallTo(() => infra2.Initialize()).MustHaveHappenedOnceExactly());
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Reset())
+            A.CallTo(() => infra1.Reset())
                 .MustHaveHappenedOnceExactly()
-                .Then(
-                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Reset())
-                        .MustHaveHappenedOnceExactly()
-                );
+                .Then(A.CallTo(() => infra2.Reset()).MustHaveHappenedOnceExactly());
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Destroy()).MustNotHaveHappened();
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => infra1.Destroy()).MustNotHaveHappened();
+            A.CallTo(() => infra2.Destroy()).MustNotHaveHappened();
         }
 
         [Fact]
         public async Task Initialize_Should_CallInfrastructureDestroyInOrder()
         {
-            _multipleInfrastructureTestCasesInfrastructure1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
-            _multipleInfrastructureTestCasesInfrastructure2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+            var infra1 = A.Fake<MultipleInfrastructureTestCasesInfrastructure1>();
+            var infra2 = A.Fake<MultipleInfrastructureTestCasesInfrastructure2>();
+            A.CallTo(() => infra1.Order).Returns(1);
+            A.CallTo(() => infra2.Order).Returns(2);
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Order).Returns(1);
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Order).Returns(2);
-
-            var environment = new MultipleInfrastructureTestCasesEnvironment();
-
+            var environment = new MultipleInfrastructureTestCasesEnvironment(infra1, infra2);
             await environment.InitializeAsync();
             await environment.Destroy();
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Initialize())
+            A.CallTo(() => infra1.Initialize())
                 .MustHaveHappenedOnceExactly()
-                .Then(
-                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Initialize())
-                        .MustHaveHappenedOnceExactly()
-                );
+                .Then(A.CallTo(() => infra2.Initialize()).MustHaveHappenedOnceExactly());
 
-            A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure1.Destroy())
+            A.CallTo(() => infra1.Destroy())
                 .MustHaveHappenedOnceExactly()
-                .Then(
-                    A.CallTo(() => _multipleInfrastructureTestCasesInfrastructure2.Destroy())
-                        .MustHaveHappenedOnceExactly()
-                );
+                .Then(A.CallTo(() => infra2.Destroy()).MustHaveHappenedOnceExactly());
         }
 
         #endregion
-        #region Configuration Object Test Cases
-        static ConfigurationObjectTestCasesInfrastructure1 _configurationObjectTestCasesInfrastructure1;
-        static ConfigurationObjectTestCasesInfrastructureWithSection2 _configurationObjectTestCasesInfrastructure2;
 
-        public class ConfigurationObjectTestCasesInfrastructureConfiguraton1
+        #region Configuration Object Test Cases
+
+        public class ConfigurationObjectTestCasesInfrastructureConfiguration1
         {
             public string Key1 { get; set; }
         }
 
-        public class ConfigurationObjectTestCasesInfrastructureConfiguraton2
+        public class ConfigurationObjectTestCasesInfrastructureConfiguration2
         {
             public string Key2 { get; set; }
         }
@@ -175,33 +147,33 @@ namespace NotoriousTest.UnitTests
         [Fact]
         public async Task InfrastructureWithinEnvironmentWithObjectConfiguration_Should_ProduceConfigurationCorrectly()
         {
-            _configurationObjectTestCasesInfrastructure1 = new ConfigurationObjectTestCasesInfrastructure1();
-            _configurationObjectTestCasesInfrastructure2 = new ConfigurationObjectTestCasesInfrastructureWithSection2();
+            var infra1 = new ConfigurationObjectTestCasesInfrastructure1();
+            var infra2 = new ConfigurationObjectTestCasesInfrastructureWithSection2();
+            var environment = new ConfigurationObjectTestCasesEnvironment(infra1, infra2);
 
-            var environment = new ConfigurationObjectTestCasesEnvironment();
             await environment.InitializeAsync();
-            var config1 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationObjectTestCasesInfrastructureConfiguraton1")?.Value as ConfigurationObjectTestCasesInfrastructureConfiguraton1;
-            var config2 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "Toto")?.Value as ConfigurationObjectTestCasesInfrastructureConfiguraton2;
+
+            var config1 = infra1.OutputConfiguration.FirstOrDefault(ce => ce.Key == nameof(ConfigurationObjectTestCasesInfrastructureConfiguration1))?.Value;
+            var config2 = infra2.OutputConfiguration.FirstOrDefault(ce => ce.Key == "Toto")?.Value;
             Assert.Equal("Infra1Key1", config1?.Key1);
             Assert.Equal("Infra2Key2", config2?.Key2);
         }
 
         #endregion
+
         #region Configuration Dictionary Test Cases
-        static ConfigurationDictionaryTestCasesInfrastructure1 _configurationDictionaryTestCasesInfrastructure1;
-        static ConfigurationDictionaryTestCasesInfrastructure2 _configurationDictionaryTestCasesInfrastructure2;
 
         [Fact]
         public async Task InfrastructureWithinEnvironmentWithDictionaryConfiguration_Should_ProduceConfigurationCorrectly()
         {
-            _configurationDictionaryTestCasesInfrastructure1 = new ConfigurationDictionaryTestCasesInfrastructure1();
-            _configurationDictionaryTestCasesInfrastructure2 = new ConfigurationDictionaryTestCasesInfrastructure2();
+            var infra1 = new ConfigurationDictionaryTestCasesInfrastructure1();
+            var infra2 = new ConfigurationDictionaryTestCasesInfrastructure2();
+            var environment = new ConfigurationDictionaryTestCasesEnvironment(infra1, infra2);
 
-            var environment = new ConfigurationDictionaryTestCasesEnvironment();
             await environment.InitializeAsync();
 
-            var config1 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationDictionaryTestCasesInfrastructure1:Key1")?.Value as string;
-            var config2 = environment.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationDictionaryTestCasesInfrastructure2:Key2")?.Value as string;
+            var config1 = infra1.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationDictionaryTestCasesInfrastructure1:Key1")?.Value;
+            var config2 = infra2.OutputConfiguration.FirstOrDefault(ce => ce.Key == "ConfigurationDictionaryTestCasesInfrastructure2:Key2")?.Value;
             Assert.Equal("Infra1Key1", config1);
             Assert.Equal("Infra2Key2", config2);
         }

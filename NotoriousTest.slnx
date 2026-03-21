@@ -21,6 +21,7 @@
   <Folder Name="/Tests/">
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
+  <Project Path="NotoriousTest.Database/NotoriousTest.Database.csproj" Id="61a1bf4a-e96c-464e-a985-8ac40019acd1" />
   <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj" />
   <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj" />
   <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
