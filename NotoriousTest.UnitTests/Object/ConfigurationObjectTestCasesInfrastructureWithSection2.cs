@@ -1,38 +1,22 @@
 using NotoriousTest.Infrastructures;
 
-namespace NotoriousTest.UnitTests
+namespace NotoriousTest.UnitTests;
+
+public partial class AsyncEnvironmentUnitTests
 {
-
-    public partial class AsyncEnvironmentUnitTests
+    public class ConfigurationObjectTestCasesInfrastructureWithSection2 : Infrastructure<ConfigurationObjectTestCasesInfrastructureConfiguration2>
     {
-        public class ConfigurationObjectTestCasesInfrastructureWithSection2 : Infrastructure<ConfigurationObjectTestCasesInfrastructureConfiguraton2>
+        public override Task Destroy() => Task.CompletedTask;
+
+        public override Task Initialize()
         {
-
-
-            public ConfigurationObjectTestCasesInfrastructureWithSection2() : base(false)
+            AddEntry("Toto", new()
             {
-            }
-
-
-            public override Task Destroy()
-            {
-                return Task.CompletedTask;
-            }
-
-            public override Task Initialize()
-            {
-                AddOutputConfigurationEntry("Toto", new()
-                {
-                    Key2 = "Infra2Key2"
-                });
-
-                return Task.CompletedTask;
-            }
-
-            public override Task Reset()
-            {
-                return Task.CompletedTask;
-            }
+                Key2 = "Infra2Key2"
+            });
+            return Task.CompletedTask;
         }
+
+        public override Task Reset() => Task.CompletedTask;
     }
 }

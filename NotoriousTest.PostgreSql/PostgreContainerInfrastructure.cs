@@ -1,74 +1,49 @@
-﻿using NotoriousTest.TestContainers;
+﻿using NotoriousTest.Database;
 
 using Npgsql;
 
 using Respawn;
+using Respawn.Graph;
+
+using System.Data.Common;
 
 using Testcontainers.PostgreSql;
 
 
 namespace NotoriousTest.PostgreSql;
 
-public class PostgreContainerInfrastructure : DockerContainerInfrastructure<PostgreSqlContainer>
+public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
-    public string DbName { get; init; } = "NotoriousDb";
-    public RespawnerOptions? RespawnOptions { get; set; } = new RespawnerOptions
-    {
-        DbAdapter = DbAdapter.Postgres
-    };
-
-    protected string FullDbName;
-    private Respawner _respawner;
-    public PostgreContainerInfrastructure(bool initialize = false) : base(initialize)
-    {
-        Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
-    }
-
     /// <summary>
-    /// Returns a PostgreSQL connection connected to the current infrastructure's database.
+    /// Gets the configuration key used to retrieve the default connection string.
     /// </summary>
-    /// <returns>A NpgsqlConnection instance connected to the current infrastructure's database.</returns>
-    public NpgsqlConnection GetDatabaseConnection() => new NpgsqlConnection(GetConnectionString(FullDbName));
-
-    /// <summary>
-    /// Returns a PostgreSQL connection string pointing to the current infrastructure's database.
-    /// </summary>
-    /// <returns>A SqlConnection instance pointing to the current infrastructure's database.</returns>
-    public string GetDatabaseConnectionString() => GetConnectionString(FullDbName);
-
+    /// <remarks>Override this property in a derived class to specify a different configuration key if
+    /// needed.</remarks>
+    protected virtual string ConnectionStringKey => "ConnectionStrings:Default";
     public override async Task Initialize()
     {
         await base.Initialize();
 
-        FullDbName = $"{DbName}_{ContextId}";
-        using (var connection = GetSqlConnection())
-        {
-            await connection.OpenAsync();
-            await CreateDatabase(connection);
-            await connection.ChangeDatabaseAsync(FullDbName);
-            await PopulateDatabase(connection);
-            _respawner = await Respawner.CreateAsync(connection, RespawnOptions);
-
-        }
+        AddEntry(ConnectionStringKey, GetDatabaseConnectionString());
     }
+}
 
-    /// <summary>
-    /// Called after the database is created. Override this method to populate the database with data.
-    /// </summary>
-    /// <param name="connection">A NpgsqlConnection pointing on the newly created database</param>
-    protected virtual Task PopulateDatabase(NpgsqlConnection connection)
-    {
-        return Task.CompletedTask;
-    }
+public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<PostgreSqlContainer, TOutputConfiguration>
+{
+    public string[] SchemasToInclude { get; init; } = [];
+    public string[] SchemasToExclude { get; init; } = [];
 
-    public override async Task Reset()
+    public PostgreContainerInfrastructure() : base()
     {
-        using (var connection = GetSqlConnection())
+        Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
+        EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
         {
-            await connection.OpenAsync();
-            await connection.ChangeDatabaseAsync(FullDbName);
-            await _respawner.ResetAsync(connection);
-        }
+            TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
+            TablesToInclude = TableToInclude.Select(tti => new Table(tti)).ToArray(),
+            SchemasToExclude = SchemasToExclude,
+            SchemasToInclude = SchemasToInclude,
+            DbAdapter = DbAdapter.Postgres
+        }));
     }
 
     protected virtual PostgreSqlBuilder ConfigureSqlContainer(PostgreSqlBuilder builder)
@@ -76,26 +51,33 @@ public class PostgreContainerInfrastructure : DockerContainerInfrastructure<Post
         return builder;
     }
 
-    private async Task CreateDatabase(NpgsqlConnection sqlConnection)
+    public override DbConnection GetDatabaseConnection()
     {
-        using (NpgsqlCommand command = sqlConnection.CreateCommand())
-        {
-            command.CommandText = $"CREATE DATABASE \"{FullDbName}\"";
-            await command.ExecuteNonQueryAsync();
-        }
+        return new NpgsqlConnection(GetDatabaseConnectionString());
     }
 
-    private NpgsqlConnection GetSqlConnection() => new NpgsqlConnection(GetConnectionString());
+    public override DbConnection GetServerConnection()
+    {
+        return new NpgsqlConnection(GetServerConnectionString());
+    }
 
-    private string GetConnectionString(string? dbName = null)
+    public override string GetDatabaseConnectionString()
     {
         NpgsqlConnectionStringBuilder connectionString = new NpgsqlConnectionStringBuilder(Container.GetConnectionString());
-
-        if (!string.IsNullOrEmpty(dbName))
+        if (!string.IsNullOrEmpty(FullDbName))
         {
             connectionString.Database = FullDbName;
         }
 
         return connectionString.ToString();
+    }
+
+    protected override async Task CreateDatabase(DbConnection sqlConnection)
+    {
+        using (DbCommand command = sqlConnection.CreateCommand())
+        {
+            command.CommandText = $"CREATE DATABASE \"{FullDbName}\"";
+            await command.ExecuteNonQueryAsync();
+        }
     }
 }

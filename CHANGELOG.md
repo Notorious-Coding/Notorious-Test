@@ -71,7 +71,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 - Added C4 model architecture schema
 
-## 3.1.0 
+## v3.1.0 
 
 ### ✨ Features
 
@@ -83,22 +83,60 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 - Migrate to slnx
 - Extended target frameworks: NotoriousTest now builds for .NET 6, .NET 8, and .NET 9 (previously only .NET 6)
 
-## 4.0.0 - Configuration update !
+## v4.0.0
 
 ### ✨ Features
 
-- Full rework on configuration system :
+#### Infrastructure extensions 💥NEW💥
+- Introducing a new concept called infrastructure extension, meant to be used to react to infrastructure setup. 
+- New interface `IInfrastructureExtension`, provide hooks such as `OnBeforeInitialize` to extends Infrastructure.
+- Configuration is now handled by extensions classes.
+- Use `EnsureExtension<MyExtension>()` or `EnsureExtension(new MyExtension())`  to register an extension.
+- Built-in extensions : 
+	- Core 
+		- `OutputConfigurationExtension<TOutputConfiguration>` : Provide a way to output configuration. Included in `Infrastructure` base class.
+		- `SettingsExtension<TSettings>`: Load from `testsettings.json` your infrastructure configuration. Config key default to infrastructure name, and can be override.
+	- Database
+		- `RespawnExtension`: Integration of Respawn package to reset databases between test.
 
-#### Output configuration
-- Environment no longer depends on configuration type
-- `IConfiguration` no longer exist, replaced by `IConfigurationProducer<T>`, Infrastructure now produce their own configuration type and doesn't rely on a global configuration object.
-  They all produce a list of `ConfigurationEntry<T>` or `ConfigurationEntry<object>` that will be used by `IConfigurationConsumer`.
-- `IConfigurationConsumer` will be provided with all configuration from previously initialized infrastructures as a list of `ConfigurationEntry<object>`.
-- `WebApplication` now convert `ConfigurationEntry<object>` as a `IConfiguration` key-value pair to override configuration.
+#### Settings 💥NEW💥
+- By registering a `SettingsExtension`, you can now load settings from `testsettings.json` to configure infrastructure.
+- Automatically loaded from the infrastructure name as config key.
 
-### 🛠 Technical
+#### Output configuration 🔧 UPDATED 🔧
+- Environments no longer require a global configuration object. Configuration is now propagated automatically through extensions.
+- Output configuration is now handled by an extension built-in Infrastructure base class.
+- Adding a configuration output will now be made by calling `AddEntry(key, config)`.
+- Environment will gather all configuration under all keys and pass to all `IConfigurationConsumer` infrastructures, such as `WebApplicationInfrastructure`.
+- `WebApplicationInfrastructure` now maps configuration entries to appsettings format automatically. Generating the section path from the key and config structure. 
+- e.g. 
+```json
+  // Entry: "Example:Test" → { "Host": "localhost", "Port": 5432 }
+  // appsettings.json
+  {
+    "Example": {
+		"Test": {
+			"Host": "localhost",
+			"Port": 5432
+		}
+      }
+  }
+```
+#### Database 💥NEW💥
+- Non docker database infrastructure for SqlServer and PostgreSql have been added ! For those who want to run test on existing servers.
+- New package NotoriousTest.Database provides base classes for docker and non-docker database infrastructures.
+- `ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings>`: Base class for non docker database infrastructures, that need a running server to setup.
+	- `DatabaseSettings` will be loaded directly from the `testsettings.json` file.
+- `DockerDatabaseInfrastructure<TContainer>`: Base class for testcontainers powered infrastructure. Takes a `IDatabaseContainer`.
 
-- Synchronous classes are no longer available, all async classes have been renamed.
-- .NET 6 is no longer supported.
-- NotoriousTest is now in .net standard 2.1, web support has been moved to NotoriousTest.Web
-- XUnit has been updated to the latest version (xunit.v3).
+#### Misc
+- You can now add infrastructure via a generic type in addition to the IInfrastructure parameter signature : `AddInfrastructure<T>()`
+
+### 🛠 Technical & 💥 Breaking Changes
+
+- Synchronous classes have been removed. All `Async`-prefixed classes have been renamed without the suffix (e.g. `AsyncInfrastructure` → `Infrastructure`).
+- .NET 6 is no longer supported. Minimum target is .NET 8.
+- Web support has been moved to a separate package `NotoriousTest.Web`. Projects using `WebApplicationInfrastructure` must add the new package.
+- Configuration management has been fully reworked. `IConfigurableInfrastructure`, `IConfigurationConsumer`, and global environment configuration objects are replaced by the extension system. Existing configuration setups must be migrated to `EnsureExtension`.
+- XUnit has been updated to xunit.v3, which introduces breaking changes of its own. See the [xunit.v3 migration guide](https://xunit.net/docs/getting-started/v3/migration).
+

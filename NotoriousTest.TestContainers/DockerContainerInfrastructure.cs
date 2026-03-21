@@ -4,10 +4,12 @@ using NotoriousTest.Infrastructures;
 
 namespace NotoriousTest.TestContainers
 {
-
-    public abstract class DockerContainerInfrastructure<TContainer> : Infrastructure where TContainer : IContainer
+    public abstract class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration>
+        where TContainer : IContainer
     {
-        protected DockerContainerInfrastructure(bool initialize = false) : base(initialize) { }
+        protected DockerContainerInfrastructure() : base()
+        {
+        }
 
         protected TContainer Container { get; init; }
 
@@ -20,5 +22,6 @@ namespace NotoriousTest.TestContainers
         {
             await Container.StartAsync();
         }
+
     }
 }

@@ -1,79 +1,116 @@
 ﻿using NotoriousTest.Configuration;
+using NotoriousTest.Extensions;
 
-using Xunit;
+namespace NotoriousTest.Infrastructures;
 
-namespace NotoriousTest.Infrastructures
+
+public abstract class Infrastructure<TOutputConfiguration> : Infrastructure, IConfigurationProducer<TOutputConfiguration>
+{
+    public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
+
+    protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
+    protected Infrastructure() : base()
+    {
+        OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
+    }
+
+    public void AddEntry(string key, TOutputConfiguration value) => OutputConfigurationExtension.AddEntry(key, value);
+}
+
+/// <summary>
+/// Infrastructure is a base class to define a test infrastructure.
+/// </summary>
+public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 {
     ///<inheritdoc/>
-    public abstract class Infrastructure : Infrastructure<object>
+    public virtual int? Order { get; }
+
+    ///<inheritdoc/>
+    public bool AutoReset { get; set; } = true;
+
+    ///<inheritdoc/>
+    public Guid ContextId { get; set; } = Guid.NewGuid();
+
+    private readonly List<IInfrastructureExtension> _extensions = new();
+
+
+    public Infrastructure()
     {
-        public Infrastructure(bool initialize = false) : base(initialize)
-        {
-
-        }
-
     }
-    /// <summary>
-    /// AsyncInfrastructure is a base class to define a test infrastructure.
-    /// </summary>
-    public abstract class Infrastructure<TOutputConfiguration> : IConfigurationProducer<TOutputConfiguration>, IInfrastructure, IAsyncLifetime, IAsyncDisposable
+
+    public abstract Task Initialize();
+    public abstract Task Reset();
+    public abstract Task Destroy();
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        ///<inheritdoc/>
-        public virtual int? Order { get; }
-        ///<inheritdoc/>
-        public bool AutoReset { get; set; } = true;
-        ///<inheritdoc/>
-        public Guid ContextId { get; set; } = Guid.NewGuid();
+        await DestroyAsync();
+    }
 
-        ///<innheritdoc/>
-        public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration { get; set; } = new();
+    internal async Task InitializeAsync()
+    {
+        foreach (var extension in _extensions)
+            await extension.OnBeforeInitialize(this);
 
-        private bool _initialize = false;
+        await Initialize();
 
-        public Infrastructure(bool initialize = false)
-        {
-            _initialize = initialize;
-        }
+        foreach (var extension in _extensions)
+            await extension.OnAfterInitialize(this);
+    }
 
-        public abstract Task Initialize();
-        public abstract Task Reset();
-        public abstract Task Destroy();
+    internal async Task ResetAsync()
+    {
+        foreach (var extension in _extensions)
+            await extension.OnBeforeReset(this);
 
-        /// <summary>
-        /// Called by xunit
-        /// </summary>
-        public async ValueTask InitializeAsync()
-        {
-            if (_initialize) await Initialize();
-        }
+        await Reset();
 
-        public async ValueTask DisposeAsync()
-        {
-            await Destroy();
-        }
+        foreach (var extension in _extensions)
+            await extension.OnAfterReset(this);
+    }
 
-        async ValueTask IAsyncDisposable.DisposeAsync()
-        {
-            await DisposeAsync();
-        }
+    internal async Task DestroyAsync()
+    {
+        foreach (var extension in _extensions)
+            await extension.OnBeforeDestroy(this);
 
-        /// <summary>
-        /// Add an output configuration.
-        /// </summary>
-        /// <param name="key">Key or path of the value within the configuration.</param>
-        /// <param name="value">Value of the configuration.</param>
-        public void AddOutputConfigurationEntry(string key, TOutputConfiguration value)
-        {
-            OutputConfiguration.Add(new ConfigurationEntry<TOutputConfiguration>(value, key));
-        }
+        await Destroy();
 
-        /// <summary>
-        /// Add an output configuration with default key to value type.
-        /// </summary>
-        /// <param name="value">Value of the configuration.</param>
-        public void AddOutputConfigurationEntry(TOutputConfiguration value)
-        {
-            OutputConfiguration.Add(new ConfigurationEntry<TOutputConfiguration>(value, value!.GetType().Name));
-        }
+        foreach (var extension in _extensions)
+            await extension.OnAfterDestroy(this);
+    }
+
+    /// <summary>
+    /// Ensures that an extension of the specified type is present in the collection, returning the existing instance if
+    /// found or adding and returning the provided instance if not.
+    /// </summary>
+    /// <typeparam name="T">The type of the infrastructure extension to ensure. Must implement IInfrastructureExtension.</typeparam>
+    /// <param name="extension">The extension instance to add if an existing instance of type T is not already present. Cannot be null.</param>
+    /// <returns>The existing extension of type T if present; otherwise, the provided extension instance.</returns>
+    protected T EnsureExtension<T>(T extension) where T : IInfrastructureExtension
+    {
+        var existing = _extensions.OfType<T>().FirstOrDefault();
+        if (existing != null) return existing;
+
+        _extensions.Add(extension);
+        return extension;
+    }
+
+    /// <summary>
+    /// Retrieves an existing extension of the specified type from the collection, or creates and adds a new instance if
+    /// none exists.
+    /// </summary>
+    /// <typeparam name="T">The type of extension to retrieve or create. Must implement IInfrastructureExtension and have a parameterless
+    /// constructor.</typeparam>
+    /// <returns>An instance of the specified extension type. If an extension of this type already exists in the collection, it
+    /// is returned; otherwise, a new instance is created, added to the collection, and returned.</returns>
+    protected T EnsureExtension<T>() where T : IInfrastructureExtension, new()
+    {
+        var existing = _extensions.OfType<T>().FirstOrDefault();
+        if (existing != null) return existing;
+
+        T extension = new T();
+        _extensions.Add(extension);
+        return extension;
     }
 }

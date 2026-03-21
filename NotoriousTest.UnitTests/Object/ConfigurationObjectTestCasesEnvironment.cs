@@ -1,21 +1,25 @@
-using Environment = NotoriousTest.Environments.Environment;
+namespace NotoriousTest.UnitTests;
 
-namespace NotoriousTest.UnitTests
+public partial class AsyncEnvironmentUnitTests
 {
-
-    public partial class AsyncEnvironmentUnitTests
+    public class ConfigurationObjectTestCasesEnvironment : Environments.Environment
     {
-        public class ConfigurationObjectTestCasesEnvironment : Environment
+        private readonly ConfigurationObjectTestCasesInfrastructure1 _infra1;
+        private readonly ConfigurationObjectTestCasesInfrastructureWithSection2 _infra2;
+
+        public ConfigurationObjectTestCasesEnvironment(
+            ConfigurationObjectTestCasesInfrastructure1 infra1,
+            ConfigurationObjectTestCasesInfrastructureWithSection2 infra2)
         {
-            public ConfigurationObjectTestCasesEnvironment()
-            {
-            }
-            public override Task ConfigureEnvironment()
-            {
-                AddInfrastructure(_configurationObjectTestCasesInfrastructure1);
-                AddInfrastructure(_configurationObjectTestCasesInfrastructure2);
-                return Task.CompletedTask;
-            }
+            _infra1 = infra1;
+            _infra2 = infra2;
+        }
+
+        public override Task ConfigureEnvironment()
+        {
+            AddInfrastructure(_infra1);
+            AddInfrastructure(_infra2);
+            return Task.CompletedTask;
         }
     }
 }

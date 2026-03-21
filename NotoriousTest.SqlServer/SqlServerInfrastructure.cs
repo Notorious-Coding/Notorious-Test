@@ -1,17 +1,16 @@
 ﻿using Microsoft.Data.SqlClient;
 
 using NotoriousTest.Database;
+using NotoriousTest.Database.Settings;
 
 using Respawn;
 using Respawn.Graph;
 
 using System.Data.Common;
 
-using Testcontainers.MsSql;
-
 namespace NotoriousTest.SqlServer
 {
-    public class SqlServerContainerInfrastructure : SqlServerContainerInfrastructure<string>
+    public class SqlServerInfrastructure : SqlServerInfrastructure<string, DatabaseSettings>
     {
         /// <summary>
         /// Gets the configuration key used to retrieve the default connection string.
@@ -27,14 +26,13 @@ namespace NotoriousTest.SqlServer
         }
     }
 
-    public class SqlServerContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<MsSqlContainer, TOutputConfiguration>
+    public class SqlServerInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerContainerInfrastructure() : base()
+        public SqlServerInfrastructure() : base()
         {
-            Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {
                 TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
@@ -43,11 +41,6 @@ namespace NotoriousTest.SqlServer
                 SchemasToInclude = SchemasToInclude,
                 DbAdapter = DbAdapter.SqlServer
             }));
-        }
-
-        protected virtual MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder)
-        {
-            return builder;
         }
 
         public override DbConnection GetDatabaseConnection()
@@ -62,11 +55,10 @@ namespace NotoriousTest.SqlServer
 
         public override string GetDatabaseConnectionString()
         {
-            SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder(Container.GetConnectionString());
-            if (!string.IsNullOrEmpty(FullDbName))
+            SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder(Settings.ConnectionString)
             {
-                connectionString.InitialCatalog = FullDbName;
-            }
+                InitialCatalog = FullDbName
+            };
 
             return connectionString.ToString();
         }
@@ -79,6 +71,16 @@ namespace NotoriousTest.SqlServer
                 await command.ExecuteNonQueryAsync();
             }
         }
+
+        protected override async Task DropDatabase(DbConnection sqlConnection)
+        {
+            using (DbCommand command = sqlConnection.CreateCommand())
+            {
+                command.CommandText = $"DROP DATABASE [{FullDbName}]";
+                await command.ExecuteNonQueryAsync();
+            }
+        }
+
 
     }
 }

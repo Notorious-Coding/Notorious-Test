@@ -6,7 +6,7 @@
     /// <typeparam name="T">Configuration type.</typeparam>
     public interface IConfigurationProducer<T> : IConfigurationProducer
     {
-        new List<ConfigurationEntry<T>> OutputConfiguration { get; set; }
+        new List<ConfigurationEntry<T>> OutputConfiguration { get; }
 
         List<ConfigurationEntry<object>> IConfigurationProducer.OutputConfiguration
             => OutputConfiguration
@@ -18,7 +18,7 @@
         /// </summary>
         /// <param name="key">The unique key that identifies the configuration entry. Cannot be null or empty.</param>
         /// <param name="value">The value to associate with the specified key in the configuration entry.</param>
-        void AddOutputConfigurationEntry(string key, T value) => OutputConfiguration.Add(new ConfigurationEntry<T>(value, key));
+        void AddEntry(string key, T value);
     }
 
     public interface IConfigurationProducer

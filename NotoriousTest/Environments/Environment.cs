@@ -12,10 +12,15 @@ namespace NotoriousTest.Environments
     /// </summary>
     public abstract class Environment : IAsyncLifetime
     {
+        /// <summary>
+        /// Gets the unique identifier for the environment instance.
+        /// </summary>
         public Guid EnvironmentId { get; private set; } = Guid.NewGuid();
-        public List<ConfigurationEntry<object>> OutputConfiguration { get; set; } = new();
 
-        protected List<IInfrastructure> Infrastructures { get; private set; } = new List<IInfrastructure>();
+        /// <summary>
+        /// Gets the collection of infrastructure components associated with this instance.
+        /// </summary>
+        private List<Infrastructure> _infrastructures = [];
         #region IAsyncLifetime Implementation
 
         /// <summary>
@@ -48,9 +53,9 @@ namespace NotoriousTest.Environments
         /// <typeparam name="T">Infrastructure type</typeparam>
         /// <returns>Infrastructure of type <typeparamref name="T"/></returns>
         /// <exception cref="InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
-        public T GetInfrastructure<T>() where T : IInfrastructure
+        public T GetInfrastructure<T>() where T : Infrastructure
         {
-            T? infrastructure = this.Infrastructures.OfType<T>().FirstOrDefault();
+            T? infrastructure = _infrastructures.OfType<T>().FirstOrDefault();
 
             if (infrastructure == null) throw new InfrastructureNotFoundException($"L'infrastructure persistante de type {typeof(T)} n'éxiste pas, veuillez vérififer la méthode ${nameof(ConfigureEnvironment)}");
 
@@ -60,46 +65,43 @@ namespace NotoriousTest.Environments
         /// <summary>
         /// Add an infrastructure within environment.
         /// </summary>
-        /// <param name="infrastructure"></param>
-        public Environment AddInfrastructure(IInfrastructure infrastructure)
+        public Environment AddInfrastructure<T>() where T : Infrastructure, new()
+            => AddInfrastructure(Activator.CreateInstance<T>());
+
+        /// <summary>
+        /// Add an infrastructure within environment.
+        /// </summary>
+        public Environment AddInfrastructure(Infrastructure infrastructure)
         {
             infrastructure.ContextId = EnvironmentId;
-            Infrastructures.Add(infrastructure);
+            _infrastructures.Add(infrastructure);
             return this;
         }
 
         public virtual async Task Initialize()
         {
-            foreach (IInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
+            foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
             {
                 if (infra is IConfigurationConsumer consumer)
                 {
                     consumer.ConsumedConfiguration = AggregateInfrastructureConfiguration();
                 }
 
-                await infra.Initialize();
-
-                if (infra is IConfigurationProducer producer)
-                {
-                    if (producer.OutputConfiguration is not null)
-                    {
-                        OutputConfiguration.AddRange(producer.OutputConfiguration);
-                    }
-                }
+                await infra.InitializeAsync();
             }
         }
 
         public virtual async Task Reset()
         {
-            foreach (IInfrastructure infrastructure in Infrastructures.OrderBy(pi => pi.Order))
+            foreach (Infrastructure infrastructure in _infrastructures.OrderBy(pi => pi.Order))
             {
-                if (infrastructure.AutoReset) await infrastructure.Reset();
+                if (infrastructure.AutoReset) await infrastructure.ResetAsync();
             }
         }
 
         public virtual async Task Destroy()
         {
-            foreach (IInfrastructure infra in Infrastructures.OrderBy(i => i.Order))
+            foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
             {
                 await infra.Destroy();
             }
@@ -107,7 +109,7 @@ namespace NotoriousTest.Environments
 
         private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration()
         {
-            return Infrastructures
+            return _infrastructures
                     .Where(i => i is IConfigurationProducer)
                     .SelectMany(i => (i as IConfigurationProducer).OutputConfiguration)
                     .ToList();

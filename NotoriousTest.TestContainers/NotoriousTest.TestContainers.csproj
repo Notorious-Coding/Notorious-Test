@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<Description>A TestContainers integration with NotoriousTest.</Description>
 		<PackageId>NotoriousTest.TestContainers</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -26,6 +26,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Testcontainers" Version="4.1.0" />
+	  <PackageReference Include="Testcontainers" Version="4.11.0" />
 	</ItemGroup>
 </Project>
