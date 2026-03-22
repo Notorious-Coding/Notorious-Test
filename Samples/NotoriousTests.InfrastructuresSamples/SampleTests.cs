@@ -22,7 +22,7 @@ namespace NotoriousTests.InfrastructuresSamples
         {
             // You can access an infrastructure directly from the CurrentEnvironment property of the test class.
             // This is useful to access the database connection for example.
-            HttpClient client = CurrentEnvironment.GetWebApplication().HttpClient;
+            HttpClient client = CurrentEnvironment.WebApp.HttpClient;
             HttpResponseMessage response = await client.PostAsync("users", null);
 
             // Then assert that the database is in the expected state

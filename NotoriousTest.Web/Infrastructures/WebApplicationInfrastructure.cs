@@ -1,26 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-
-using NotoriousTest.Configuration;
+﻿using NotoriousTest.Configuration;
 using NotoriousTest.Infrastructures;
+using NotoriousTest.Web.Applications;
 namespace NotoriousTest.Web.Infrastructures
 {
-    public class WebApplicationInfrastructure<TEntryPoint> : Infrastructure, IConfigurationConsumer
-        where TEntryPoint : class
+    public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurationConsumer
     {
-        private WebApplicationFactory<TEntryPoint> _webApplicationFactory;
+        public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
         public HttpClient? HttpClient;
         public override int? Order => 999;
 
-        public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
-
-        public WebApplicationInfrastructure(WebApplicationFactory<TEntryPoint> webApplicationFactory) : base()
+        protected WebApplicationInfrastructure(ContextId contextId) : base(contextId)
         {
-            _webApplicationFactory = webApplicationFactory;
+
         }
 
-        public WebApplicationInfrastructure() : base()
+    }
+    public class WebApplicationInfrastructure<TWebApp> : WebApplicationInfrastructure where TWebApp : IWebApplication, new()
+    {
+        private TWebApp _webApplicationFactory;
+        public override int? Order => 999;
+
+        public WebApplicationInfrastructure(ContextId contextId) : base(contextId)
         {
-            _webApplicationFactory = new WebApplicationFactory<TEntryPoint>();
+            _webApplicationFactory = new TWebApp();
         }
 
         public override async Task Destroy()

@@ -7,9 +7,14 @@ using NotoriousTest.Web.Helpers;
 
 namespace NotoriousTest.Web.Applications
 {
-    public abstract class WebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, IConfigurationConsumer where TEntryPoint : class
+    public class WebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, IWebApplication where TEntryPoint : class
     {
         public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; } = new List<ConfigurationEntry<object>>();
+
+        public virtual HttpClient CreateDefaultClient()
+        {
+            return base.CreateDefaultClient();
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {

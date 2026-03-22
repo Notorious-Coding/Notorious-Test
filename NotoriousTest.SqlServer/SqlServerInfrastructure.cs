@@ -2,6 +2,7 @@
 
 using NotoriousTest.Database;
 using NotoriousTest.Database.Settings;
+using NotoriousTest.Settings;
 
 using Respawn;
 using Respawn.Graph;
@@ -12,6 +13,10 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerInfrastructure : SqlServerInfrastructure<string, DatabaseSettings>
     {
+        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider) : base(contextId, settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Gets the configuration key used to retrieve the default connection string.
         /// </summary>
@@ -31,7 +36,7 @@ namespace NotoriousTest.SqlServer
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerInfrastructure() : base()
+        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider testSettingsProvider) : base(contextId, testSettingsProvider)
         {
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {

@@ -13,6 +13,10 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerContainerInfrastructure : SqlServerContainerInfrastructure<string>
     {
+        public SqlServerContainerInfrastructure(ContextId contextId) : base(contextId)
+        {
+        }
+
         /// <summary>
         /// Gets the configuration key used to retrieve the default connection string.
         /// </summary>
@@ -32,7 +36,7 @@ namespace NotoriousTest.SqlServer
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerContainerInfrastructure() : base()
+        public SqlServerContainerInfrastructure(ContextId contextId) : base(contextId)
         {
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()

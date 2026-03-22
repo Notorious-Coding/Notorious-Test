@@ -2,10 +2,10 @@
 
 namespace NotoriousTest.Settings
 {
-    internal static class TestSettingsProvider
+    internal class TestSettingsProvider : ITestSettingsProvider
     {
-        private static IConfiguration _cache;
-        public static IConfiguration Find()
+        private IConfiguration _cache;
+        public IConfiguration Find()
         {
             if (_cache == null)
             {

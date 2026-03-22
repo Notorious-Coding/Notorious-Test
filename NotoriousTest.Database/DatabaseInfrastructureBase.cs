@@ -8,12 +8,12 @@ namespace NotoriousTest.Database
     public abstract class DatabaseInfrastructureBase<TOutputConfiguration> : Infrastructure<TOutputConfiguration>, IDatabaseInfrastructure
     {
         public string DbPrefix { get; init; } = "NotoriousDb";
-        public string FullDbName => $"{DbPrefix}_{ContextId}";
+        public string FullDbName => $"{DbPrefix}_{ContextId.Value}";
         public string[] TableToIgnore { get; init; } = [];
         public string[] TableToInclude { get; init; } = [];
 
 
-        public DatabaseInfrastructureBase() : base()
+        public DatabaseInfrastructureBase(ContextId contextId) : base(contextId)
         {
         }
 

@@ -6,6 +6,10 @@ namespace NotoriousTest.Database
 {
     public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration> where TContainer : IDatabaseContainer
     {
+        protected DockerDatabaseInfrastructure(ContextId contextId) : base(contextId)
+        {
+        }
+
         protected TContainer Container { get; init; }
 
         public override async Task Initialize()

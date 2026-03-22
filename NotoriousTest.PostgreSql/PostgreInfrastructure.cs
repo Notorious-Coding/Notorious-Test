@@ -1,5 +1,6 @@
 ﻿using NotoriousTest.Database;
 using NotoriousTest.Database.Settings;
+using NotoriousTest.Settings;
 
 using Npgsql;
 
@@ -12,6 +13,10 @@ namespace NotoriousTest.PostgreSql
 {
     public class PostgreInfrastructure : PostgreInfrastructure<string, DatabaseSettings>
     {
+        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider) : base(contextId, settingsProvider)
+        {
+        }
+
         /// <summary>
         /// Gets the configuration key used to retrieve the default connection string.
         /// </summary>
@@ -31,7 +36,7 @@ namespace NotoriousTest.PostgreSql
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public PostgreInfrastructure() : base()
+        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider) : base(contextId, settingsProvider)
         {
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {

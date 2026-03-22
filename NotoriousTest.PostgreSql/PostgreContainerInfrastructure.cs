@@ -14,6 +14,10 @@ namespace NotoriousTest.PostgreSql;
 
 public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
+    public PostgreContainerInfrastructure(ContextId contextId) : base(contextId)
+    {
+    }
+
     /// <summary>
     /// Gets the configuration key used to retrieve the default connection string.
     /// </summary>
@@ -33,7 +37,7 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
     public string[] SchemasToInclude { get; init; } = [];
     public string[] SchemasToExclude { get; init; } = [];
 
-    public PostgreContainerInfrastructure() : base()
+    public PostgreContainerInfrastructure(Guid contextId) : base(contextId)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
         EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
