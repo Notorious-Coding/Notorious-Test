@@ -7,7 +7,7 @@ namespace NotoriousTest.TestContainers
     public abstract class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration>
         where TContainer : IContainer
     {
-        protected DockerContainerInfrastructure() : base()
+        protected DockerContainerInfrastructure(ContextId contextId) : base(contextId)
         {
         }
 

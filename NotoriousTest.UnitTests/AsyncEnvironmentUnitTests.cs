@@ -136,12 +136,12 @@ namespace NotoriousTest.UnitTests
 
         public class ConfigurationObjectTestCasesInfrastructureConfiguration1
         {
-            public string Key1 { get; set; }
+            public string? Key1 { get; set; }
         }
 
         public class ConfigurationObjectTestCasesInfrastructureConfiguration2
         {
-            public string Key2 { get; set; }
+            public string? Key2 { get; set; }
         }
 
         [Fact]

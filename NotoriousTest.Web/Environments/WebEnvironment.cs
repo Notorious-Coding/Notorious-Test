@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-
-using NotoriousTest.Web.Applications;
+﻿using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
 
 using Environment = NotoriousTest.Environments.Environment;
@@ -11,41 +9,19 @@ namespace NotoriousTest.Web.Environments
     /// Testing environment that support Web application.
     /// </summary>
     /// <typeparam name="TEntryPoint">An entrypoint to your program.cs</typeparam>
-    public abstract class WebEnvironment<TEntryPoint> : Environment
-        where TEntryPoint : class
+    public abstract class WebEnvironment : Environment
     {
+        public WebApplicationInfrastructure WebApp => GetInfrastructure<WebApplicationInfrastructure>();
         /// <summary>
         /// Adds a web application factory to the current web environment configuration.
         /// </summary>
         /// <param name="webApp">The web application factory instance to be added. Cannot be null.</param>
         /// <returns>The current web environment instance with the web application factory added.</returns>
-        public WebEnvironment<TEntryPoint> AddWebApplication(WebApplicationFactory<TEntryPoint> webApp)
+        public WebEnvironment AddWebApplication<TWebApp>() where TWebApp : IWebApplication, new()
         {
-            ArgumentNullException.ThrowIfNull(webApp, nameof(webApp));
-            AddInfrastructure(new WebApplicationInfrastructure<TEntryPoint>(webApp));
+            AddInfrastructure<WebApplicationInfrastructure<TWebApp>>();
 
             return this;
-        }
-
-        /// <summary>
-        /// Adds a web application to the current web environment configuration.
-        /// </summary>
-        /// <param name="webApp">The web application instance to add. Cannot be null.</param>
-        /// <returns>The current web environment instance with the web application added.</returns>
-        public WebEnvironment<TEntryPoint> AddWebApplication(WebApplication<TEntryPoint> webApp)
-        {
-            ArgumentNullException.ThrowIfNull(webApp, nameof(webApp));
-            AddInfrastructure(new WebApplicationInfrastructure<TEntryPoint>(webApp));
-            return this;
-        }
-
-        /// <summary>
-        /// Retrieve environment web application.
-        /// </summary>
-        /// <returns>Web application.</returns>
-        public WebApplicationInfrastructure<TEntryPoint> GetWebApplication()
-        {
-            return GetInfrastructure<WebApplicationInfrastructure<TEntryPoint>>();
         }
     }
 }

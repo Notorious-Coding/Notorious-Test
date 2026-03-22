@@ -1,4 +1,5 @@
-﻿using NotoriousTest.SqlServer;
+﻿using NotoriousTest;
+using NotoriousTest.SqlServer;
 
 using System.Data.Common;
 
@@ -6,7 +7,7 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 {
     public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
-        public SqlServerInfrastructure()
+        public SqlServerInfrastructure(ContextId contextId) : base(contextId)
         {
         }
 

@@ -9,7 +9,7 @@ public abstract class Infrastructure<TOutputConfiguration> : Infrastructure, ICo
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
 
     protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
-    protected Infrastructure() : base()
+    protected Infrastructure(ContextId contextId) : base(contextId)
     {
         OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
     }
@@ -29,13 +29,14 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     public bool AutoReset { get; set; } = true;
 
     ///<inheritdoc/>
-    public Guid ContextId { get; set; } = Guid.NewGuid();
+    public ContextId ContextId { get; set; }
 
     private readonly List<IInfrastructureExtension> _extensions = new();
 
 
-    public Infrastructure()
+    public Infrastructure(ContextId contextId)
     {
+        ContextId = contextId;
     }
 
     public abstract Task Initialize();

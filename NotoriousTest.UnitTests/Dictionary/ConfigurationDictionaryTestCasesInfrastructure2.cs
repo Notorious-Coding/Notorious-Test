@@ -6,6 +6,7 @@ public partial class AsyncEnvironmentUnitTests
 {
     public class ConfigurationDictionaryTestCasesInfrastructure2 : Infrastructure<string>
     {
+        public ConfigurationDictionaryTestCasesInfrastructure2() : base(Guid.NewGuid()) { }
         public override Task Destroy() => Task.CompletedTask;
 
         public override Task Initialize()

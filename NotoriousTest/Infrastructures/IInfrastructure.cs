@@ -3,7 +3,7 @@
     public interface IInfrastructure
     {
         bool AutoReset { get; set; }
-        Guid ContextId { get; set; }
+        ContextId ContextId { get; set; }
         int? Order { get; }
 
         Task Destroy();

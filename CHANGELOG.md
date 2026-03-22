@@ -129,14 +129,15 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 	- `DatabaseSettings` will be loaded directly from the `testsettings.json` file.
 - `DockerDatabaseInfrastructure<TContainer>`: Base class for testcontainers powered infrastructure. Takes a `IDatabaseContainer`.
 
+
+#### Web
+- Web support has been moved to `NotoriousTest.Web`. 
+- `WebEnvironment` no longer need an EntryPoint in generic parameter.
+- `WebApplicationInfrastructure` is now available in environment with `WebApp` properties. Use WebApp.HttpClient to make your http calls.
+
 #### Misc
-- You can now add infrastructure via a generic type in addition to the IInfrastructure parameter signature : `AddInfrastructure<T>()`
-
-### 🛠 Technical & 💥 Breaking Changes
-
 - Synchronous classes have been removed. All `Async`-prefixed classes have been renamed without the suffix (e.g. `AsyncInfrastructure` → `Infrastructure`).
 - .NET 6 is no longer supported. Minimum target is .NET 8.
-- Web support has been moved to a separate package `NotoriousTest.Web`. Projects using `WebApplicationInfrastructure` must add the new package.
-- Configuration management has been fully reworked. `IConfigurableInfrastructure`, `IConfigurationConsumer`, and global environment configuration objects are replaced by the extension system. Existing configuration setups must be migrated to `EnsureExtension`.
 - XUnit has been updated to xunit.v3, which introduces breaking changes of its own. See the [xunit.v3 migration guide](https://xunit.net/docs/getting-started/v3/migration).
+
 

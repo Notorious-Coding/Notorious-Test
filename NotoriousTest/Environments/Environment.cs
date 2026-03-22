@@ -1,6 +1,9 @@
-﻿using NotoriousTest.Configuration;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+using NotoriousTest.Configuration;
 using NotoriousTest.Exceptions;
 using NotoriousTest.Infrastructures;
+using NotoriousTest.Settings;
 
 using Xunit;
 
@@ -15,7 +18,9 @@ namespace NotoriousTest.Environments
         /// <summary>
         /// Gets the unique identifier for the environment instance.
         /// </summary>
-        public Guid EnvironmentId { get; private set; } = Guid.NewGuid();
+        public ContextId EnvironmentId { get; private set; } = Guid.NewGuid();
+        protected IServiceProvider ServiceProvider { get; private set; }
+        private IServiceCollection _serviceCollection;
 
         /// <summary>
         /// Gets the collection of infrastructure components associated with this instance.
@@ -28,6 +33,9 @@ namespace NotoriousTest.Environments
         /// </summary>
         public async ValueTask InitializeAsync()
         {
+            _serviceCollection = new ServiceCollection();
+            await ConfigureInfrastructureServices(_serviceCollection);
+            ServiceProvider = _serviceCollection.BuildServiceProvider();
             await ConfigureEnvironment();
             await Initialize();
         }
@@ -40,6 +48,16 @@ namespace NotoriousTest.Environments
             await Destroy();
         }
         #endregion
+
+        /// <summary>
+        /// Configuration infrastructure dependency injection.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task ConfigureInfrastructureServices(IServiceCollection collection)
+        {
+            _serviceCollection.AddSingleton(EnvironmentId);
+            _serviceCollection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>();
+        }
 
         /// <summary>
         /// Configure environment with infrastructures. Called before environment initialization.
@@ -65,8 +83,8 @@ namespace NotoriousTest.Environments
         /// <summary>
         /// Add an infrastructure within environment.
         /// </summary>
-        public Environment AddInfrastructure<T>() where T : Infrastructure, new()
-            => AddInfrastructure(Activator.CreateInstance<T>());
+        public Environment AddInfrastructure<T>() where T : Infrastructure
+            => AddInfrastructure(ActivatorUtilities.CreateInstance<T>(ServiceProvider));
 
         /// <summary>
         /// Add an infrastructure within environment.
