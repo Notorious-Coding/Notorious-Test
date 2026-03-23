@@ -55,11 +55,11 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     internal async Task InitializeAsync()
     {
-        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Initialization ...");
+        Logger.Log($"[{GetType().Name}] Initialization ...");
         var sw = Stopwatch.StartNew();
         foreach (var extension in _extensions)
         {
-            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnBeforeInitialize");
+            Logger.Log($"[{extension.GetType().Name}] OnBeforeInitialize");
             await extension.OnBeforeInitialize(this);
         }
 
@@ -67,7 +67,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
         foreach (var extension in _extensions)
         {
-            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnAfterInitialize");
+            Logger.Log($"[{extension.GetType().Name}] OnAfterInitialize");
             await extension.OnAfterInitialize(this);
         }
         Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
@@ -75,11 +75,11 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     internal async Task ResetAsync()
     {
-        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Reset ...");
+        Logger.Log($"[{GetType().Name}] Reset ...");
         var sw = Stopwatch.StartNew();
         foreach (var extension in _extensions)
         {
-            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnBeforeReset");
+            Logger.Log($"[{extension.GetType().Name}] OnBeforeReset");
             await extension.OnBeforeReset(this);
         }
 
@@ -87,21 +87,21 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
         foreach (var extension in _extensions)
         {
-            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnAfterReset");
+            Logger.Log($"[{extension.GetType().Name}] OnAfterReset");
             await extension.OnAfterReset(this);
         }
-        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Reset completed in {sw.ElapsedMilliseconds} ms");
+        Logger.Log($"[{GetType().Name} ] Reset completed in ");
 
     }
 
     internal async Task DestroyAsync()
     {
-        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Destroy ...");
+        Logger.Log($"[{GetType().Name}] Destroy ...");
         var sw = Stopwatch.StartNew();
 
         foreach (var extension in _extensions)
         {
-            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnBeforeDestroy");
+            Logger.Log($"[{extension.GetType().Name}] OnBeforeDestroy");
             await extension.OnBeforeDestroy(this);
         }
 
@@ -109,11 +109,11 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
         foreach (var extension in _extensions)
         {
-            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnAfterDestroy");
+            Logger.Log($"[{extension.GetType().Name}] OnAfterDestroy");
             await extension.OnAfterDestroy(this);
         }
 
-        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Destroy completed in {sw.ElapsedMilliseconds} ms");
+        Logger.Log($"[{GetType().Name} ] Destroy completed in ");
     }
 
     /// <summary>
