@@ -2,11 +2,17 @@
 
 using NotoriousTests.InfrastructuresSamples.Infrastructures;
 
+using Xunit.Sdk;
+
 namespace NotoriousTests.InfrastructuresSamples.Environments
 {
     // In fact, this is a test fixture (xUnit terminology).
     public class TestEnvironment : WebEnvironment
     {
+        public TestEnvironment(IMessageSink sink) : base(sink)
+        {
+        }
+
         // This is called at the start of the test campaign
         public override async Task ConfigureEnvironment()
         {

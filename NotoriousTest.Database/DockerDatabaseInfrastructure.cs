@@ -1,12 +1,14 @@
 ﻿using DotNet.Testcontainers.Containers;
 
+using NotoriousTest.Logger;
+
 using System.Data.Common;
 
 namespace NotoriousTest.Database
 {
     public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration> where TContainer : IDatabaseContainer
     {
-        protected DockerDatabaseInfrastructure(ContextId contextId) : base(contextId)
+        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
         {
         }
 

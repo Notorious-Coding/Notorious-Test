@@ -1,5 +1,8 @@
 ﻿using NotoriousTest.Configuration;
 using NotoriousTest.Extensions;
+using NotoriousTest.Logger;
+
+using System.Diagnostics;
 
 namespace NotoriousTest.Infrastructures;
 
@@ -9,7 +12,7 @@ public abstract class Infrastructure<TOutputConfiguration> : Infrastructure, ICo
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
 
     protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
-    protected Infrastructure(ContextId contextId) : base(contextId)
+    protected Infrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
     {
         OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
     }
@@ -31,12 +34,14 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     ///<inheritdoc/>
     public ContextId ContextId { get; set; }
 
+    protected readonly ITestLogger Logger;
+
     private readonly List<IInfrastructureExtension> _extensions = new();
 
-
-    public Infrastructure(ContextId contextId)
+    public Infrastructure(ContextId contextId, ITestLogger logger)
     {
         ContextId = contextId;
+        Logger = logger;
     }
 
     public abstract Task Initialize();
@@ -50,35 +55,65 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     internal async Task InitializeAsync()
     {
+        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Initialization ...");
+        var sw = Stopwatch.StartNew();
         foreach (var extension in _extensions)
+        {
+            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnBeforeInitialize");
             await extension.OnBeforeInitialize(this);
+        }
 
         await Initialize();
 
         foreach (var extension in _extensions)
+        {
+            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnAfterInitialize");
             await extension.OnAfterInitialize(this);
+        }
+        Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
     }
 
     internal async Task ResetAsync()
     {
+        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Reset ...");
+        var sw = Stopwatch.StartNew();
         foreach (var extension in _extensions)
+        {
+            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnBeforeReset");
             await extension.OnBeforeReset(this);
+        }
 
         await Reset();
 
         foreach (var extension in _extensions)
+        {
+            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnAfterReset");
             await extension.OnAfterReset(this);
+        }
+        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Reset completed in {sw.ElapsedMilliseconds} ms");
+
     }
 
     internal async Task DestroyAsync()
     {
+        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Destroy ...");
+        var sw = Stopwatch.StartNew();
+
         foreach (var extension in _extensions)
+        {
+            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnBeforeDestroy");
             await extension.OnBeforeDestroy(this);
+        }
 
         await Destroy();
 
         foreach (var extension in _extensions)
+        {
+            Logger.Log($"[{ContextId.Value}][{extension.GetType().Name}] OnAfterDestroy");
             await extension.OnAfterDestroy(this);
+        }
+
+        Logger.Log($"[{ContextId.Value}][{GetType().Name}] Destroy completed in {sw.ElapsedMilliseconds} ms");
     }
 
     /// <summary>

@@ -3,9 +3,11 @@
 using NotoriousTest.Configuration;
 using NotoriousTest.Exceptions;
 using NotoriousTest.Infrastructures;
+using NotoriousTest.Logger;
 using NotoriousTest.Settings;
 
 using Xunit;
+using Xunit.Sdk;
 
 namespace NotoriousTest.Environments
 {
@@ -26,6 +28,12 @@ namespace NotoriousTest.Environments
         /// Gets the collection of infrastructure components associated with this instance.
         /// </summary>
         private List<Infrastructure> _infrastructures = [];
+        private readonly IMessageSink _sink;
+
+        protected Environment(IMessageSink sink)
+        {
+            _sink = sink;
+        }
         #region IAsyncLifetime Implementation
 
         /// <summary>
@@ -57,6 +65,8 @@ namespace NotoriousTest.Environments
         {
             _serviceCollection.AddSingleton(EnvironmentId);
             _serviceCollection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>();
+            _serviceCollection.AddSingleton(_sink);
+            _serviceCollection.AddSingleton<ITestLogger, TestLogger>();
         }
 
         /// <summary>

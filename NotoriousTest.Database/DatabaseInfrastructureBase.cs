@@ -1,4 +1,5 @@
 ﻿using NotoriousTest.Infrastructures;
+using NotoriousTest.Logger;
 
 using System.Data.Common;
 
@@ -13,7 +14,7 @@ namespace NotoriousTest.Database
         public string[] TableToInclude { get; init; } = [];
 
 
-        public DatabaseInfrastructureBase(ContextId contextId) : base(contextId)
+        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger) : base(contextId, logger)
         {
         }
 
