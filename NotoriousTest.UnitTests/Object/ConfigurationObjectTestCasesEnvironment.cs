@@ -1,3 +1,7 @@
+using FakeItEasy;
+
+using Xunit.Sdk;
+
 namespace NotoriousTest.UnitTests;
 
 public partial class AsyncEnvironmentUnitTests
@@ -9,7 +13,7 @@ public partial class AsyncEnvironmentUnitTests
 
         public ConfigurationObjectTestCasesEnvironment(
             ConfigurationObjectTestCasesInfrastructure1 infra1,
-            ConfigurationObjectTestCasesInfrastructureWithSection2 infra2)
+            ConfigurationObjectTestCasesInfrastructureWithSection2 infra2) : base(A.Fake<IMessageSink>())
         {
             _infra1 = infra1;
             _infra2 = infra2;

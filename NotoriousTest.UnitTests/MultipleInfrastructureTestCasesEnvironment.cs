@@ -1,4 +1,8 @@
+using FakeItEasy;
+
 using NotoriousTest.Infrastructures;
+
+using Xunit.Sdk;
 
 namespace NotoriousTest.UnitTests;
 
@@ -9,7 +13,7 @@ public partial class AsyncEnvironmentUnitTests
         private readonly Infrastructure _infra1;
         private readonly Infrastructure _infra2;
 
-        public MultipleInfrastructureTestCasesEnvironment(Infrastructure infra1, Infrastructure infra2)
+        public MultipleInfrastructureTestCasesEnvironment(Infrastructure infra1, Infrastructure infra2) : base(A.Fake<IMessageSink>())
         {
             _infra1 = infra1;
             _infra2 = infra2;

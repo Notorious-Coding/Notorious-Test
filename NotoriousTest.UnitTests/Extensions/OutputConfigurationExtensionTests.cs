@@ -1,5 +1,8 @@
+using FakeItEasy;
+
 using NotoriousTest.Extensions;
 using NotoriousTest.Infrastructures;
+using NotoriousTest.Logger;
 
 namespace NotoriousTest.UnitTests.Extensions;
 
@@ -77,7 +80,7 @@ public class OutputConfigurationExtensionTests
         private readonly string key;
         private readonly string value;
 
-        public TestInfrastructure(string key, string value) : base(Guid.NewGuid())
+        public TestInfrastructure(string key, string value) : base(Guid.NewGuid(), A.Fake<ITestLogger>())
         {
             this.key = key;
             this.value = value;
@@ -118,7 +121,7 @@ public class OutputConfigurationExtensionTests
 
     private class MultiEntryInfrastructure : Infrastructure<string>
     {
-        public MultiEntryInfrastructure() : base(Guid.NewGuid()) { }
+        public MultiEntryInfrastructure() : base(Guid.NewGuid(), A.Fake<ITestLogger>()) { }
 
         public override Task Initialize()
         {
