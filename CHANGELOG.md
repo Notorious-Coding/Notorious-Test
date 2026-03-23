@@ -122,6 +122,7 @@ git stash- Automatically loaded from the infrastructure name as config key.
       }
   }
 ```
+
 #### Database 💥NEW💥
 - Non docker database infrastructure for SqlServer and PostgreSql have been added ! For those who want to run test on existing servers.
 - New package NotoriousTest.Database provides base classes for docker and non-docker database infrastructures.
@@ -129,16 +130,19 @@ git stash- Automatically loaded from the infrastructure name as config key.
 	- `DatabaseSettings` will be loaded directly from the `testsettings.json` file.
 - `DockerDatabaseInfrastructure<TContainer>`: Base class for testcontainers powered infrastructure. Takes a `IDatabaseContainer`.
 
-### Logging 💥NEW💥
+#### Dependency Injection 💥NEW💥
+- NotoriousTest now handle dependency injection direclty into infrastructures. 
+- Configure dependencies via `ConfigurationInfrastructureServices(IServiceCollection collection)` method in your environment ! 
 
-- NotoriousTest now deliver a `ITestLogger` that is injected directly in the `Infrastructure.Logger` property. 
+#### Logging 💥NEW💥
+
+- NotoriousTest now deliver a `ITestLogger` that is injected directly in the `Infrastructure.Logger` property, and can be accessed from everywhere via DI.
 - Enable diagnostic messages in xunit.runner.json or via xunit attributes 
 
 #### Web
 - Web support has been moved to `NotoriousTest.Web`. 
 - `WebEnvironment` no longer need an EntryPoint in generic parameter.
 - `WebApplicationInfrastructure` is now available in environment with `WebApp` properties. Use WebApp.HttpClient to make your http calls.
-
 
 #### Misc
 - Synchronous classes have been removed. All `Async`-prefixed classes have been renamed without the suffix (e.g. `AsyncInfrastructure` → `Infrastructure`).
