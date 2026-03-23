@@ -137,7 +137,7 @@ git stash- Automatically loaded from the infrastructure name as config key.
 #### Logging 💥NEW💥
 
 - NotoriousTest now deliver a `ITestLogger` that is injected directly in the `Infrastructure.Logger` property, and can be accessed from everywhere via DI.
-- Enable diagnostic messages in xunit.runner.json or via xunit attributes 
+- Enable diagnostic messages in xunit.runner.json or via xunit attributes, and navigate into the tests output (in visual studio).
 
 #### Web
 - Web support has been moved to `NotoriousTest.Web`. 
