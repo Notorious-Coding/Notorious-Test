@@ -129,11 +129,16 @@ git stash- Automatically loaded from the infrastructure name as config key.
 	- `DatabaseSettings` will be loaded directly from the `testsettings.json` file.
 - `DockerDatabaseInfrastructure<TContainer>`: Base class for testcontainers powered infrastructure. Takes a `IDatabaseContainer`.
 
+### Logging 💥NEW💥
+
+- NotoriousTest now deliver a `ITestLogger` that is injected directly in the `Infrastructure.Logger` property. 
+- Enable diagnostic messages in xunit.runner.json or via xunit attributes 
 
 #### Web
 - Web support has been moved to `NotoriousTest.Web`. 
 - `WebEnvironment` no longer need an EntryPoint in generic parameter.
 - `WebApplicationInfrastructure` is now available in environment with `WebApp` properties. Use WebApp.HttpClient to make your http calls.
+
 
 #### Misc
 - Synchronous classes have been removed. All `Async`-prefixed classes have been renamed without the suffix (e.g. `AsyncInfrastructure` → `Infrastructure`).
