@@ -1,7 +1,10 @@
 using FakeItEasy;
+
 using Microsoft.Extensions.Configuration;
+
 using NotoriousTest.Extensions;
 using NotoriousTest.Infrastructures;
+using NotoriousTest.Logger;
 using NotoriousTest.Settings;
 
 namespace NotoriousTest.UnitTests.Extensions;
@@ -16,7 +19,7 @@ public class SettingsExtensionTests
 
     private class MyInfrastructure : Infrastructure
     {
-        public MyInfrastructure() : base(Guid.NewGuid()) { }
+        public MyInfrastructure() : base(Guid.NewGuid(), A.Fake<ITestLogger>()) { }
         public override Task Initialize() => Task.CompletedTask;
         public override Task Reset() => Task.CompletedTask;
         public override Task Destroy() => Task.CompletedTask;

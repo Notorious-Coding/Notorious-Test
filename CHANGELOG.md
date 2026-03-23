@@ -101,7 +101,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 #### Settings 💥NEW💥
 - By registering a `SettingsExtension`, you can now load settings from `testsettings.json` to configure infrastructure.
-- Automatically loaded from the infrastructure name as config key.
+git stash- Automatically loaded from the infrastructure name as config key.
 
 #### Output configuration 🔧 UPDATED 🔧
 - Environments no longer require a global configuration object. Configuration is now propagated automatically through extensions.
