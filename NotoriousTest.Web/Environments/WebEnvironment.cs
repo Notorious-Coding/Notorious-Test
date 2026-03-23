@@ -1,6 +1,8 @@
 ﻿using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
 
+using Xunit.Sdk;
+
 using Environment = NotoriousTest.Environments.Environment;
 
 namespace NotoriousTest.Web.Environments
@@ -11,6 +13,10 @@ namespace NotoriousTest.Web.Environments
     /// <typeparam name="TEntryPoint">An entrypoint to your program.cs</typeparam>
     public abstract class WebEnvironment : Environment
     {
+        protected WebEnvironment(IMessageSink sink) : base(sink)
+        {
+        }
+
         public WebApplicationInfrastructure WebApp => GetInfrastructure<WebApplicationInfrastructure>();
         /// <summary>
         /// Adds a web application factory to the current web environment configuration.
