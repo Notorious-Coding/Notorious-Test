@@ -1,6 +1,8 @@
 ﻿using DotNet.Testcontainers.Containers;
 
-using NotoriousTest.Logger;
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 
 using System.Data.Common;
 
@@ -8,7 +10,7 @@ namespace NotoriousTest.Database
 {
     public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration> where TContainer : IDatabaseContainer
     {
-        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
         {
         }
 

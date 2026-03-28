@@ -8,7 +8,7 @@ namespace NotoriousTest.UnitTests;
 
 public partial class AsyncEnvironmentUnitTests
 {
-    public class UniqueInfrastructureTestCasesEnvironment : Environments.Environment
+    public class UniqueInfrastructureTestCasesEnvironment : Environments.EnvironmentBase
     {
         private readonly Infrastructure _infra;
 

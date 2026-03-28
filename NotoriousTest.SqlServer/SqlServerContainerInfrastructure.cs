@@ -1,7 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 using NotoriousTest.Database;
-using NotoriousTest.Logger;
 
 using Respawn;
 using Respawn.Graph;
@@ -14,7 +16,7 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerContainerInfrastructure : SqlServerContainerInfrastructure<string>
     {
-        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
         {
         }
 
@@ -37,7 +39,7 @@ namespace NotoriousTest.SqlServer
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
         {
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()

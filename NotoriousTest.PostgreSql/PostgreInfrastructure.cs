@@ -1,7 +1,9 @@
-﻿using NotoriousTest.Database;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Settings;
+using NotoriousTest.Database;
 using NotoriousTest.Database.Settings;
-using NotoriousTest.Logger;
-using NotoriousTest.Settings;
 
 using Npgsql;
 
@@ -14,7 +16,7 @@ namespace NotoriousTest.PostgreSql
 {
     public class PostgreInfrastructure : PostgreInfrastructure<string, DatabaseSettings>
     {
-        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger) : base(contextId, settingsProvider, logger)
+        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistryProvider registry) : base(contextId, settingsProvider, logger, registry)
         {
         }
 
@@ -37,7 +39,7 @@ namespace NotoriousTest.PostgreSql
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger) : base(contextId, settingsProvider, logger)
+        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistryProvider registry) : base(contextId, settingsProvider, logger, registry)
         {
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {

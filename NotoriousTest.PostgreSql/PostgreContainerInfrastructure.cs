@@ -1,5 +1,7 @@
-﻿using NotoriousTest.Database;
-using NotoriousTest.Logger;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Database;
 
 using Npgsql;
 
@@ -15,7 +17,7 @@ namespace NotoriousTest.PostgreSql;
 
 public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
-    public PostgreContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+    public PostgreContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
     {
     }
 
@@ -38,7 +40,7 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
     public string[] SchemasToInclude { get; init; } = [];
     public string[] SchemasToExclude { get; init; } = [];
 
-    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger) : base(contextId, logger)
+    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
         EnsureExtension(new RespawnExtension(() => new RespawnerOptions()

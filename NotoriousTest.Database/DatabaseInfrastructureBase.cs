@@ -1,5 +1,7 @@
-﻿using NotoriousTest.Infrastructures;
-using NotoriousTest.Logger;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 
 using System.Data.Common;
 
@@ -14,7 +16,7 @@ namespace NotoriousTest.Database
         public string[] TableToInclude { get; init; } = [];
 
 
-        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
         {
         }
 

@@ -6,7 +6,7 @@ namespace NotoriousTest.UnitTests;
 
 public partial class AsyncEnvironmentUnitTests
 {
-    public class ConfigurationDictionaryTestCasesEnvironment : Environments.Environment
+    public class ConfigurationDictionaryTestCasesEnvironment : Environments.EnvironmentBase
     {
         private readonly ConfigurationDictionaryTestCasesInfrastructure1 _infra1;
         private readonly ConfigurationDictionaryTestCasesInfrastructure2 _infra2;

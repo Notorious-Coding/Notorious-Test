@@ -17,17 +17,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
-		<PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\icon.png" Pack="true" PackagePath="" Visible="False" />
 		<None Include="..\README.md" Pack="true" PackagePath="" Visible="False" />
 		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
+	  <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" />
+	  <ProjectReference Include="..\NotoriousTest.TestSettings\NotoriousTest.TestSettings.csproj" />
 	</ItemGroup>
 </Project>

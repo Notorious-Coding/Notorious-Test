@@ -1,4 +1,4 @@
-﻿using NotoriousTest.Infrastructures;
+﻿using NotoriousTest.Core.Infrastructures;
 
 using System.Data.Common;
 

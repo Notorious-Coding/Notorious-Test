@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
     <ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj" />
     <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
   </ItemGroup>

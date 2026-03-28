@@ -16,6 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
 		<ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
 	</ItemGroup>
 

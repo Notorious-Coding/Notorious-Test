@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 
-using NotoriousTest.Configuration;
+using NotoriousTest.Core.Configuration;
 using NotoriousTest.Web.Helpers;
 
 namespace NotoriousTest.Web.Applications

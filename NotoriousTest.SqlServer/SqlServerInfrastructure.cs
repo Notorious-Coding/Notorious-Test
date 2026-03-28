@@ -1,9 +1,11 @@
 ﻿using Microsoft.Data.SqlClient;
 
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Settings;
 using NotoriousTest.Database;
 using NotoriousTest.Database.Settings;
-using NotoriousTest.Logger;
-using NotoriousTest.Settings;
 
 using Respawn;
 using Respawn.Graph;
@@ -14,7 +16,7 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerInfrastructure : SqlServerInfrastructure<string, DatabaseSettings>
     {
-        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger) : base(contextId, settingsProvider, logger)
+        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistryProvider registry) : base(contextId, settingsProvider, logger, registry)
         {
         }
 
@@ -37,7 +39,7 @@ namespace NotoriousTest.SqlServer
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider testSettingsProvider, ITestLogger logger) : base(contextId, testSettingsProvider, logger)
+        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider testSettingsProvider, ITestLogger logger, IRegistryProvider registry) : base(contextId, testSettingsProvider, logger, registry)
         {
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {

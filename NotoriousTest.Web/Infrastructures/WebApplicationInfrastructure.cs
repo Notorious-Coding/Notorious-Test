@@ -1,6 +1,8 @@
-﻿using NotoriousTest.Configuration;
-using NotoriousTest.Infrastructures;
-using NotoriousTest.Logger;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Infrastructures;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 using NotoriousTest.Web.Applications;
 namespace NotoriousTest.Web.Infrastructures
 {
@@ -10,7 +12,7 @@ namespace NotoriousTest.Web.Infrastructures
         public HttpClient? HttpClient;
         public override int? Order => 999;
 
-        protected WebApplicationInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        protected WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
         {
 
         }
@@ -21,7 +23,7 @@ namespace NotoriousTest.Web.Infrastructures
         private TWebApp _webApplicationFactory;
         public override int? Order => 999;
 
-        public WebApplicationInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
         {
             _webApplicationFactory = new TWebApp();
         }
