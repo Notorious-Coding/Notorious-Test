@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<Description>A Database integration with NotoriousTest.</Description>
 		<PackageId>NotoriousTest.Database</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -13,6 +13,7 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<IsPackable>true</IsPackable>
+		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

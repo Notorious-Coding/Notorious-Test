@@ -1,6 +1,4 @@
-﻿using NotoriousTest.Core;
-
-namespace NotoriousTest.Core.Infrastructures
+﻿namespace NotoriousTest.Core.Infrastructures
 {
     public interface IInfrastructure
     {

@@ -28,7 +28,7 @@ namespace NotoriousTest.Database
             Metadata = new DatabaseMetadata()
             {
                 DatabaseName = FullDbName,
-                ConnectionString = GetDatabaseConnectionString()
+                ServerConnectionString = GetServerConnectionString()
             };
         }
     }

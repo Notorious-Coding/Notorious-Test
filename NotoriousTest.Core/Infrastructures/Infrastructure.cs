@@ -28,6 +28,7 @@ public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata
     /// Gets or sets the metadata associated with the current object.
     /// </summary>
     protected new TMetadata? Metadata { get => (TMetadata?)base.Metadata; set => base.Metadata = value; }
+
     protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
     {
     }
