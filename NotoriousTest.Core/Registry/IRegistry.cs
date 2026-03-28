@@ -8,5 +8,6 @@
         Task Ensure();
         Task<InfrastuctureRegistryEntry> Register(InfrastuctureRegistryEntry entry);
         Task<bool> Remove(Guid id);
+        Task<IEnumerable<InfrastuctureRegistryEntry>> GetByProcessId(int processId);
     }
 }

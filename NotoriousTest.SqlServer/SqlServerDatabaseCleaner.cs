@@ -6,7 +6,6 @@ using NotoriousTest.Database;
 
 namespace NotoriousTest.SqlServer
 {
-    [InfrastructureCleaner(typeof(SqlServerInfrastructure<,>))]
     public class SqlServerInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
         public async Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)

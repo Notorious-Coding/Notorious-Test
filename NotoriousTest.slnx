@@ -29,6 +29,7 @@
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
   <Project Path="NotoriousTest.Core/NotoriousTest.Core.csproj" Id="ab05b07d-dc15-407e-9af7-e995a4f7c2d9" />
+  <Project Path="NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj" Id="8408dd70-9d47-4f50-bab4-bcd86e50bc3d" />
   <Project Path="NotoriousTest.SqlLiteRegistry/NotoriousTest.SqlLiteRegistry.csproj" Id="fe120d83-193d-410c-98c5-baf3fd93af7a" />
   <Project Path="NotoriousTest.TestSettings/NotoriousTest.TestSettings.csproj" Id="0989b9dc-fe24-43ee-b04a-ac791bf12c4f" />
   <Project Path="NotoriousTest.XUnit/NotoriousTest.XUnit.csproj" Id="7936b457-1116-4175-92ee-2dd46d7b6273" />

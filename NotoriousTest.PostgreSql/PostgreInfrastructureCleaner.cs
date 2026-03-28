@@ -6,7 +6,6 @@ using Npgsql;
 
 namespace NotoriousTest.PostgreSql
 {
-    [InfrastructureCleaner(typeof(PostgreInfrastructure<,>))]
     public class PostgreInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
         public async Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)

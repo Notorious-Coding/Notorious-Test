@@ -2,6 +2,8 @@
 
 using NotoriousTests.InfrastructuresSamples.Infrastructures;
 
+using System.Reflection;
+
 using Xunit.Sdk;
 
 namespace NotoriousTests.InfrastructuresSamples.Environments
@@ -12,6 +14,8 @@ namespace NotoriousTests.InfrastructuresSamples.Environments
         public TestEnvironment(IMessageSink sink) : base(sink)
         {
         }
+
+        public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
         // This is called at the start of the test campaign
         public override async Task ConfigureEnvironment()

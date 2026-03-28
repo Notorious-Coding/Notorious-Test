@@ -5,6 +5,9 @@ using NotoriousTest.Core.Exceptions;
 using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Registry;
 
+using System.Diagnostics;
+using System.Reflection;
+
 namespace NotoriousTest.Core.Environments
 {
 
@@ -21,9 +24,15 @@ namespace NotoriousTest.Core.Environments
         private IServiceCollection _serviceCollection;
 
         /// <summary>
+        /// Define current test assembly.
+        /// </summary>
+        public abstract Assembly CurrentAssembly { get; }
+
+        /// <summary>
         /// Gets the collection of infrastructure components associated with this instance.
         /// </summary>
         private List<Infrastructure> _infrastructures = [];
+        private Process _doggyDogProcess;
 
         /// <summary>
         /// Configuration infrastructure dependency injection.
@@ -85,6 +94,9 @@ namespace NotoriousTest.Core.Environments
             ConfigureInfrastructureServices(_serviceCollection);
             ServiceProvider = _serviceCollection.BuildServiceProvider();
             await SetupRegistry();
+            if (_infrastructures.Any(i => !i.DisableRegistry))
+                await StartDoggyDog();
+
             await ConfigureEnvironment();
 
             foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
@@ -96,6 +108,21 @@ namespace NotoriousTest.Core.Environments
 
                 await infra.InitializeAsync();
             }
+        }
+
+        private async Task StartDoggyDog()
+        {
+            var watchdogPath = Path.Combine(AppContext.BaseDirectory, "NotoriousTest.DoggyDog.exe");
+            var currentPid = Process.GetCurrentProcess().Id;
+            var assemblyPath = CurrentAssembly.Location;
+
+            _doggyDogProcess = Process.Start(new ProcessStartInfo
+            {
+                FileName = watchdogPath,
+                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\"",
+                UseShellExecute = true,
+                CreateNoWindow = false,
+            });
         }
 
         public virtual async Task Reset()

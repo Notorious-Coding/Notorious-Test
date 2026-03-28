@@ -10,7 +10,7 @@ namespace NotoriousTest.SqlLiteRegistry
         public string InfrastructureId { get; set; }
         public string InfrastructureType { get; set; }
         public string EnvironmentId { get; set; }
-        public int ProcessPID { get; set; }
+        public int ProcessID { get; set; }
         public string? Metadata { get; set; }
         public string? MetadataType { get; set; }
         public string CreationDate { get; set; }
@@ -21,9 +21,9 @@ namespace NotoriousTest.SqlLiteRegistry
             return new InfrastructureRegistryEntryEntity()
             {
                 InfrastructureId = entry.InfrastructureId.ToString(),
-                InfrastructureType = entry.InfrastructureType.ToString(),
+                InfrastructureType = entry.InfrastructureType.AssemblyQualifiedName,
                 EnvironmentId = entry.EnvironmentId.ToString(),
-                ProcessPID = entry.ProcessPID,
+                ProcessID = entry.ProcessID,
                 Metadata = JsonSerializer.Serialize(entry.Metadata),
                 MetadataType = entry.Metadata?.GetType().AssemblyQualifiedName
             };
@@ -38,12 +38,18 @@ namespace NotoriousTest.SqlLiteRegistry
                 metadataType = Type.GetType(MetadataType);
             }
 
+            Type? infraType = Type.GetType(InfrastructureType);
+            if (infraType == null)
+            {
+                throw new TypeLoadException($"Unable to load type {InfrastructureType}");
+            }
+
             return new InfrastuctureRegistryEntry()
             {
                 InfrastructureId = Guid.Parse(InfrastructureId),
-                InfrastructureType = Type.GetType(InfrastructureType)!,
+                InfrastructureType = Type.GetType(InfrastructureType),
                 EnvironmentId = Guid.Parse(EnvironmentId),
-                ProcessPID = ProcessPID,
+                ProcessID = ProcessID,
                 Metadata = !(Metadata is null) && !(metadataType is null)
                     ? JsonSerializer.Deserialize(Metadata, metadataType)
                     : null,

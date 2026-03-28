@@ -2,16 +2,20 @@
 
 using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures;
+using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
 namespace NotoriousTest.TestContainers
 {
+    [Cleaner(typeof(DockerInfrastructureCleaner))]
     public abstract class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration, DockerMetadata>
         where TContainer : IContainer
     {
         protected DockerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
+            if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
+                Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");
         }
 
         protected TContainer Container { get; init; }

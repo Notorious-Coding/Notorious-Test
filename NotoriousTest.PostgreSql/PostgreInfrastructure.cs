@@ -1,4 +1,5 @@
 ﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
@@ -14,6 +15,7 @@ using System.Data.Common;
 
 namespace NotoriousTest.PostgreSql
 {
+    [Cleaner(typeof(PostgreInfrastructureCleaner))]
     public class PostgreInfrastructure : PostgreInfrastructure<string, DatabaseSettings>
     {
         public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)

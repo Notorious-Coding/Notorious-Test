@@ -5,11 +5,13 @@ using Microsoft.Data.Sqlite;
 using NotoriousTest.Core.Registry;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 namespace NotoriousTest.SqlLiteRegistry
 {
-    public class SqliteRegistryProvider : IRegistry, IAsyncDisposable
+    public partial class SqliteRegistryProvider : IRegistry, IAsyncDisposable
     {
         private static string RegistryFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "notorioustest");
         private const string RegistryFileName = "doggydog-registry.db";
@@ -45,16 +47,13 @@ namespace NotoriousTest.SqlLiteRegistry
             {
                 Directory.CreateDirectory(RegistryFolder);
             }
-
-            // WAL mode to handle multiple write
-            // SYNCHRONOUS NORMAL to flush only when 
-            await Connection.ExecuteAsync(SqliteRegistryProviderQueries.ENSURE_REGISTRY);
+            await Connection.ExecuteAsync(ENSURE_REGISTRY);
         }
 
         public async Task<InfrastuctureRegistryEntry> Register(InfrastuctureRegistryEntry entry)
         {
 
-            InfrastructureRegistryEntryEntity entity = await Connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(SqliteRegistryProviderQueries.REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
+            InfrastructureRegistryEntryEntity entity = await Connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
 
             return entity.ToDomain();
         }
@@ -66,8 +65,19 @@ namespace NotoriousTest.SqlLiteRegistry
 
         public async Task<bool> Remove(Guid id)
         {
-            int deletedRows = await Connection.ExecuteAsync(SqliteRegistryProviderQueries.REMOVE_INFRASTRUCTURE, new { InfrastructureId = id.ToString() });
+            int deletedRows = await Connection.ExecuteAsync(REMOVE_INFRASTRUCTURE, new { InfrastructureId = id.ToString() });
             return deletedRows > 0;
+        }
+
+        public async Task<IEnumerable<InfrastuctureRegistryEntry>> GetByProcessId(int processId)
+        {
+            IEnumerable<InfrastructureRegistryEntryEntity> entries = await Connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_PROCESS_ID, new { ProcessID = processId });
+            return entries.Select(entry => entry.ToDomain());
+        }
+
+        public void Empty()
+        {
+
         }
     }
 }

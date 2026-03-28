@@ -14,6 +14,7 @@ using Testcontainers.MsSql;
 
 namespace NotoriousTest.SqlServer
 {
+
     public class SqlServerContainerInfrastructure : SqlServerContainerInfrastructure<string>
     {
         public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)

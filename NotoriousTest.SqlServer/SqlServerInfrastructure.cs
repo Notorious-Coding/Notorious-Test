@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 
 using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
@@ -34,6 +35,7 @@ namespace NotoriousTest.SqlServer
         }
     }
 
+    [Cleaner(typeof(SqlServerInfrastructureCleaner))]
     public class SqlServerInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
         public string[] SchemasToInclude { get; init; } = [];

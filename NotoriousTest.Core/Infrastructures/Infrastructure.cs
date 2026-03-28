@@ -45,6 +45,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     ///<inheritdoc/>
     public bool AutoReset { get; set; } = true;
 
+    public virtual bool DisableRegistry { get; } = false;
     ///<inheritdoc/>
     public ContextId ContextId { get; set; }
     public Guid Id = Guid.NewGuid();
@@ -91,7 +92,8 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Initialize();
-        await Register();
+
+        if (!DisableRegistry) await Register();
 
         foreach (var extension in _extensions)
         {
@@ -109,7 +111,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
             InfrastructureType = GetType(),
             Metadata = Metadata,
             EnvironmentId = ContextId,
-            ProcessPID = Process.GetCurrentProcess().Id,
+            ProcessID = Process.GetCurrentProcess().Id,
         });
     }
 
@@ -146,7 +148,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Destroy();
-        await Registry.Remove(Id);
+        if (!DisableRegistry) await Registry.Remove(Id);
 
         foreach (var extension in _extensions)
         {

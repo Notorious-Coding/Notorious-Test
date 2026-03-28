@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NotoriousTest.DoggyDog": {
+      "commandName": "Project",
+      "commandLineArgs": "--pid 21964 --assembly \"C:\\Repositories\\Notorious Test\\Samples\\NotoriousTests.InfrastructuresSamples\\bin\\Debug\\net9.0\\NotoriousTests.InfrastructuresSamples.dll\""
+    }
+  }
+}

@@ -11,7 +11,7 @@ namespace NotoriousTest.Web.Infrastructures
         public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
         public HttpClient? HttpClient;
         public override int? Order => 999;
-
+        public override bool DisableRegistry => true;
         protected WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
 
