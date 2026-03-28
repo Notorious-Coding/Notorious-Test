@@ -17,7 +17,7 @@ namespace NotoriousTest.PostgreSql;
 
 public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
-    public PostgreContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+    public PostgreContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
     {
     }
 
@@ -40,7 +40,7 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
     public string[] SchemasToInclude { get; init; } = [];
     public string[] SchemasToExclude { get; init; } = [];
 
-    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
         EnsureExtension(new RespawnExtension(() => new RespawnerOptions()

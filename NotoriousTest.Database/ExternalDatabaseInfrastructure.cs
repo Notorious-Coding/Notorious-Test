@@ -7,18 +7,29 @@ using NotoriousTest.Database.Settings;
 
 namespace NotoriousTest.Database
 {
-    public abstract class ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> : DatabaseInfrastructureBase<TOutputConfiguration> where TSettings : DatabaseSettings, new()
+    public abstract class ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> : DatabaseInfrastructureBase<TOutputConfiguration, DatabaseMetadata> where TSettings : DatabaseSettings, new()
     {
         protected TSettings Settings { get; private set; }
 
-        public ExternalDatabaseInfrastructure(ContextId contextId, ITestSettingsProvider provider, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        public ExternalDatabaseInfrastructure(ContextId contextId, ITestSettingsProvider provider, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Settings = EnsureExtension(new SettingsExtension<TSettings>(provider)).Settings;
         }
 
+
         public override string GetServerConnectionString()
         {
             return Settings.ConnectionString;
+        }
+
+        public override async Task Initialize()
+        {
+            await base.Initialize();
+            Metadata = new DatabaseMetadata()
+            {
+                DatabaseName = FullDbName,
+                ConnectionString = GetDatabaseConnectionString()
+            };
         }
     }
 }

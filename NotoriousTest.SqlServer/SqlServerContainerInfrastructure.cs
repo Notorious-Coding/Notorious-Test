@@ -16,7 +16,7 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerContainerInfrastructure : SqlServerContainerInfrastructure<string>
     {
-        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 
@@ -39,7 +39,7 @@ namespace NotoriousTest.SqlServer
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()

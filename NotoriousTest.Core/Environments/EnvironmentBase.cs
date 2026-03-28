@@ -110,7 +110,7 @@ namespace NotoriousTest.Core.Environments
         {
             foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
             {
-                await infra.Destroy();
+                await infra.DestroyAsync();
             }
         }
 
@@ -124,7 +124,7 @@ namespace NotoriousTest.Core.Environments
 
         private async Task SetupRegistry()
         {
-            var registry = ServiceProvider.GetRequiredService<IRegistryProvider>();
+            var registry = ServiceProvider.GetRequiredService<IRegistry>();
             await registry.Ensure();
         }
     }

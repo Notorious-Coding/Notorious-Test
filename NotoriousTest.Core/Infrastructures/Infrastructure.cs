@@ -8,17 +8,29 @@ using System.Diagnostics;
 namespace NotoriousTest.Core.Infrastructures;
 
 
-public abstract class Infrastructure<TOutputConfiguration> : Infrastructure, IConfigurationProducer<TOutputConfiguration>
+public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastructure<TMetadata>, IConfigurationProducer<TOutputConfiguration>
+    where TMetadata : class
 {
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
 
     protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
-    protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider provider) : base(contextId, logger, provider)
+    protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
     {
         OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
     }
 
     public void AddEntry(string key, TOutputConfiguration value) => OutputConfigurationExtension.AddEntry(key, value);
+}
+
+public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata : class
+{
+    /// <summary>
+    /// Gets or sets the metadata associated with the current object.
+    /// </summary>
+    protected new TMetadata? Metadata { get => (TMetadata?)base.Metadata; set => base.Metadata = value; }
+    protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+    {
+    }
 }
 
 /// <summary>
@@ -49,9 +61,9 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// <summary>
     /// Gets the registry provider used to track infrastructure and clean them after test crash.
     /// </summary>
-    protected IRegistryProvider Registry { get; private set; }
+    protected IRegistry Registry { get; private set; }
 
-    public Infrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider provider)
+    public Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider)
     {
         ContextId = contextId;
         Logger = logger;
@@ -93,7 +105,8 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         return Registry.Register(new InfrastuctureRegistryEntry()
         {
             InfrastructureId = Id,
-            InfrastructureType = GetType().Name,
+            InfrastructureType = GetType(),
+            Metadata = Metadata,
             EnvironmentId = ContextId,
             ProcessPID = Process.GetCurrentProcess().Id,
         });
@@ -132,6 +145,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Destroy();
+        await Registry.Remove(Id);
 
         foreach (var extension in _extensions)
         {

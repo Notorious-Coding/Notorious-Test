@@ -3,14 +3,15 @@
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.TestContainers;
 
 using System.Data.Common;
 
 namespace NotoriousTest.Database
 {
-    public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration> where TContainer : IDatabaseContainer
+    public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration, DockerMetadata> where TContainer : IDatabaseContainer
     {
-        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 
@@ -20,6 +21,13 @@ namespace NotoriousTest.Database
         {
             await Container.StartAsync();
             await base.Initialize();
+
+
+            Metadata = new DockerMetadata
+            {
+                ContainerID = Container.Id,
+                ContainerName = Container.Name,
+            };
         }
 
         public override async Task Destroy()

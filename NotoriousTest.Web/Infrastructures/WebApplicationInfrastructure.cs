@@ -12,7 +12,7 @@ namespace NotoriousTest.Web.Infrastructures
         public HttpClient? HttpClient;
         public override int? Order => 999;
 
-        protected WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        protected WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
 
         }
@@ -23,7 +23,7 @@ namespace NotoriousTest.Web.Infrastructures
         private TWebApp _webApplicationFactory;
         public override int? Order => 999;
 
-        public WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        public WebApplicationInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             _webApplicationFactory = new TWebApp();
         }

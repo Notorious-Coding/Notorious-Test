@@ -15,7 +15,7 @@ namespace NotoriousTest.Environments
             base.ConfigureInfrastructureServices(collection);
 
             collection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>()
-                .AddSingleton<IRegistryProvider, SqliteRegistryProvider>();
+                .AddSingleton<IRegistry, SqliteRegistryProvider>();
 
         }
     }

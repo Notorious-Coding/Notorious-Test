@@ -8,7 +8,7 @@ using System.Data.Common;
 namespace NotoriousTest.Database
 {
 
-    public abstract class DatabaseInfrastructureBase<TOutputConfiguration> : Infrastructure<TOutputConfiguration>, IDatabaseInfrastructure
+    public abstract class DatabaseInfrastructureBase<TOutputConfiguration, TMetadata> : Infrastructure<TOutputConfiguration, TMetadata>, IDatabaseInfrastructure where TMetadata : class
     {
         public string DbPrefix { get; init; } = "NotoriousDb";
         public string FullDbName => $"{DbPrefix}_{ContextId.Value}";
@@ -16,7 +16,7 @@ namespace NotoriousTest.Database
         public string[] TableToInclude { get; init; } = [];
 
 
-        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 

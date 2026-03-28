@@ -7,10 +7,10 @@ using NotoriousTest.Core.Registry;
 
 namespace NotoriousTest.TestContainers
 {
-    public abstract class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration>
+    public abstract class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration, DockerMetadata>
         where TContainer : IContainer
     {
-        protected DockerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistryProvider registry) : base(contextId, logger, registry)
+        protected DockerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 
@@ -19,6 +19,11 @@ namespace NotoriousTest.TestContainers
         public override async Task Destroy()
         {
             await Container.StopAsync();
+            Metadata = new DockerMetadata()
+            {
+                ContainerID = Container.Id,
+                ContainerName = Container.Name,
+            };
         }
 
         public override async Task Initialize()

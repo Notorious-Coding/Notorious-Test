@@ -3,33 +3,41 @@
 using Microsoft.Data.Sqlite;
 
 using NotoriousTest.Core.Registry;
-using NotoriousTest.SqlLiteRegistry.TypeHandler;
 
 using System;
 using System.IO;
 using System.Threading.Tasks;
 namespace NotoriousTest.SqlLiteRegistry
 {
-    public class SqliteRegistryProvider : IRegistryProvider, IAsyncDisposable
+    public class SqliteRegistryProvider : IRegistry, IAsyncDisposable
     {
-        private static string RegistryFolder = Path.Combine(Path.GetTempPath(), "notorioustest");
+        private static string RegistryFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "notorioustest");
         private const string RegistryFileName = "doggydog-registry.db";
+        protected SqliteConnection Connection
+        {
+            get
+            {
+                if (_connection == null)
+                {
+                    _connection = new SqliteConnection(ConnectionString.ToString());
+                }
+
+                if (_connection.State != System.Data.ConnectionState.Open)
+                {
+                    _connection.Open();
+                }
+
+                _connection.Execute("PRAGMA SYNCHRONOUS=NORMAL;PRAGMA JOURNAL_MODE=WAL;");
+
+                return _connection;
+            }
+        }
+
         private SqliteConnection _connection;
         private SqliteConnectionStringBuilder ConnectionString => new SqliteConnectionStringBuilder
         {
             DataSource = Path.Combine(RegistryFolder, RegistryFileName)
         };
-
-        public SqliteRegistryProvider()
-        {
-            SqlMapper.AddTypeHandler(new GuidTypeHandler());
-            _connection = new SqliteConnection(ConnectionString.ToString());
-            _connection.Open();
-
-            // WAL mode to handle multiple write
-            // SYNCHRONOUS NORMAL to flush only when 
-            _connection.Execute("PRAGMA SYNCHRONOUS=NORMAL;PRAGMA JOURNAL_MODE=WAL;");
-        }
 
         public async Task Ensure()
         {
@@ -38,18 +46,28 @@ namespace NotoriousTest.SqlLiteRegistry
                 Directory.CreateDirectory(RegistryFolder);
             }
 
-
-            await _connection.ExecuteAsync(SqliteRegistryProviderQueries.CREATE_REGISTRY);
+            // WAL mode to handle multiple write
+            // SYNCHRONOUS NORMAL to flush only when 
+            await Connection.ExecuteAsync(SqliteRegistryProviderQueries.ENSURE_REGISTRY);
         }
 
         public async Task<InfrastuctureRegistryEntry> Register(InfrastuctureRegistryEntry entry)
         {
-            return await _connection.QuerySingleAsync<InfrastuctureRegistryEntry>(SqliteRegistryProviderQueries.REGISTER_INFRASTRUCTURE, entry);
+
+            InfrastructureRegistryEntryEntity entity = await Connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(SqliteRegistryProviderQueries.REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
+
+            return entity.ToDomain();
         }
 
         public async ValueTask DisposeAsync()
         {
-            await _connection.DisposeAsync();
+            await Connection.DisposeAsync();
+        }
+
+        public async Task<bool> Remove(Guid id)
+        {
+            int deletedRows = await Connection.ExecuteAsync(SqliteRegistryProviderQueries.REMOVE_INFRASTRUCTURE, new { InfrastructureId = id.ToString() });
+            return deletedRows > 0;
         }
     }
 }
