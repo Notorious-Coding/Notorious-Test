@@ -1,4 +1,6 @@
-﻿using DotNet.Testcontainers.Containers;
+﻿using Docker.DotNet;
+
+using DotNet.Testcontainers.Containers;
 
 using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures.Cleaner;
@@ -24,19 +26,22 @@ namespace NotoriousTest.Database
         public override async Task Initialize()
         {
             await Container.StartAsync();
-            await base.Initialize();
-
-
             Metadata = new DockerMetadata
             {
                 ContainerID = Container.Id,
                 ContainerName = Container.Name,
             };
+            await Register();
+            await base.Initialize();
         }
 
         public override async Task Destroy()
         {
-            await Container.StopAsync();
+            var client = new DockerClientConfiguration().CreateClient();
+            await client.Containers.RemoveContainerAsync(Container.Id, new Docker.DotNet.Models.ContainerRemoveParameters()
+            {
+                Force = true
+            });
         }
 
         public override string GetServerConnectionString()

@@ -20,20 +20,22 @@ namespace NotoriousTest.TestContainers
 
         protected TContainer Container { get; init; }
 
-        public override async Task Destroy()
+        public override async Task Initialize()
         {
-            await Container.StopAsync();
+            await Container.StartAsync();
             Metadata = new DockerMetadata()
             {
                 ContainerID = Container.Id,
                 ContainerName = Container.Name,
             };
+            await Register();
+        }
+        public override async Task Destroy()
+        {
+            await Container.StopAsync();
+
         }
 
-        public override async Task Initialize()
-        {
-            await Container.StartAsync();
-        }
 
     }
 }

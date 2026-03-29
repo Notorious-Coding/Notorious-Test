@@ -1,0 +1,9 @@
+{
+  "commands": {
+    "Publish DoggyDog": {
+      "fileName": "powershell",
+      "workingDirectory": ".",
+      "arguments": "-ExecutionPolicy Bypass -File ./Commands/publish-doggydog.ps1"
+    }
+  }
+}

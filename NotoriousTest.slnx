@@ -3,6 +3,9 @@
     <File Path=".github/workflows/prerelease.yml" />
     <File Path=".github/workflows/release.yml" />
   </Folder>
+  <Folder Name="/Commands/">
+    <File Path="Commands/publish-doggydog.ps1" />
+  </Folder>
   <Folder Name="/Docs/">
     <File Path=".gitignore" />
     <File Path="CHANGELOG.md" />

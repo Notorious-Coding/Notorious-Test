@@ -24,12 +24,13 @@ namespace NotoriousTest.Database
 
         public override async Task Initialize()
         {
-            await base.Initialize();
             Metadata = new DatabaseMetadata()
             {
                 DatabaseName = FullDbName,
                 ServerConnectionString = GetServerConnectionString()
             };
+            await Register();
+            await base.Initialize();
         }
     }
 }

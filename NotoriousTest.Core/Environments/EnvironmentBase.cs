@@ -94,9 +94,7 @@ namespace NotoriousTest.Core.Environments
             ConfigureInfrastructureServices(_serviceCollection);
             ServiceProvider = _serviceCollection.BuildServiceProvider();
             await SetupRegistry();
-            if (_infrastructures.Any(i => !i.DisableRegistry))
-                await StartDoggyDog();
-
+            await StartDoggyDog();
             await ConfigureEnvironment();
 
             foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))

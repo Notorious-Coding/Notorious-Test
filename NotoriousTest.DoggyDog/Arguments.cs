@@ -15,7 +15,6 @@ namespace NotoriousTest.DoggyDog
                 }
                 return result;
             }
-            Console.WriteLine("Args reçus: " + string.Join(" | ", args));
 
             var parsedArgs = ParseArgs(args);
 

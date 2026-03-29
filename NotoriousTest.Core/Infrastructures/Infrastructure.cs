@@ -64,6 +64,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// Gets the registry provider used to track infrastructure and clean them after test crash.
     /// </summary>
     protected IRegistry Registry { get; private set; }
+    protected bool Registered { get; private set; } = false;
 
     public Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider)
     {
@@ -92,8 +93,8 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Initialize();
+        if (!DisableRegistry && !Registered) await Register();
 
-        if (!DisableRegistry) await Register();
 
         foreach (var extension in _extensions)
         {
@@ -103,9 +104,9 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
     }
 
-    private Task Register()
+    protected async Task Register()
     {
-        return Registry.Register(new InfrastuctureRegistryEntry()
+        await Registry.Register(new InfrastuctureRegistryEntry()
         {
             InfrastructureId = Id,
             InfrastructureType = GetType(),
@@ -113,6 +114,8 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
             EnvironmentId = ContextId,
             ProcessID = Process.GetCurrentProcess().Id,
         });
+
+        Registered = true;
     }
 
     internal async Task ResetAsync()

@@ -6,14 +6,15 @@ using NotoriousTest.SqlLiteRegistry;
 using System.Diagnostics;
 using System.Reflection;
 
-
-
 try
 {
-
-
-
     Arguments arguments = Arguments.From(args);
+    var version = Assembly
+        .GetExecutingAssembly()
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+        ?.InformationalVersion ?? "?";
+
+    Banner.Print(version, arguments.Pid);
 
     AppDomain.CurrentDomain.AssemblyResolve += (sender, resolveArgs) =>
     {
@@ -21,11 +22,9 @@ try
         var name = assemblyName.Name + ".dll";
         var baseDir = Path.GetDirectoryName(arguments.AssemblyPath)!;
 
-        // Cherche dans le bin
         var testPath = Path.Combine(baseDir, name);
         if (File.Exists(testPath)) return Assembly.LoadFrom(testPath);
 
-        // Cherche dans le sous-dossier culture
         if (!string.IsNullOrEmpty(assemblyName.CultureName))
         {
             var culturePath = Path.Combine(baseDir, assemblyName.CultureName, name);
@@ -35,43 +34,52 @@ try
         return null;
     };
 
-    var assemblyDir = Path.GetDirectoryName(arguments.AssemblyPath)!;
     int processId = arguments.Pid;
     Assembly testAssembly = Assembly.LoadFrom(arguments.AssemblyPath);
 
+    Logger.Cyan(() => Console.WriteLine($"[DoggyDog] Attached to test process (PID {processId})"));
 
-    Console.WriteLine($"Starting DoggyDog for test process pid: {processId}");
     IRegistry registry = new SqliteRegistryProvider();
 
-    Process process = Process.GetProcessById(processId);
-    Console.WriteLine($"Waiting for test process {processId} to exit");
+    Process? process = null;
+    try
+    {
+        process = Process.GetProcessById(processId);
+    }
+    catch (ArgumentException)
+    {
+        Logger.Red(() => Console.WriteLine($"[DoggyDog] No process with PID {processId} found. Exiting."));
+        Console.ReadLine();
+        Environment.Exit(1);
+    }
+
+    Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Monitoring PID {processId} — awaiting termination..."));
     await process.WaitForExitAsync();
 
     if (process.ExitCode == 0)
     {
-        Console.WriteLine($"Test process {processId} has terminated correctly, no crash recovery needed. ExitCode: {process.ExitCode}");
-        Console.ReadLine();
+        Logger.Green(() => Console.WriteLine($"[DoggyDog] Process {processId} exited cleanly (code {process.ExitCode}). No recovery needed."));
         Environment.Exit(0);
     }
 
-    Console.WriteLine($"Test process has terminated incorreclty, starting infrastructure clean up. Exit Code: {process.ExitCode}");
+    Logger.Red(() => Console.WriteLine($"[DoggyDog] Process {processId} exited with code {process.ExitCode}. Initiating crash recovery..."));
 
-    // Récupérer toutes les infrastructures existante lié au PID passé en paramètre
     IReadOnlyList<InfrastuctureRegistryEntry> entries = (await registry.GetByProcessId(processId)).ToList();
     if (entries.Count == 0)
     {
-        Console.WriteLine("No infrastructure found. Exiting.");
+        Logger.Yellow(() => Console.WriteLine($"[DoggyDog] No registered infrastructure found for PID {processId}. Nothing to clean up."));
         Console.ReadLine();
         Environment.Exit(0);
     }
 
-    Console.WriteLine($"Found {entries.Count()} infrastructures associated with test process {processId}");
-    // Récuperer le type des metadata
+    Logger.Cyan(() => Console.WriteLine($"[DoggyDog] {entries.Count} infrastructure(s) registered for PID {processId}. Starting cleanup..."));
+
     foreach (var entry in entries)
     {
-        Console.WriteLine($"Cleaning up {entry.InfrastructureType.Name} ...");
-        Type? infrastuctureType = testAssembly.GetLoadableTypes().FirstOrDefault(t => t.AssemblyQualifiedName == entry.InfrastructureType.AssemblyQualifiedName);
-        CleanerAttribute? attr = infrastuctureType?.GetCustomAttribute<CleanerAttribute>();
+        Logger.Yellow(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleanup in progress..."));
+
+        Type? infrastructureType = testAssembly.GetLoadableTypes().FirstOrDefault(t => t.AssemblyQualifiedName == entry.InfrastructureType.AssemblyQualifiedName);
+        CleanerAttribute? attr = infrastructureType?.GetCustomAttribute<CleanerAttribute>();
 
         if (attr != null)
         {
@@ -80,44 +88,33 @@ try
             if (cleaner != null)
             {
                 await cleaner.CleanAfterCrash(entry.EnvironmentId, entry.InfrastructureId, entry.Metadata);
-                Console.WriteLine($"Clean up for {entry.InfrastructureType.Name} has been a success. Deleting from registry...");
+                Logger.Green(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleanup successful. Removing registry entry..."));
                 await registry.Remove(entry.InfrastructureId);
-                Console.WriteLine("Registry entry has been deleted.");
+                Logger.DarkGray(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Registry entry removed."));
             }
             else
             {
-                Console.WriteLine($"No cleaner found for {entry.InfrastructureType.Name}. Cleanup aborted.");
+                Logger.Red(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Failed to instantiate cleaner. Skipping."));
             }
         }
         else
         {
-            Console.WriteLine($"No cleaner attributres found for {entry.InfrastructureType.Name}. Cleanup aborted.");
+            Logger.Red(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] No [Cleaner] attribute found. Skipping."));
         }
     }
 
-    Console.WriteLine($"End of cleaning for test process {processId}. Exiting...");
+    Logger.Green(() => Console.WriteLine($"[DoggyDog] Crash recovery complete for PID {processId}."));
     Console.ReadLine();
     Environment.Exit(0);
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Fatal error: {ex}");
-    Console.WriteLine("Press any key to exit...");
+    Logger.Red(() =>
+    {
+        Console.WriteLine($"[DoggyDog] Fatal error during execution.");
+        Console.WriteLine(ex.ToString());
+        Console.WriteLine("Press any key to exit...");
+    });
     Console.ReadKey();
     Environment.Exit(1);
-}
-
-public static class AssemblyExtensions
-{
-    public static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
-    {
-        try
-        {
-            return assembly.GetTypes();
-        }
-        catch (ReflectionTypeLoadException ex)
-        {
-            return ex.Types.Where(t => t != null)!;
-        }
-    }
 }
