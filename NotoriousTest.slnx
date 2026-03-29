@@ -18,17 +18,18 @@
     <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
     <Project Path="Samples/NotoriousTests.InfrastructuresSamples/NotoriousTests.InfrastructuresSamples.csproj" />
   </Folder>
-  <Folder Name="/src/">
+  <Folder Name="/src/" />
+  <Folder Name="/src/CI/">
+    <File Path=".github/workflows/prerelease.yml" />
+    <File Path=".github/workflows/release.yml" />
+  </Folder>
+  <Folder Name="/src/Core/">
     <Project Path="DoggyDog/DoggyDog.csproj" Id="8408dd70-9d47-4f50-bab4-bcd86e50bc3d" />
     <Project Path="NotoriousTest.Core/NotoriousTest.Core.csproj" Id="ab05b07d-dc15-407e-9af7-e995a4f7c2d9" />
     <Project Path="NotoriousTest.SqlLiteRegistry/NotoriousTest.SqlLiteRegistry.csproj" Id="fe120d83-193d-410c-98c5-baf3fd93af7a" />
     <Project Path="NotoriousTest.TestSettings/NotoriousTest.TestSettings.csproj" Id="0989b9dc-fe24-43ee-b04a-ac791bf12c4f" />
-    <Project Path="NotoriousTest.XUnit/NotoriousTest.XUnit.csproj" Id="7936b457-1116-4175-92ee-2dd46d7b6273" />
+    <Project Path="NotoriousTest.Watchdog/NotoriousTest.Watchdog.csproj" Id="a925d516-7983-4cbf-a637-e54edecb47b3" />
     <Project Path="NotoriousTest/NotoriousTest.csproj" />
-  </Folder>
-  <Folder Name="/src/CI/">
-    <File Path=".github/workflows/prerelease.yml" />
-    <File Path=".github/workflows/release.yml" />
   </Folder>
   <Folder Name="/src/Infrastructures/">
     <Project Path="NotoriousTest.Database/NotoriousTest.Database.csproj" Id="61a1bf4a-e96c-464e-a985-8ac40019acd1" />
@@ -37,8 +38,10 @@
     <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
     <Project Path="NotoriousTest.Web/NotoriousTest.Web.csproj" Id="5a2ebcfc-d429-4f2a-be6c-c7680a4ee8b7" />
   </Folder>
+  <Folder Name="/src/TestFramework/">
+    <Project Path="NotoriousTest.XUnit/NotoriousTest.XUnit.csproj" Id="7936b457-1116-4175-92ee-2dd46d7b6273" />
+  </Folder>
   <Folder Name="/Tests/">
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
-  <Project Path="NotoriousTest.Watchdog/NotoriousTest.Watchdog.csproj" Id="a925d516-7983-4cbf-a637-e54edecb47b3" />
 </Solution>
