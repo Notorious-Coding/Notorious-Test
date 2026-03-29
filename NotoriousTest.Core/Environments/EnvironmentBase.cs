@@ -33,7 +33,6 @@ namespace NotoriousTest.Core.Environments
         /// Gets the collection of infrastructure components associated with this instance.
         /// </summary>
         private List<Infrastructure> _infrastructures = [];
-        private Process _doggyDogProcess;
 
         /// <summary>
         /// Configuration infrastructure dependency injection.

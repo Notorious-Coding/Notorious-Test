@@ -77,7 +77,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     public abstract Task Reset();
     public abstract Task Destroy();
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await DestroyAsync();
     }
@@ -169,7 +169,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// <typeparam name="T">The type of the infrastructure extension to ensure. Must implement IInfrastructureExtension.</typeparam>
     /// <param name="extension">The extension instance to add if an existing instance of type T is not already present. Cannot be null.</param>
     /// <returns>The existing extension of type T if present; otherwise, the provided extension instance.</returns>
-    protected T EnsureExtension<T>(T extension) where T : IInfrastructureExtension
+    public T EnsureExtension<T>(T extension) where T : IInfrastructureExtension
     {
         var existing = _extensions.OfType<T>().FirstOrDefault();
         if (existing != null) return existing;
@@ -186,13 +186,9 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// constructor.</typeparam>
     /// <returns>An instance of the specified extension type. If an extension of this type already exists in the collection, it
     /// is returned; otherwise, a new instance is created, added to the collection, and returned.</returns>
-    protected T EnsureExtension<T>() where T : IInfrastructureExtension, new()
+    public T EnsureExtension<T>() where T : IInfrastructureExtension, new()
     {
-        var existing = _extensions.OfType<T>().FirstOrDefault();
-        if (existing != null) return existing;
-
         T extension = new T();
-        _extensions.Add(extension);
-        return extension;
+        return EnsureExtension(extension);
     }
 }

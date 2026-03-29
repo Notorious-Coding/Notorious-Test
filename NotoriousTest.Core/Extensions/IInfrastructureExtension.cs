@@ -36,22 +36,22 @@ public interface IInfrastructureExtension
 public interface IInfrastructureExtension<T> : IInfrastructureExtension where T : IInfrastructure
 {
     Task IInfrastructureExtension.OnBeforeInitialize(IInfrastructure infrastructure)
-        => infrastructure is T typed ? OnBeforeInitialize(typed) : Task.CompletedTask;
+        => infrastructure is T typed ? OnBeforeInitialize(typed) : throw new InvalidOperationException($"Infrastructure must be of type {typeof(T)}");
 
     Task IInfrastructureExtension.OnAfterInitialize(IInfrastructure infrastructure)
-        => infrastructure is T typed ? OnAfterInitialize(typed) : Task.CompletedTask;
+        => infrastructure is T typed ? OnAfterInitialize(typed) : throw new InvalidOperationException($"Infrastructure must be of type {typeof(T)}");
 
     Task IInfrastructureExtension.OnBeforeReset(IInfrastructure infrastructure)
-        => infrastructure is T typed ? OnBeforeReset(typed) : Task.CompletedTask;
+        => infrastructure is T typed ? OnBeforeReset(typed) : throw new InvalidOperationException($"Infrastructure must be of type {typeof(T)}");
 
     Task IInfrastructureExtension.OnAfterReset(IInfrastructure infrastructure)
-        => infrastructure is T typed ? OnAfterReset(typed) : Task.CompletedTask;
+        => infrastructure is T typed ? OnAfterReset(typed) : throw new InvalidOperationException($"Infrastructure must be of type {typeof(T)}");
 
     Task IInfrastructureExtension.OnBeforeDestroy(IInfrastructure infrastructure)
-        => infrastructure is T typed ? OnBeforeDestroy(typed) : Task.CompletedTask;
+        => infrastructure is T typed ? OnBeforeDestroy(typed) : throw new InvalidOperationException($"Infrastructure must be of type {typeof(T)}");
 
     Task IInfrastructureExtension.OnAfterDestroy(IInfrastructure infrastructure)
-        => infrastructure is T typed ? OnAfterDestroy(typed) : Task.CompletedTask;
+        => infrastructure is T typed ? OnAfterDestroy(typed) : throw new InvalidOperationException($"Infrastructure must be of type {typeof(T)}");
 
     /// <summary>
     /// Called before the infrastructure is initialized.

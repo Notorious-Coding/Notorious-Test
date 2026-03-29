@@ -1,6 +1,7 @@
 ﻿using NotoriousTest.Core.Registry;
 
 using System;
+using System.Globalization;
 using System.Text.Json;
 
 namespace NotoriousTest.SqlLiteRegistry
@@ -53,8 +54,8 @@ namespace NotoriousTest.SqlLiteRegistry
                 Metadata = !(Metadata is null) && !(metadataType is null)
                     ? JsonSerializer.Deserialize(Metadata, metadataType)
                     : null,
-                CreationDate = DateTime.Parse(CreationDate),
-                UpdateDate = DateTime.Parse(UpdateDate),
+                CreationDate = DateTime.Parse(CreationDate, null, DateTimeStyles.RoundtripKind),
+                UpdateDate = DateTime.Parse(UpdateDate, null, DateTimeStyles.RoundtripKind),
             };
         }
     }

@@ -33,4 +33,7 @@
 		<None Include="..\README.md" Pack="true" PackagePath="" Visible="False" />
 		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
 	</ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="NotoriousTest.UnitTests"/>
+	</ItemGroup>
 </Project>
