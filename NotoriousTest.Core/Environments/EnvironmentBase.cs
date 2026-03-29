@@ -4,6 +4,7 @@ using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Exceptions;
 using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Watchdog;
 
 using System.Diagnostics;
 using System.Reflection;
@@ -110,17 +111,8 @@ namespace NotoriousTest.Core.Environments
 
         private async Task StartDoggyDog()
         {
-            var watchdogPath = Path.Combine(AppContext.BaseDirectory, "NotoriousTest.DoggyDog.exe");
-            var currentPid = Process.GetCurrentProcess().Id;
-            var assemblyPath = CurrentAssembly.Location;
-
-            _doggyDogProcess = Process.Start(new ProcessStartInfo
-            {
-                FileName = watchdogPath,
-                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\"",
-                UseShellExecute = true,
-                CreateNoWindow = false,
-            });
+            var watchDog = ServiceProvider.GetRequiredService<IWatchDog>();
+            watchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id);
         }
 
         public virtual async Task Reset()

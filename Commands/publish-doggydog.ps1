@@ -4,7 +4,7 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.nuget\packages\notorioustest.core
 
 # Publish DoggyDog for Windows
 Write-Host "Publishing DoggyDog for win-x64..."
-dotnet publish ./NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj `
+dotnet publish ./DoggyDog/DoggyDog.csproj `
     -r win-x64 `
     --self-contained `
     -p:PublishSingleFile=true `
@@ -12,7 +12,7 @@ dotnet publish ./NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj `
 
 # Publish DoggyDog for Linux
 Write-Host "Publishing DoggyDog for linux-x64..."
-dotnet publish ./NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj `
+dotnet publish ./DoggyDog/DoggyDog.csproj `
     -r linux-x64 `
     --self-contained `
     -p:PublishSingleFile=true `

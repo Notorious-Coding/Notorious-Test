@@ -74,10 +74,5 @@ namespace NotoriousTest.SqlLiteRegistry
             IEnumerable<InfrastructureRegistryEntryEntity> entries = await Connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_PROCESS_ID, new { ProcessID = processId });
             return entries.Select(entry => entry.ToDomain());
         }
-
-        public void Empty()
-        {
-
-        }
     }
 }
