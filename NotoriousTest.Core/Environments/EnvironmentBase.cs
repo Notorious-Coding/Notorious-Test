@@ -21,18 +21,24 @@ namespace NotoriousTest.Core.Environments
         /// Gets the unique identifier for the environment instance.
         /// </summary>
         public ContextId EnvironmentId { get; private set; } = Guid.NewGuid();
+        public abstract Assembly CurrentAssembly { get; }
+
         protected IServiceProvider ServiceProvider { get; private set; }
         private IServiceCollection _serviceCollection;
+        protected IWatchDog WatchDog => _watchDog ??= ServiceProvider.GetRequiredService<IWatchDog>();
+        private IWatchDog? _watchDog;
+        protected IRegistry Registry => _registry ??= ServiceProvider.GetRequiredService<IRegistry>();
+        private IRegistry? _registry;
 
         /// <summary>
         /// Define current test assembly.
         /// </summary>
-        public abstract Assembly CurrentAssembly { get; }
 
         /// <summary>
         /// Gets the collection of infrastructure components associated with this instance.
         /// </summary>
         private List<Infrastructure> _infrastructures = [];
+
 
         /// <summary>
         /// Configuration infrastructure dependency injection.
@@ -110,8 +116,7 @@ namespace NotoriousTest.Core.Environments
 
         private async Task StartDoggyDog()
         {
-            var watchDog = ServiceProvider.GetRequiredService<IWatchDog>();
-            watchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id);
+            WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id);
         }
 
         public virtual async Task Reset()
@@ -128,6 +133,8 @@ namespace NotoriousTest.Core.Environments
             {
                 await infra.DestroyAsync();
             }
+
+            WatchDog.SendSuccessSignal(Process.GetCurrentProcess().Id);
         }
 
         private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration()

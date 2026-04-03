@@ -22,13 +22,29 @@ namespace NotoriousTest.IntegrationTests
         {
             public static Process? StartFakeProcess(int exitCode = 0, int timeToExit = 5)
             {
-                return Process.Start(new ProcessStartInfo
+                ProcessStartInfo startInfo = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c timeout /t {timeToExit} && exit {exitCode}",
+                        UseShellExecute = true,
+                        CreateNoWindow = false,
+                    }
+                    : new ProcessStartInfo
+                    {
+                        FileName = "/bin/sh",
+                        Arguments = $"-c \"sleep {timeToExit} && exit {exitCode}\"",
+                        UseShellExecute = true,
+                        CreateNoWindow = false,
+                    };
+
+                Process? fakeProcess = Process.Start(startInfo);
+                if (exitCode == 0 && fakeProcess != null)
                 {
-                    FileName = "cmd.exe",
-                    Arguments = $"/c timeout /t {timeToExit} && exit {exitCode}",
-                    UseShellExecute = true,
-                    CreateNoWindow = false,
-                });
+                    File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{fakeProcess.Id}.signal"), "OK");
+                }
+
+                return fakeProcess;
             }
 
             public static async Task CreateRegistry(SqliteInfrastructure registryInfrastructure)
@@ -196,7 +212,7 @@ namespace NotoriousTest.IntegrationTests
 
             public static async Task ShouldHaveInitiatedRecovery(string stdout, Process? attachedProcess)
             {
-                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} exited with code {attachedProcess.ExitCode}. Initiating crash recovery...");
+                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} exited abnormally. Initiating crash recovery...");
             }
 
             public static async Task ShouldHaveMonitoredProcess(string stdout, Process? attachedProcess)
@@ -216,7 +232,7 @@ namespace NotoriousTest.IntegrationTests
 
             public static async Task ShouldHaveExitNormally(string stdout, Process? attachedProcess)
             {
-                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} exited cleanly (code {attachedProcess.ExitCode}). No recovery needed.");
+                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} exited cleanly. No recovery needed.");
             }
 
             public static async Task ShouldHaveNotFoundProcess(string stdout, int pid)

@@ -4,6 +4,7 @@ using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.DoggyDog;
 using NotoriousTest.SqlLiteRegistry;
+using NotoriousTest.Watchdog;
 
 using System.Diagnostics;
 using System.Reflection;
@@ -78,13 +79,14 @@ try
     Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Monitoring PID {processId} — awaiting termination..."));
     await process.WaitForExitAsync();
 
-    if (process.ExitCode == 0)
+
+    if (DoggyDogWatchDog.ReadSuccessSignal(processId))
     {
-        Logger.Green(() => Console.WriteLine($"[DoggyDog] Process {processId} exited cleanly (code {process.ExitCode}). No recovery needed."));
+        Logger.Green(() => Console.WriteLine($"[DoggyDog] Process {processId} exited cleanly. No recovery needed."));
         Environment.Exit(0);
     }
 
-    Logger.Red(() => Console.WriteLine($"[DoggyDog] Process {processId} exited with code {process.ExitCode}. Initiating crash recovery..."));
+    Logger.Red(() => Console.WriteLine($"[DoggyDog] Process {processId} exited abnormally. Initiating crash recovery..."));
 
     IReadOnlyList<InfrastuctureRegistryEntry> entries = (await registry.GetByProcessId(processId)).ToList();
 

@@ -11,11 +11,11 @@ namespace NotoriousTest.Watchdog
 {
     public class DoggyDogWatchDog : IWatchDog
     {
-        private readonly SqliteRegistryProviderConfiguration _configuration;
+        private readonly SqliteRegistryProviderConfiguration _registyConfiguration;
 
-        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration configuration)
+        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration)
         {
-            _configuration = configuration;
+            _registyConfiguration = registryConfiguration;
         }
 
         public Process Start(Assembly currentAssembly, int currentPid)
@@ -26,13 +26,27 @@ namespace NotoriousTest.Watchdog
             Process process = Process.Start(new ProcessStartInfo
             {
                 FileName = watchdogPath,
-                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\" --connectionString \"{_configuration.ConnectionString}\"",
+                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\" --connectionString \"{_registyConfiguration.ConnectionString}\"",
                 UseShellExecute = true,
                 CreateNoWindow = false,
             });
 
 
             return process;
+        }
+
+        public void SendSuccessSignal(int currentPid)
+        {
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{currentPid}.signal"), "OK");
+        }
+
+        public static bool ReadSuccessSignal(int currentPid)
+        {
+            var path = Path.Combine(Path.GetTempPath(), $"nt-{currentPid}.signal");
+            var isSuccess = File.Exists(path);
+            if (isSuccess) File.Delete(path);
+
+            return isSuccess;
         }
     }
 }

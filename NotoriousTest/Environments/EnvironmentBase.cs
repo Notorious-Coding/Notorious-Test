@@ -23,13 +23,14 @@ namespace NotoriousTest.Environments
                 DataSource = EnvironmentBaseDefaults.DefaultRegistryConnectionString
             };
 
+            var registryConfig = new SqliteRegistryProviderConfiguration()
+            {
+                ConnectionString = builder.ConnectionString
+            };
+
             collection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>()
-                .AddSingleton<SqliteRegistryProviderConfiguration>((_) => new()
-                {
-                    ConnectionString = builder.ConnectionString
-                })
-                .AddSingleton<IRegistry, SqliteRegistryProvider>()
-                .AddSingleton<IWatchDog, DoggyDogWatchDog>();
+                .AddSingleton<IRegistry>((_) => new SqliteRegistryProvider(registryConfig))
+                .AddSingleton<IWatchDog>((_) => new DoggyDogWatchDog(registryConfig));
 
         }
     }

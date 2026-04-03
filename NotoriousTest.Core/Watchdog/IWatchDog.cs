@@ -6,5 +6,6 @@ namespace NotoriousTest.Core.Watchdog
     public interface IWatchDog
     {
         Process Start(Assembly currentAssembly, int currentPid);
+        void SendSuccessSignal(int currentPid);
     }
 }

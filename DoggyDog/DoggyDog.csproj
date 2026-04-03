@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
     <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Watchdog\NotoriousTest.Watchdog.csproj" />
   </ItemGroup>
 
 </Project>
