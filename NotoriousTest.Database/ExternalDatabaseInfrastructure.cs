@@ -16,7 +16,6 @@ namespace NotoriousTest.Database
             Settings = EnsureExtension(new SettingsExtension<TSettings>(provider)).Settings;
         }
 
-
         public override string GetServerConnectionString()
         {
             return Settings.ConnectionString;

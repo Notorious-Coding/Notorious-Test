@@ -21,7 +21,7 @@ namespace NotoriousTest.Database
                 Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");
         }
 
-        protected TContainer Container { get; init; }
+        public TContainer Container { get; init; }
 
         public override async Task Initialize()
         {

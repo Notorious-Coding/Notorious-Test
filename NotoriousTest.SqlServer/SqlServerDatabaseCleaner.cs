@@ -11,6 +11,7 @@ namespace NotoriousTest.SqlServer
         public async Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
         {
             using var connection = new SqlConnection(metadata.ServerConnectionString);
+
             await connection.OpenAsync();
             var command = connection.CreateCommand();
             command.CommandText = $"DROP DATABASE [{metadata.DatabaseName}]";

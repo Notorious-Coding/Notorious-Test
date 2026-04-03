@@ -13,8 +13,15 @@ namespace NotoriousTest.SqlLiteRegistry
 {
     public partial class SqliteRegistryProvider : IRegistry, IAsyncDisposable
     {
-        private static string RegistryFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "notorioustest");
-        private const string RegistryFileName = "doggydog-registry.db";
+        private readonly SqliteRegistryProviderConfiguration _configuration;
+
+        public SqliteRegistryProvider(SqliteRegistryProviderConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        private SqliteConnection _connection;
+        private SqliteConnectionStringBuilder ConnectionString => new SqliteConnectionStringBuilder(_configuration.ConnectionString);
         protected SqliteConnection Connection
         {
             get
@@ -35,17 +42,13 @@ namespace NotoriousTest.SqlLiteRegistry
             }
         }
 
-        private SqliteConnection _connection;
-        private SqliteConnectionStringBuilder ConnectionString => new SqliteConnectionStringBuilder
-        {
-            DataSource = Path.Combine(RegistryFolder, RegistryFileName)
-        };
 
         public async Task Ensure()
         {
-            if (!Directory.Exists(RegistryFolder))
+            string directory = Path.GetDirectoryName(ConnectionString.DataSource);
+            if (!Directory.Exists(directory))
             {
-                Directory.CreateDirectory(RegistryFolder);
+                Directory.CreateDirectory(directory);
             }
             await Connection.ExecuteAsync(ENSURE_REGISTRY);
         }

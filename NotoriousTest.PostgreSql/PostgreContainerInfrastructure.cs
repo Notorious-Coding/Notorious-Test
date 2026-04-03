@@ -53,19 +53,14 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
         }));
     }
 
+    public override DbConnection GetConnection(string connectionString)
+    {
+        return new NpgsqlConnection(connectionString);
+    }
+
     protected virtual PostgreSqlBuilder ConfigureSqlContainer(PostgreSqlBuilder builder)
     {
         return builder;
-    }
-
-    public override DbConnection GetDatabaseConnection()
-    {
-        return new NpgsqlConnection(GetDatabaseConnectionString());
-    }
-
-    public override DbConnection GetServerConnection()
-    {
-        return new NpgsqlConnection(GetServerConnectionString());
     }
 
     public override string GetDatabaseConnectionString()
@@ -87,4 +82,6 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
             await command.ExecuteNonQueryAsync();
         }
     }
+
+
 }

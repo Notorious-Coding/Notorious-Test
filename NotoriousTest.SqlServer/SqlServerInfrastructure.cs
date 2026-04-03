@@ -53,14 +53,9 @@ namespace NotoriousTest.SqlServer
             }));
         }
 
-        public override DbConnection GetDatabaseConnection()
+        public override DbConnection GetConnection(string connectionString)
         {
-            return new SqlConnection(GetDatabaseConnectionString());
-        }
-
-        public override DbConnection GetServerConnection()
-        {
-            return new SqlConnection(GetServerConnectionString());
+            return new SqlConnection(connectionString);
         }
 
         public override string GetDatabaseConnectionString()
@@ -84,9 +79,12 @@ namespace NotoriousTest.SqlServer
 
         protected override async Task DropDatabase(DbConnection sqlConnection)
         {
+            SqlConnection.ClearPool((SqlConnection)GetDatabaseConnection());
+
             using (DbCommand command = sqlConnection.CreateCommand())
             {
-                command.CommandText = $"DROP DATABASE [{FullDbName}]";
+                command.CommandText = $@"
+                    DROP DATABASE [{FullDbName}]";
                 await command.ExecuteNonQueryAsync();
             }
         }

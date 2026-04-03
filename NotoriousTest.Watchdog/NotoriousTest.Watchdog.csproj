@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
+    <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" />
   </ItemGroup>
 
 </Project>

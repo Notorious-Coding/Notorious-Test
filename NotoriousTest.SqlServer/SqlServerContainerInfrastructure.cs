@@ -58,14 +58,9 @@ namespace NotoriousTest.SqlServer
             return builder;
         }
 
-        public override DbConnection GetDatabaseConnection()
+        public override DbConnection GetConnection(string connectionString)
         {
-            return new SqlConnection(GetDatabaseConnectionString());
-        }
-
-        public override DbConnection GetServerConnection()
-        {
-            return new SqlConnection(GetServerConnectionString());
+            return new SqlConnection(connectionString);
         }
 
         public override string GetDatabaseConnectionString()
@@ -81,6 +76,7 @@ namespace NotoriousTest.SqlServer
 
         protected override async Task CreateDatabase(DbConnection sqlConnection)
         {
+
             using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"CREATE DATABASE [{FullDbName}]";

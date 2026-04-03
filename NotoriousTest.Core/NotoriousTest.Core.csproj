@@ -35,5 +35,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<InternalsVisibleTo Include="NotoriousTest.UnitTests"/>
+		<InternalsVisibleTo Include="NotoriousTest.IntegrationTests"/>
 	</ItemGroup>
 </Project>

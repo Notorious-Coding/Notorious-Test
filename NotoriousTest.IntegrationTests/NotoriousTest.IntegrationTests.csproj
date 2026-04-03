@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Dapper" Version="2.1.72" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="NotoriousTest.Core" Version="4.0.0" />
+	<PackageReference Include="xunit.v3" Version="3.2.2" />
+	<PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+	<PackageReference Include="AwesomeAssertions" Version="9.4.0" />
+	<PackageReference Include="FakeItEasy" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.IntegrationTests.Web\NotoriousTest.IntegrationTests.Web.csproj" />
+    <ProjectReference Include="..\NotoriousTest.PostgreSql\NotoriousTest.PostgreSql.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Sqlite\NotoriousTest.Sqlite.csproj" />
+    <ProjectReference Include="..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj" />
+    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
+    <ProjectReference Include="..\NotoriousTest.XUnit\NotoriousTest.XUnit.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="testsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

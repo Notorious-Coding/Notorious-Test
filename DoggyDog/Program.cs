@@ -1,4 +1,6 @@
-﻿using NotoriousTest.Core.Infrastructures.Cleaner;
+﻿using Microsoft.Data.Sqlite;
+
+using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.DoggyDog;
 using NotoriousTest.SqlLiteRegistry;
@@ -36,10 +38,30 @@ try
 
     int processId = arguments.Pid;
     Assembly testAssembly = Assembly.LoadFrom(arguments.AssemblyPath);
-
     Logger.Cyan(() => Console.WriteLine($"[DoggyDog] Attached to test process (PID {processId})"));
 
-    IRegistry registry = new SqliteRegistryProvider();
+    var cs = new SqliteConnectionStringBuilder(arguments.ConnectionString); // Validate connection string format early
+
+    if (!File.Exists(cs.DataSource))
+    {
+        Logger.Red(() =>
+        {
+            Console.WriteLine($"[DoggyDog] Registry file not found at {cs.DataSource}");
+            Environment.Exit(-1);
+        });
+    }
+    else
+    {
+        Logger.Yellow(() =>
+        {
+            Console.WriteLine($"[DoggyDog] Using registry file at {cs.DataSource}");
+        });
+    }
+
+    IRegistry registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration()
+    {
+        ConnectionString = arguments.ConnectionString
+    });
 
     Process? process = null;
     try
@@ -50,7 +72,7 @@ try
     {
         Logger.Red(() => Console.WriteLine($"[DoggyDog] No process with PID {processId} found. Exiting."));
         Console.ReadLine();
-        Environment.Exit(1);
+        Environment.Exit(0);
     }
 
     Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Monitoring PID {processId} — awaiting termination..."));
@@ -65,6 +87,7 @@ try
     Logger.Red(() => Console.WriteLine($"[DoggyDog] Process {processId} exited with code {process.ExitCode}. Initiating crash recovery..."));
 
     IReadOnlyList<InfrastuctureRegistryEntry> entries = (await registry.GetByProcessId(processId)).ToList();
+
     if (entries.Count == 0)
     {
         Logger.Yellow(() => Console.WriteLine($"[DoggyDog] No registered infrastructure found for PID {processId}. Nothing to clean up."));
@@ -83,6 +106,8 @@ try
 
         if (attr != null)
         {
+            Logger.DarkGray(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleaning using {attr.CleanerType.Name}."));
+
             IInfrastructureCleaner? cleaner = Activator.CreateInstance(attr.CleanerType) as IInfrastructureCleaner;
 
             if (cleaner != null)
@@ -95,11 +120,13 @@ try
             else
             {
                 Logger.Red(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Failed to instantiate cleaner. Skipping."));
+                continue;
             }
         }
         else
         {
             Logger.Red(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] No [Cleaner] attribute found. Skipping."));
+            continue;
         }
     }
 

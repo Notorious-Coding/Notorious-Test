@@ -1,7 +1,7 @@
 ﻿
 namespace NotoriousTest.DoggyDog
 {
-    internal record Arguments(int Pid, string AssemblyPath)
+    internal record Arguments(int Pid, string AssemblyPath, string ConnectionString)
     {
         public static Arguments From(string[] args)
         {
@@ -18,30 +18,34 @@ namespace NotoriousTest.DoggyDog
 
             var parsedArgs = ParseArgs(args);
 
-            Console.ForegroundColor = ConsoleColor.Red;
             if (!parsedArgs.TryGetValue("pid", out string? pidStr))
             {
-                Console.WriteLine("Error: --pid parameters is missing.");
+                Logger.Red(() => Console.WriteLine("[DoggyDog]--pid parameter is missing."));
             }
 
             if (!int.TryParse(pidStr, out int pid))
             {
-                Console.WriteLine("Error: --pid is not a number.");
+                Logger.Red(() => Console.WriteLine("[DoggyDog] --pid is not a number."));
             }
 
             if (!parsedArgs.TryGetValue("assembly", out string? assemblyPath))
             {
-                Console.WriteLine("Error: --assembly parameters is missing.");
+                Logger.Red(() => Console.WriteLine("[DoggyDog] --assembly parameter is missing."));
             }
 
-            if (pid == default || assemblyPath == null)
+            if (!parsedArgs.TryGetValue("connectionString", out string? connectionString))
+            {
+                Logger.Red(() => Console.WriteLine("[DoggyDog] --connectionString parameter is missing."));
+            }
+
+            if (pid == default || assemblyPath == null || connectionString == null)
             {
                 Environment.Exit(-1);
             }
 
-            Console.ForegroundColor = ConsoleColor.White;
 
-            return new Arguments(pid, assemblyPath);
+
+            return new Arguments(pid, assemblyPath, connectionString);
         }
     }
 }

@@ -27,7 +27,7 @@ public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata
     /// <summary>
     /// Gets or sets the metadata associated with the current object.
     /// </summary>
-    protected new TMetadata? Metadata { get => (TMetadata?)base.Metadata; set => base.Metadata = value; }
+    public new TMetadata? Metadata { get => (TMetadata?)base.Metadata; protected set => base.Metadata = value; }
 
     protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
     {
@@ -54,7 +54,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// <summary>
     /// Gets or sets the metadata associated with the current object.
     /// </summary>
-    protected object? Metadata { get; set; }
+    public object? Metadata { get; protected set; }
     /// <summary>
     /// Gets the logger instance used to record test execution details and diagnostic information.
     /// </summary>
@@ -84,24 +84,34 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     internal async Task InitializeAsync()
     {
-        Logger.Log($"[{GetType().Name}] Initialization ...");
-        var sw = Stopwatch.StartNew();
-        foreach (var extension in _extensions)
+        try
         {
-            Logger.Log($"[{extension.GetType().Name}] OnBeforeInitialize");
-            await extension.OnBeforeInitialize(this);
+            Logger.Log($"[{GetType().Name}] Initialization ...");
+            var sw = Stopwatch.StartNew();
+            foreach (var extension in _extensions)
+            {
+                Logger.Log($"[{extension.GetType().Name}] OnBeforeInitialize");
+                await extension.OnBeforeInitialize(this);
+            }
+
+            await Initialize();
+            if (!DisableRegistry && !Registered) await Register();
+
+
+            foreach (var extension in _extensions)
+            {
+                Logger.Log($"[{extension.GetType().Name}] OnAfterInitialize");
+                await extension.OnAfterInitialize(this);
+            }
+            Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
+
         }
-
-        await Initialize();
-        if (!DisableRegistry && !Registered) await Register();
-
-
-        foreach (var extension in _extensions)
+        catch (Exception ec)
         {
-            Logger.Log($"[{extension.GetType().Name}] OnAfterInitialize");
-            await extension.OnAfterInitialize(this);
+            Logger.Log("Initialization failed with exception: " + ec.ToString());
+            await Destroy();
+            throw;
         }
-        Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
     }
 
     protected async Task Register()

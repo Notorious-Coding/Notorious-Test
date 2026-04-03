@@ -13,6 +13,7 @@
 		<PackageReference Include="System.Text.Json" Version="10.0.5" />
 	</ItemGroup>
 	<ItemGroup>
-		<InternalsVisibleTo Include="NotoriousTest.UnitTests"/>
+		<InternalsVisibleTo Include="NotoriousTest.UnitTests" />
+		<InternalsVisibleTo Include="NotoriousTest.IntegrationTests" />
 	</ItemGroup>
 </Project>

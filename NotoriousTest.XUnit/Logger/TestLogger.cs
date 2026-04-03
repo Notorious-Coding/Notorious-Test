@@ -14,7 +14,7 @@ namespace NotoriousTest.XUnit.Logger
         public TestLogger(IMessageSink sink, ContextId contextId)
         {
             _sink = sink;
-            this._contextId = contextId;
+            _contextId = contextId;
         }
 
         public void Log(string message)

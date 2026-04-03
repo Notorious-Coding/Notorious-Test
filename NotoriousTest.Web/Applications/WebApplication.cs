@@ -22,6 +22,11 @@ namespace NotoriousTest.Web.Applications
 
             builder.ConfigureAppConfiguration((config) =>
             {
+                if (ConsumedConfiguration == null || !ConsumedConfiguration.Any())
+                {
+                    return;
+                }
+
                 Dictionary<string, string> aggregatedConfiguration = ConsumedConfiguration
                                                 .Select(ce => ce.Value.ToDictionary(ce.Key))
                                                 .SelectMany(d => d)

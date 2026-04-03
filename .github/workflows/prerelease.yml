@@ -29,8 +29,11 @@ jobs:
     - name: Build
       run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
 
-    - name: Test
+    - name: Run Unit Tests
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
+
+    - name: Run Integration Tests
+      run: dotnet test NotoriousTest.IntegrationTests --no-build --verbosity normal
 
     - name: Publish DoggyDog for Windows
       run: |
@@ -51,7 +54,6 @@ jobs:
             -o ./tools/linux-x64 \
             --version-suffix "beta.${{ github.run_number }}" \
             --no-build
-
 
     - name: Pack
       run: dotnet pack -c ${{ env.CONFIGURATION }}  -o out --version-suffix "beta.${{ github.run_number }}"

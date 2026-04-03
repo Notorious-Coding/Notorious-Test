@@ -1,10 +1,8 @@
-﻿using NotoriousTest.XUnit;
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 using Xunit;
 
-namespace NotoriousTest
+namespace NotoriousTest.XUnit
 {
     public abstract class IntegrationTest<T> : IClassFixture<T>, IAsyncLifetime where T : Environment
     {

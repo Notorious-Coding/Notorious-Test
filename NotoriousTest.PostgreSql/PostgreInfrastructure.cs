@@ -15,7 +15,6 @@ using System.Data.Common;
 
 namespace NotoriousTest.PostgreSql
 {
-    [Cleaner(typeof(PostgreInfrastructureCleaner))]
     public class PostgreInfrastructure : PostgreInfrastructure<string, DatabaseSettings>
     {
         public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
@@ -36,6 +35,7 @@ namespace NotoriousTest.PostgreSql
         }
     }
 
+    [Cleaner(typeof(PostgreInfrastructureCleaner))]
     public class PostgreInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
         public string[] SchemasToInclude { get; init; } = [];
@@ -53,14 +53,9 @@ namespace NotoriousTest.PostgreSql
             }));
         }
 
-        public override DbConnection GetDatabaseConnection()
+        public override DbConnection GetConnection(string connectionString)
         {
-            return new NpgsqlConnection(GetDatabaseConnectionString());
-        }
-
-        public override DbConnection GetServerConnection()
-        {
-            return new NpgsqlConnection(GetServerConnectionString());
+            return new NpgsqlConnection(connectionString);
         }
 
         public override string GetDatabaseConnectionString()
@@ -85,11 +80,15 @@ namespace NotoriousTest.PostgreSql
 
         protected override async Task DropDatabase(DbConnection sqlConnection)
         {
+            using var connection = (NpgsqlConnection)GetDatabaseConnection();
+            NpgsqlConnection.ClearPool(connection);
+
             using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"DROP DATABASE \"{FullDbName}\"";
                 await command.ExecuteNonQueryAsync();
             }
         }
+
     }
 }

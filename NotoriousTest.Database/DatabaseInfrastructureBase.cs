@@ -20,12 +20,21 @@ namespace NotoriousTest.Database
         {
         }
 
+
+        public abstract DbConnection GetConnection(string connectionString);
         /// <summary>
         /// Returns a SQL Server connection connected to the current infrastructure's database.
         /// </summary>
         /// <returns>A SqlConnection instance connected to the current infrastructure's database.</returns>
-        public abstract DbConnection GetDatabaseConnection();
-        public abstract DbConnection GetServerConnection();
+        public DbConnection GetDatabaseConnection()
+        {
+            return GetConnection(GetDatabaseConnectionString());
+        }
+
+        public DbConnection GetServerConnection()
+        {
+            return GetConnection(GetServerConnectionString());
+        }
 
         /// <summary>
         /// Returns a SQL Server connection string pointing to the current infrastructure's database.
@@ -48,6 +57,7 @@ namespace NotoriousTest.Database
         public override async Task Destroy()
         {
             using var connection = GetServerConnection();
+
             await connection.OpenAsync();
             await DropDatabase(connection);
         }

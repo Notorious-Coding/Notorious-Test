@@ -1,5 +1,5 @@
-using NotoriousTest;
 using NotoriousTest.Web;
+using NotoriousTest.XUnit;
 
 using NotoriousTests.InfrastructuresSamples.Environments;
 using NotoriousTests.InfrastructuresSamples.Infrastructures;
