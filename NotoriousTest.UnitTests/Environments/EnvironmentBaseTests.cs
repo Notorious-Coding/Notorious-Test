@@ -162,6 +162,7 @@ public class EnvironmentBaseTests
         stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnDestroy = async () => destroyOrder.Add(2) });
         stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 1) { OnDestroy = async () => destroyOrder.Add(1) });
         stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 3) { OnDestroy = async () => destroyOrder.Add(3) });
+        await stub.Initialize();
         await stub.Destroy();
         destroyOrder.Should().Equal(1, 2, 3);
     }
