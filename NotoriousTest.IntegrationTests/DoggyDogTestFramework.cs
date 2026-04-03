@@ -11,6 +11,7 @@ using NotoriousTest.PostgreSql;
 using NotoriousTest.SqlLiteRegistry;
 
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 
 namespace NotoriousTest.IntegrationTests
@@ -132,7 +133,7 @@ namespace NotoriousTest.IntegrationTests
         {
             public static Process? StartDoggyDog(int processId, string assembly, string connectionString)
             {
-                var doggyDogPath = Path.Combine(AppContext.BaseDirectory, "DoggyDog.exe");
+                var doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
                 Process? doggyDogProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = doggyDogPath,
