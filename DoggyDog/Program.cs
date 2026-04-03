@@ -76,7 +76,7 @@ try
         Environment.Exit(0);
     }
 
-    Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Monitoring PID {processId} — awaiting termination..."));
+    Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Monitoring PID {processId} - awaiting termination..."));
     await process.WaitForExitAsync();
 
 
