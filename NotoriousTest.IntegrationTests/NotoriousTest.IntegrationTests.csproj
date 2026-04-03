@@ -10,7 +10,6 @@
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
     <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="NotoriousTest.Core" Version="4.0.0" />
 	<PackageReference Include="xunit.v3" Version="3.2.2" />
 	<PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
 	<PackageReference Include="AwesomeAssertions" Version="9.4.0" />
@@ -18,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
     <ProjectReference Include="..\NotoriousTest.IntegrationTests.Web\NotoriousTest.IntegrationTests.Web.csproj" />
     <ProjectReference Include="..\NotoriousTest.PostgreSql\NotoriousTest.PostgreSql.csproj" />
     <ProjectReference Include="..\NotoriousTest.Sqlite\NotoriousTest.Sqlite.csproj" />
@@ -26,7 +26,7 @@
     <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
     <ProjectReference Include="..\NotoriousTest.XUnit\NotoriousTest.XUnit.csproj" />
   </ItemGroup>
-
+  <Import Project="./build/NotoriousTest.IntegrationTests.targets" />
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

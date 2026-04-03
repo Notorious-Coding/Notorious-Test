@@ -43,6 +43,9 @@ jobs:
 
     - name: Test
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
+    
+    - name: Run Integration Tests
+      run: dotnet test NotoriousTest.IntegrationTests --no-build --verbosity normal
     - name: Pack
       run: dotnet pack -c ${{ env.CONFIGURATION }} -o out
     - name: Push
