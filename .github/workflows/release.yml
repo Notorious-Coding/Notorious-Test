@@ -19,7 +19,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Restore dependencies
-      run: dotnet restore --locked-mode
+      run: dotnet restore
     - name: Build
       run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
 
