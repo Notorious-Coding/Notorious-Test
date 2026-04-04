@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
@@ -9,9 +8,9 @@
 		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Dapper" Version="2.1.72" />
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.5" />
-		<PackageReference Include="System.Text.Json" Version="10.0.5" />
+		<PackageReference Include="Dapper" />
+		<PackageReference Include="Microsoft.Data.Sqlite" />
+		<PackageReference Include="System.Text.Json" />
 	</ItemGroup>
 	<ItemGroup>
 		<InternalsVisibleTo Include="NotoriousTest.UnitTests" />

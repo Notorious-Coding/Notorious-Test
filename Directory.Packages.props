@@ -1,0 +1,32 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="AwesomeAssertions" Version="9.4.0" />
+    <PackageVersion Include="coverlet.collector" Version="8.0.1" />
+    <PackageVersion Include="Dapper" Version="2.1.72" />
+    <PackageVersion Include="FakeItEasy" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
+    <PackageVersion Include="Npgsql" Version="10.0.2" />
+    <PackageVersion Include="Respawn" Version="7.0.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageVersion Include="System.Text.Json" Version="10.0.5" />
+    <PackageVersion Include="Testcontainers" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.11.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.11.0" />
+    <PackageVersion Include="xunit" Version="2.5.0" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.2" />
+  </ItemGroup>
+</Project>

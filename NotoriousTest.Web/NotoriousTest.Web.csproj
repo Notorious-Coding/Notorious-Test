@@ -3,37 +3,23 @@
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<Description>Web integration tests support for NotoriousTest.</Description>
 		<PackageId>NotoriousTest.Web</PackageId>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<VersionPrefix>4.0.0</VersionPrefix>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Authors>Brice SCHUMACHER</Authors>
-		<RepositoryUrl>https://github.com/Notorious-Coding/Notorious-Test/</RepositoryUrl>
-		<PackageIcon>icon.png</PackageIcon>
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<IsPackable>true</IsPackable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="xunit.v3.extensibility.core" Version="3.2.2" />
+		<PackageReference Include="xunit.v3.extensibility.core" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" VersionOverride="8.0.*" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.*" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" VersionOverride="9.0.*" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.*" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="..\icon.png" Pack="true" PackagePath="" Visible="False" />
-		<None Include="..\README.md" Pack="true" PackagePath="" Visible="False" />
-		<None Include="..\LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" VersionOverride="10.0.*" />
 	</ItemGroup>
 
 	<ItemGroup>
