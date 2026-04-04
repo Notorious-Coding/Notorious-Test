@@ -21,7 +21,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         [Fact]
         public async Task Initialize_Should_CreateContainerAndADatabase()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Initialize_Should_CreateContainerAndADatabase);
             await using var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {
@@ -41,7 +41,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         [Fact]
         public async Task Reset_Should_Empty_Database()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Reset_Should_Empty_Database);
             await using var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {
@@ -59,7 +59,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         [Fact]
         public async Task Destroy_Should_Delete_Container()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Destroy_Should_Delete_Container);
             var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {

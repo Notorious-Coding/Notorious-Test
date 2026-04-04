@@ -13,7 +13,7 @@ internal static class Banner
           ╚═════╝  ╚═════╝  ╚═════╝  ╚═════╝    ╚═╝       ╚═════╝  ╚═════╝  ╚═════╝ 
         """;
 
-    public static void Print(string version, int parentPid)
+    public static void Print(string version, int parentPid, Guid environmentId)
     {
         Logger.Magenta(() =>
         {
@@ -22,7 +22,7 @@ internal static class Banner
 
         Logger.DarkGray(() =>
         {
-            Console.WriteLine($"  Watchdog process  ·  Monitoring PID {parentPid}  ·  v{version}");
+            Console.WriteLine($"  Watchdog process  ·  Monitoring PID {parentPid} | EID {environmentId}  ·  v{version}");
             Console.WriteLine();
         });
     }

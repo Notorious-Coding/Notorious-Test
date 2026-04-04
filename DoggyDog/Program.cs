@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 
+using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.DoggyDog;
@@ -17,7 +18,7 @@ try
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
         ?.InformationalVersion ?? "?";
 
-    Banner.Print(version, arguments.Pid);
+    Banner.Print(version, arguments.Pid, arguments.EnvironmentId);
 
     AppDomain.CurrentDomain.AssemblyResolve += (sender, resolveArgs) =>
     {
@@ -39,7 +40,7 @@ try
 
     int processId = arguments.Pid;
     Assembly testAssembly = Assembly.LoadFrom(arguments.AssemblyPath);
-    Logger.Cyan(() => Console.WriteLine($"[DoggyDog] Attached to test process (PID {processId})"));
+    Logger.Cyan(() => Console.WriteLine($"[DoggyDog] Attached to test process with PID {processId} and EID {arguments.EnvironmentId}"));
 
     var cs = new SqliteConnectionStringBuilder(arguments.ConnectionString); // Validate connection string format early
 
@@ -80,24 +81,25 @@ try
     await process.WaitForExitAsync();
 
 
-    if (DoggyDogWatchDog.ReadSuccessSignal(processId))
+    if (DoggyDogWatchDog.ReadSuccessSignal(arguments.EnvironmentId))
     {
-        Logger.Green(() => Console.WriteLine($"[DoggyDog] Process {processId} exited cleanly. No recovery needed."));
+        Logger.Green(() => Console.WriteLine($"[DoggyDog] Process {processId} for EID {arguments.EnvironmentId} exited cleanly. No recovery needed."));
+        Logger.Gray(() => Console.WriteLine($"[DoggyDog] Success signal found for {arguments.EnvironmentId}."));
         Environment.Exit(0);
     }
 
-    Logger.Red(() => Console.WriteLine($"[DoggyDog] Process {processId} exited abnormally. Initiating crash recovery..."));
+    Logger.Red(() => Console.WriteLine($"[DoggyDog] Process {processId} for EID {arguments.EnvironmentId} exited abnormally. Initiating crash recovery..."));
 
-    IReadOnlyList<InfrastuctureRegistryEntry> entries = (await registry.GetByProcessId(processId)).ToList();
+    IReadOnlyList<InfrastuctureRegistryEntry> entries = (await registry.GetByEnvironmentId(new EnvironmentId(arguments.EnvironmentId))).ToList();
 
     if (entries.Count == 0)
     {
-        Logger.Yellow(() => Console.WriteLine($"[DoggyDog] No registered infrastructure found for PID {processId}. Nothing to clean up."));
+        Logger.Yellow(() => Console.WriteLine($"[DoggyDog] No registered infrastructure found for EID {arguments.EnvironmentId}. Nothing to clean up."));
         Console.ReadLine();
         Environment.Exit(0);
     }
 
-    Logger.Cyan(() => Console.WriteLine($"[DoggyDog] {entries.Count} infrastructure(s) registered for PID {processId}. Starting cleanup..."));
+    Logger.Cyan(() => Console.WriteLine($"[DoggyDog] {entries.Count} infrastructure(s) registered for EID {arguments.EnvironmentId}. Starting cleanup..."));
 
     foreach (var entry in entries)
     {
@@ -132,7 +134,7 @@ try
         }
     }
 
-    Logger.Green(() => Console.WriteLine($"[DoggyDog] Crash recovery complete for PID {processId}."));
+    Logger.Green(() => Console.WriteLine($"[DoggyDog] Crash recovery complete for PID {processId} and EID {arguments.EnvironmentId}."));
     Console.ReadLine();
     Environment.Exit(0);
 }

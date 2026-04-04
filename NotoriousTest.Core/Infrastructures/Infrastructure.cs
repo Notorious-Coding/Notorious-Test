@@ -14,7 +14,7 @@ public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastr
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
 
     protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
-    protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
     {
         OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
     }
@@ -29,7 +29,7 @@ public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata
     /// </summary>
     public new TMetadata? Metadata { get => (TMetadata?)base.Metadata; protected set => base.Metadata = value; }
 
-    protected Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
     {
     }
 }
@@ -47,7 +47,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     public virtual bool DisableRegistry { get; } = false;
     ///<inheritdoc/>
-    public ContextId ContextId { get; set; }
+    public EnvironmentId EnvironmentId { get; set; }
     public Guid Id = Guid.NewGuid();
     private readonly List<IInfrastructureExtension> _extensions = new();
 
@@ -66,9 +66,9 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     protected IRegistry Registry { get; private set; }
     protected bool Registered { get; private set; } = false;
 
-    public Infrastructure(ContextId contextId, ITestLogger logger, IRegistry provider)
+    public Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
     {
-        ContextId = contextId;
+        EnvironmentId = contextId;
         Logger = logger;
         Registry = provider;
     }
@@ -121,7 +121,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
             InfrastructureId = Id,
             InfrastructureType = GetType(),
             Metadata = Metadata,
-            EnvironmentId = ContextId,
+            EnvironmentId = EnvironmentId,
             ProcessID = Process.GetCurrentProcess().Id,
         });
 

@@ -20,7 +20,7 @@ namespace NotoriousTest.Core.Environments
         /// <summary>
         /// Gets the unique identifier for the environment instance.
         /// </summary>
-        public ContextId EnvironmentId { get; private set; } = Guid.NewGuid();
+        public EnvironmentId EnvironmentId { get; private set; } = Guid.NewGuid();
         public abstract Assembly CurrentAssembly { get; }
 
         protected IServiceProvider ServiceProvider { get; private set; }
@@ -81,7 +81,7 @@ namespace NotoriousTest.Core.Environments
         /// </summary>
         public EnvironmentBase AddInfrastructure(Infrastructure infrastructure)
         {
-            infrastructure.ContextId = EnvironmentId;
+            infrastructure.EnvironmentId = EnvironmentId;
             _infrastructures.Add(infrastructure);
             return this;
         }
@@ -116,7 +116,7 @@ namespace NotoriousTest.Core.Environments
 
         private async Task StartDoggyDog()
         {
-            WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id);
+            WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id, EnvironmentId);
         }
 
         public virtual async Task Reset()
@@ -134,7 +134,7 @@ namespace NotoriousTest.Core.Environments
                 await infra.DestroyAsync();
             }
 
-            WatchDog.SendSuccessSignal(Process.GetCurrentProcess().Id);
+            WatchDog.SendSuccessSignal(EnvironmentId);
         }
 
         private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration()

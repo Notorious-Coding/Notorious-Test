@@ -18,7 +18,7 @@ namespace NotoriousTest.IntegrationTests.TestContainers
         [Fact]
         public async Task Initialize_Should_CreateContainer()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             await using var infrastructure = new ContainerTestInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
 
             await infrastructure.InitializeAsync();
@@ -30,7 +30,7 @@ namespace NotoriousTest.IntegrationTests.TestContainers
         [Fact]
         public async Task Destroy_Should_DeleteContainer()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             var infrastructure = new ContainerTestInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
 
             await infrastructure.InitializeAsync();
@@ -45,7 +45,7 @@ namespace NotoriousTest.IntegrationTests.TestContainers
 
     class ContainerTestInfrastructure : DockerContainerInfrastructure<IContainer, string>
     {
-        public ContainerTestInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public ContainerTestInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Container = new ContainerBuilder("alpine")
                 .WithCommand("sleep", "infinity")

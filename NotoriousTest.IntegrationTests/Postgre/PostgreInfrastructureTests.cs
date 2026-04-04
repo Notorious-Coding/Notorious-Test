@@ -26,7 +26,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
         [Fact]
         public async Task Initialize_Should_Create_Database()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Initialize_Should_Create_Database);
 
             await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
@@ -52,7 +52,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
         [Fact]
         public async Task Reset_Should_Empty_Database()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Reset_Should_Empty_Database);
             await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {
@@ -70,7 +70,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
         [Fact]
         public async Task Destroy_Should_Delete_Database()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Destroy_Should_Delete_Database);
             var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {

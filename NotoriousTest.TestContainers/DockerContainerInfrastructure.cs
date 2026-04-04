@@ -14,7 +14,7 @@ namespace NotoriousTest.TestContainers
     public class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration, DockerMetadata>
         where TContainer : IContainer
     {
-        public DockerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public DockerContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
                 Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");

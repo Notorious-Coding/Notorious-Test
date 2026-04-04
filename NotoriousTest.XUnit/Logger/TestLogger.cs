@@ -9,9 +9,9 @@ namespace NotoriousTest.XUnit.Logger
     public class TestLogger : ITestLogger
     {
         private readonly IMessageSink _sink;
-        private readonly ContextId _contextId;
+        private readonly EnvironmentId _contextId;
 
-        public TestLogger(IMessageSink sink, ContextId contextId)
+        public TestLogger(IMessageSink sink, EnvironmentId contextId)
         {
             _sink = sink;
             _contextId = contextId;

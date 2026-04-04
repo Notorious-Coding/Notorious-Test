@@ -11,12 +11,12 @@ namespace NotoriousTest.Database
     public abstract class DatabaseInfrastructureBase<TOutputConfiguration, TMetadata> : Infrastructure<TOutputConfiguration, TMetadata>, IDatabaseInfrastructure where TMetadata : class
     {
         public string DbPrefix { get; init; } = "NotoriousDb";
-        public string FullDbName => $"{DbPrefix}_{ContextId.Value}";
+        public string FullDbName => $"{DbPrefix}_{EnvironmentId.Value}";
         public string[] TableToIgnore { get; init; } = [];
         public string[] TableToInclude { get; init; } = [];
 
 
-        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public DatabaseInfrastructureBase(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 

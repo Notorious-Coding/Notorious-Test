@@ -27,7 +27,7 @@ namespace NotoriousTest.IntegrationTests.Environment
 
     public class SqlServerInfrastructure : DockerContainerInfrastructure<MsSqlContainer, string>
     {
-        public SqlServerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Container = new MsSqlBuilder().Build();
         }

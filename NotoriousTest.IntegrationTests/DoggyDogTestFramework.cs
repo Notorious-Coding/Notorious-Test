@@ -20,7 +20,7 @@ namespace NotoriousTest.IntegrationTests
     {
         public static class Arrange
         {
-            public static Process? StartFakeProcess(int exitCode = 0, int timeToExit = 5)
+            public static Process? StartFakeProcess(Guid environmentId, int exitCode = 0, int timeToExit = 5)
             {
                 ProcessStartInfo startInfo = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? new ProcessStartInfo
@@ -41,7 +41,7 @@ namespace NotoriousTest.IntegrationTests
                 Process? fakeProcess = Process.Start(startInfo);
                 if (exitCode == 0 && fakeProcess != null)
                 {
-                    File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{fakeProcess.Id}.signal"), "OK");
+                    File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{environmentId}.signal"), "OK");
                 }
 
                 return fakeProcess;
@@ -53,14 +53,14 @@ namespace NotoriousTest.IntegrationTests
                 await connection.ExecuteAsync(SqliteRegistryProvider.ENSURE_REGISTRY);
 
             }
-            public static async Task<InfrastuctureRegistryEntry> PopulateRegistryWithFakeInfrastructure(SqliteInfrastructure registryInfrastructure, Process attachedProcess, Type fakeInfrastructureType)
+            public static async Task<InfrastuctureRegistryEntry> PopulateRegistryWithFakeInfrastructure(SqliteInfrastructure registryInfrastructure, Process attachedProcess, Type fakeInfrastructureType, Guid environmentId)
             {
                 using var connection = registryInfrastructure.GetDatabaseConnection();
 
                 var entry = new InfrastuctureRegistryEntry
                 {
                     InfrastructureId = Guid.NewGuid(),
-                    EnvironmentId = Guid.NewGuid(),
+                    EnvironmentId = environmentId,
                     ProcessID = attachedProcess.Id,
                     InfrastructureType = fakeInfrastructureType,
                     Metadata = "Test passed !"
@@ -73,7 +73,7 @@ namespace NotoriousTest.IntegrationTests
             public class FakeCleaner : IInfrastructureCleaner
             {
                 public static string Message = "[FakeCleaner] {0} with {1} for Id : {2}";
-                public Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, object? metadata = null)
+                public Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, object? metadata = null)
                 {
                     Console.WriteLine(Message, metadata, contextId.Value, infrastructureId);
                     return Task.CompletedTask;
@@ -82,7 +82,7 @@ namespace NotoriousTest.IntegrationTests
             [Cleaner(typeof(FakeCleaner))]
             public class FakeInfrastructureWithCleaner : Infrastructure<string>
             {
-                public FakeInfrastructureWithCleaner(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+                public FakeInfrastructureWithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
                 {
                 }
 
@@ -105,7 +105,7 @@ namespace NotoriousTest.IntegrationTests
             [Cleaner(typeof(FakeCleaner))]
             public class FakeInfrastructure2WithCleaner : Infrastructure<string>
             {
-                public FakeInfrastructure2WithCleaner(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+                public FakeInfrastructure2WithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
                 {
                 }
 
@@ -127,7 +127,7 @@ namespace NotoriousTest.IntegrationTests
 
             public class FakeInfrastructureWithoutCleanerAttribute : Infrastructure<string>
             {
-                public FakeInfrastructureWithoutCleanerAttribute(ContextId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+                public FakeInfrastructureWithoutCleanerAttribute(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
                 {
                 }
                 public override Task Destroy()
@@ -147,13 +147,13 @@ namespace NotoriousTest.IntegrationTests
 
         public static class Act
         {
-            public static Process? StartDoggyDog(int processId, string assembly, string connectionString)
+            public static Process? StartDoggyDog(int processId, string assembly, string connectionString, Guid environmentId)
             {
                 var doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
                 Process? doggyDogProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = doggyDogPath,
-                    Arguments = $"--pid {processId} --assembly \"{assembly}\" --connectionString \"{connectionString}\"",
+                    Arguments = $"--pid {processId} --assembly \"{assembly}\" --connectionString \"{connectionString}\" --environment {environmentId}",
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
                     UseShellExecute = false,
@@ -167,23 +167,24 @@ namespace NotoriousTest.IntegrationTests
 
         public static class Assert
         {
-            public static async Task ShouldHaveFoundInfrastructureToClean(string stdout, int count, int processId)
+            public static async Task ShouldHaveFoundInfrastructureToClean(string stdout, int count, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] {count} infrastructure(s) registered for PID {processId}. Starting cleanup...");
+                stdout.Should().Contain($"[DoggyDog] {count} infrastructure(s) registered for EID {environmentId}. Starting cleanup...");
             }
-            public static async Task ShouldHaveNotFoundInfrastructureToClean(string stdout, int processId)
+            public static async Task ShouldHaveNotFoundInfrastructureToClean(string stdout, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] No registered infrastructure found for PID {processId}. Nothing to clean up.");
+                stdout.Should().Contain($"[DoggyDog] No registered infrastructure found for EID {environmentId}. Nothing to clean up.");
             }
             public static async Task ShouldHaveCleanedEntry(string stdout, SqliteInfrastructure registry, InfrastuctureRegistryEntry entry)
             {
                 using var connection = registry.GetDatabaseConnection();
-                var count = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM InfrastructureRegistry WHERE ProcessID = @ProcessId", new { ProcessId = entry.ProcessID });
+                var count = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM InfrastructureRegistry WHERE EnvironmentId = @EnvironmentId", new { EnvironmentId = entry.EnvironmentId });
 
                 count.Should().Be(0);
 
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleanup in progress...");
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleaning using {nameof(Arrange.FakeCleaner)}");
+                stdout.Should().Contain(string.Format(Arrange.FakeCleaner.Message, entry.Metadata, entry.EnvironmentId, entry.InfrastructureId));
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleanup successful. Removing registry entry...");
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Registry entry removed.");
             }
@@ -210,14 +211,20 @@ namespace NotoriousTest.IntegrationTests
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Failed to instantiate cleaner. Skipping.");
             }
 
-            public static async Task ShouldHaveInitiatedRecovery(string stdout, Process? attachedProcess)
+            public static async Task ShouldHaveInitiatedRecovery(string stdout, Process? attachedProcess, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} exited abnormally. Initiating crash recovery...");
+                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} for EID {environmentId} exited abnormally. Initiating crash recovery...");
             }
 
             public static async Task ShouldHaveMonitoredProcess(string stdout, Process? attachedProcess)
             {
                 stdout.Should().Contain($"[DoggyDog] Monitoring PID {attachedProcess.Id} - awaiting termination...");
+            }
+
+            public static async Task ShouldHaveReceivedExitSignal(string stdout, Guid environmentId)
+            {
+                stdout.Should().Contain($"[DoggyDog] Success signal found for {environmentId}.");
+                File.Exists(Path.Combine(Path.GetTempPath(), $"nt-{environmentId}.signal")).Should().BeFalse();
             }
 
             public static async Task ShouldHaveFoundRegistryFile(string stdout, string registryPath)
@@ -230,9 +237,9 @@ namespace NotoriousTest.IntegrationTests
                 stdout.Should().Contain($"[DoggyDog] Registry file not found at {registryPath}");
             }
 
-            public static async Task ShouldHaveExitNormally(string stdout, Process? attachedProcess)
+            public static async Task ShouldHaveExitNormally(string stdout, Process? attachedProcess, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} exited cleanly. No recovery needed.");
+                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} for EID {environmentId} exited cleanly. No recovery needed.");
             }
 
             public static async Task ShouldHaveNotFoundProcess(string stdout, int pid)

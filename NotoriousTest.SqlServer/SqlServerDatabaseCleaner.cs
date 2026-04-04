@@ -8,7 +8,7 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
-        public async Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
+        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
         {
             using var connection = new SqlConnection(metadata.ServerConnectionString);
 

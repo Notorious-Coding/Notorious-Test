@@ -1,7 +1,7 @@
 ﻿
 namespace NotoriousTest.DoggyDog
 {
-    internal record Arguments(int Pid, string AssemblyPath, string ConnectionString)
+    internal record Arguments(int Pid, string AssemblyPath, string ConnectionString, Guid EnvironmentId)
     {
         public static Arguments From(string[] args)
         {
@@ -38,14 +38,19 @@ namespace NotoriousTest.DoggyDog
                 Logger.Red(() => Console.WriteLine("[DoggyDog] --connectionString parameter is missing."));
             }
 
-            if (pid == default || assemblyPath == null || connectionString == null)
+            if (!parsedArgs.TryGetValue("environment", out string? environmentId))
+            {
+                Logger.Red(() => Console.WriteLine("[DoggyDog] --environment parameter is missing."));
+            }
+
+            if (pid == default || assemblyPath == null || connectionString == null || environmentId == null)
             {
                 Environment.Exit(-1);
             }
 
 
 
-            return new Arguments(pid, assemblyPath, connectionString);
+            return new Arguments(pid, assemblyPath, connectionString, Guid.Parse(environmentId));
         }
     }
 }

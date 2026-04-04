@@ -9,7 +9,7 @@ namespace NotoriousTests.InfrastructuresSamples.Infrastructures
 {
     public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
-        public SqlServerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 

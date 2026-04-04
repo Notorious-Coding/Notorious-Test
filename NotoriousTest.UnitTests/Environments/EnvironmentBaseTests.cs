@@ -4,6 +4,7 @@ using FakeItEasy;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using NotoriousTest.Core;
 using NotoriousTest.Core.Exceptions;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
@@ -69,7 +70,7 @@ public class EnvironmentBaseTests
     {
         EnvironmentStub stub = new(_testLogger, _watchDog, _registry);
         await stub.Initialize();
-        A.CallTo(() => _watchDog.Start(A<Assembly>._, A<int>._)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _watchDog.Start(A<Assembly>._, A<int>._, A<EnvironmentId>._)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -97,7 +98,7 @@ public class EnvironmentBaseTests
 
         await stub.Initialize();
         InfrastructureStub infrastructure = stub.GetInfrastructure<InfrastructureStub>();
-        infrastructure.ContextId.Should().Be(stub.EnvironmentId);
+        infrastructure.EnvironmentId.Should().Be(stub.EnvironmentId);
     }
 
     [Fact]
@@ -107,7 +108,7 @@ public class EnvironmentBaseTests
         InfrastructureStub infra = new(_testLogger, _registry);
 
         stub.AddInfrastructure(infra);
-        infra.ContextId.Should().Be(stub.EnvironmentId);
+        infra.EnvironmentId.Should().Be(stub.EnvironmentId);
     }
 
     [Fact]
