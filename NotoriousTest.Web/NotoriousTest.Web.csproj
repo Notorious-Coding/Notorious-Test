@@ -37,6 +37,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
 	  <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
 	  <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
 	</ItemGroup>

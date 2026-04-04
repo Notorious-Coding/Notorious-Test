@@ -1,4 +1,4 @@
-﻿using NotoriousTest.Infrastructures;
+﻿using NotoriousTest.Core.Infrastructures;
 
 using System.Data.Common;
 
@@ -9,6 +9,7 @@ namespace NotoriousTest.Database
         string DbPrefix { get; init; }
         string[] TableToIgnore { get; init; }
         string[] TableToInclude { get; init; }
+        DbConnection GetConnection(string connectionString);
 
         DbConnection GetDatabaseConnection();
         DbConnection GetServerConnection();

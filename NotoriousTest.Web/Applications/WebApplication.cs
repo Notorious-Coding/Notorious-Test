@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 
-using NotoriousTest.Configuration;
+using NotoriousTest.Core.Configuration;
 using NotoriousTest.Web.Helpers;
 
 namespace NotoriousTest.Web.Applications
@@ -22,6 +22,11 @@ namespace NotoriousTest.Web.Applications
 
             builder.ConfigureAppConfiguration((config) =>
             {
+                if (ConsumedConfiguration == null || !ConsumedConfiguration.Any())
+                {
+                    return;
+                }
+
                 Dictionary<string, string> aggregatedConfiguration = ConsumedConfiguration
                                                 .Select(ce => ce.Value.ToDictionary(ce.Key))
                                                 .SelectMany(d => d)

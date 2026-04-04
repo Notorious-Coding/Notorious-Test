@@ -15,7 +15,7 @@ jobs:
   publish:
     env: 
       CONFIGURATION: 'Release'
-      DOTNET_VERSION: '9.0'
+      DOTNET_VERSION: '10.0'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -25,10 +25,34 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Build
       run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test
+
+    - name: Publish DoggyDog for Windows
+      run: |
+        dotnet publish ./DoggyDog/DoggyDog.csproj \
+            -r win-x64 \
+            --self-contained \
+            -p:PublishSingleFile=true \
+            -o ./tools/win-x64 \
+            --version-suffix "beta.${{ github.run_number }}" \
+
+    - name: Publish DoggyDog for Linux
+      run: |
+        dotnet publish ./DoggyDog/DoggyDog.csproj \
+            -r linux-x64 \
+            --self-contained \
+            -p:PublishSingleFile=true \
+            -o ./tools/linux-x64 \
+            --version-suffix "beta.${{ github.run_number }}" \
+
+    - name: Run Unit Tests
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
+
+    - name: Run Integration Tests
+      run: dotnet test NotoriousTest.IntegrationTests --no-build --verbosity normal
+      
     - name: Pack
       run: dotnet pack -c ${{ env.CONFIGURATION }}  -o out --version-suffix "beta.${{ github.run_number }}"
     - name: Push

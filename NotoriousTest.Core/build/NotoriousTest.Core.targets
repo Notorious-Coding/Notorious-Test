@@ -1,0 +1,15 @@
+<Project>
+	<Target Name="CopyDoggyDog" AfterTargets="Build">
+		<PropertyGroup>
+			<DoggyDogDir Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(MSBuildThisFileDirectory)../tools/win-x64/</DoggyDogDir>
+			<DoggyDogDir Condition="$([MSBuild]::IsOSPlatform('Linux'))">$(MSBuildThisFileDirectory)../tools/linux-x64/</DoggyDogDir>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<DoggyDogFiles Include="$(DoggyDogDir)*" />
+		</ItemGroup>
+
+		<Message Text="DoggyDog files: @(DoggyDogFiles)" Importance="high" />
+		<Copy SourceFiles="@(DoggyDogFiles)" DestinationFolder="$(OutDir)" />
+	</Target>
+</Project>

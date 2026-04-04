@@ -1,7 +1,10 @@
-﻿using NotoriousTest.Database;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures.Cleaner;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Settings;
+using NotoriousTest.Database;
 using NotoriousTest.Database.Settings;
-using NotoriousTest.Logger;
-using NotoriousTest.Settings;
 
 using Npgsql;
 
@@ -14,7 +17,7 @@ namespace NotoriousTest.PostgreSql
 {
     public class PostgreInfrastructure : PostgreInfrastructure<string, DatabaseSettings>
     {
-        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger) : base(contextId, settingsProvider, logger)
+        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
         {
         }
 
@@ -32,12 +35,13 @@ namespace NotoriousTest.PostgreSql
         }
     }
 
+    [Cleaner(typeof(PostgreInfrastructureCleaner))]
     public class PostgreInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger) : base(contextId, settingsProvider, logger)
+        public PostgreInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
         {
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {
@@ -49,14 +53,9 @@ namespace NotoriousTest.PostgreSql
             }));
         }
 
-        public override DbConnection GetDatabaseConnection()
+        public override DbConnection GetConnection(string connectionString)
         {
-            return new NpgsqlConnection(GetDatabaseConnectionString());
-        }
-
-        public override DbConnection GetServerConnection()
-        {
-            return new NpgsqlConnection(GetServerConnectionString());
+            return new NpgsqlConnection(connectionString);
         }
 
         public override string GetDatabaseConnectionString()
@@ -81,11 +80,15 @@ namespace NotoriousTest.PostgreSql
 
         protected override async Task DropDatabase(DbConnection sqlConnection)
         {
+            using var connection = (NpgsqlConnection)GetDatabaseConnection();
+            NpgsqlConnection.ClearPool(connection);
+
             using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"DROP DATABASE \"{FullDbName}\"";
                 await command.ExecuteNonQueryAsync();
             }
         }
+
     }
 }

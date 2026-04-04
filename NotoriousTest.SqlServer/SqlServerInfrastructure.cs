@@ -1,9 +1,12 @@
 ﻿using Microsoft.Data.SqlClient;
 
+using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures.Cleaner;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Settings;
 using NotoriousTest.Database;
 using NotoriousTest.Database.Settings;
-using NotoriousTest.Logger;
-using NotoriousTest.Settings;
 
 using Respawn;
 using Respawn.Graph;
@@ -14,7 +17,7 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerInfrastructure : SqlServerInfrastructure<string, DatabaseSettings>
     {
-        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger) : base(contextId, settingsProvider, logger)
+        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
         {
         }
 
@@ -32,12 +35,13 @@ namespace NotoriousTest.SqlServer
         }
     }
 
+    [Cleaner(typeof(SqlServerInfrastructureCleaner))]
     public class SqlServerInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider testSettingsProvider, ITestLogger logger) : base(contextId, testSettingsProvider, logger)
+        public SqlServerInfrastructure(ContextId contextId, ITestSettingsProvider testSettingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, testSettingsProvider, logger, registry)
         {
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {
@@ -49,14 +53,9 @@ namespace NotoriousTest.SqlServer
             }));
         }
 
-        public override DbConnection GetDatabaseConnection()
+        public override DbConnection GetConnection(string connectionString)
         {
-            return new SqlConnection(GetDatabaseConnectionString());
-        }
-
-        public override DbConnection GetServerConnection()
-        {
-            return new SqlConnection(GetServerConnectionString());
+            return new SqlConnection(connectionString);
         }
 
         public override string GetDatabaseConnectionString()
@@ -80,9 +79,12 @@ namespace NotoriousTest.SqlServer
 
         protected override async Task DropDatabase(DbConnection sqlConnection)
         {
+            SqlConnection.ClearPool((SqlConnection)GetDatabaseConnection());
+
             using (DbCommand command = sqlConnection.CreateCommand())
             {
-                command.CommandText = $"DROP DATABASE [{FullDbName}]";
+                command.CommandText = $@"
+                    DROP DATABASE [{FullDbName}]";
                 await command.ExecuteNonQueryAsync();
             }
         }

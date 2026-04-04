@@ -1,28 +1,47 @@
-﻿using DotNet.Testcontainers.Containers;
+﻿using Docker.DotNet;
 
-using NotoriousTest.Logger;
+using DotNet.Testcontainers.Containers;
+
+using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures.Cleaner;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.TestContainers;
 
 using System.Data.Common;
 
 namespace NotoriousTest.Database
 {
-    public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration> where TContainer : IDatabaseContainer
+    [Cleaner(typeof(DockerInfrastructureCleaner))]
+    public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration, DockerMetadata> where TContainer : IDatabaseContainer
     {
-        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
+            if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
+                Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");
         }
 
-        protected TContainer Container { get; init; }
+        public TContainer Container { get; init; }
 
         public override async Task Initialize()
         {
             await Container.StartAsync();
+            Metadata = new DockerMetadata
+            {
+                ContainerID = Container.Id,
+                ContainerName = Container.Name,
+            };
+            await Register();
             await base.Initialize();
         }
 
         public override async Task Destroy()
         {
-            await Container.StopAsync();
+            var client = new DockerClientConfiguration().CreateClient();
+            await client.Containers.RemoveContainerAsync(Container.Id, new Docker.DotNet.Models.ContainerRemoveParameters()
+            {
+                Force = true
+            });
         }
 
         public override string GetServerConnectionString()

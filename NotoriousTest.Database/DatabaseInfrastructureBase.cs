@@ -1,12 +1,14 @@
-﻿using NotoriousTest.Infrastructures;
-using NotoriousTest.Logger;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 
 using System.Data.Common;
 
 namespace NotoriousTest.Database
 {
 
-    public abstract class DatabaseInfrastructureBase<TOutputConfiguration> : Infrastructure<TOutputConfiguration>, IDatabaseInfrastructure
+    public abstract class DatabaseInfrastructureBase<TOutputConfiguration, TMetadata> : Infrastructure<TOutputConfiguration, TMetadata>, IDatabaseInfrastructure where TMetadata : class
     {
         public string DbPrefix { get; init; } = "NotoriousDb";
         public string FullDbName => $"{DbPrefix}_{ContextId.Value}";
@@ -14,16 +16,25 @@ namespace NotoriousTest.Database
         public string[] TableToInclude { get; init; } = [];
 
 
-        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public DatabaseInfrastructureBase(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 
+
+        public abstract DbConnection GetConnection(string connectionString);
         /// <summary>
         /// Returns a SQL Server connection connected to the current infrastructure's database.
         /// </summary>
         /// <returns>A SqlConnection instance connected to the current infrastructure's database.</returns>
-        public abstract DbConnection GetDatabaseConnection();
-        public abstract DbConnection GetServerConnection();
+        public DbConnection GetDatabaseConnection()
+        {
+            return GetConnection(GetDatabaseConnectionString());
+        }
+
+        public DbConnection GetServerConnection()
+        {
+            return GetConnection(GetServerConnectionString());
+        }
 
         /// <summary>
         /// Returns a SQL Server connection string pointing to the current infrastructure's database.
@@ -46,6 +57,7 @@ namespace NotoriousTest.Database
         public override async Task Destroy()
         {
             using var connection = GetServerConnection();
+
             await connection.OpenAsync();
             await DropDatabase(connection);
         }

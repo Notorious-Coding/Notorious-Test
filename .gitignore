@@ -348,3 +348,5 @@ healthchecksdb
 workspace.json
 /.claude
 /bash.exe.stackdump
+/local-packages
+/tools

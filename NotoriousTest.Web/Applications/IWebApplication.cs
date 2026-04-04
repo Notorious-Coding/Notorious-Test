@@ -1,4 +1,4 @@
-﻿using NotoriousTest.Configuration;
+﻿using NotoriousTest.Core.Configuration;
 
 namespace NotoriousTest.Web.Applications
 {

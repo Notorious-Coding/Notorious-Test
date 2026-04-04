@@ -1,7 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 using NotoriousTest.Database;
-using NotoriousTest.Logger;
 
 using Respawn;
 using Respawn.Graph;
@@ -12,9 +14,10 @@ using Testcontainers.MsSql;
 
 namespace NotoriousTest.SqlServer
 {
+
     public class SqlServerContainerInfrastructure : SqlServerContainerInfrastructure<string>
     {
-        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
         }
 
@@ -37,7 +40,7 @@ namespace NotoriousTest.SqlServer
         public string[] SchemasToInclude { get; init; } = [];
         public string[] SchemasToExclude { get; init; } = [];
 
-        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+        public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
@@ -55,14 +58,9 @@ namespace NotoriousTest.SqlServer
             return builder;
         }
 
-        public override DbConnection GetDatabaseConnection()
+        public override DbConnection GetConnection(string connectionString)
         {
-            return new SqlConnection(GetDatabaseConnectionString());
-        }
-
-        public override DbConnection GetServerConnection()
-        {
-            return new SqlConnection(GetServerConnectionString());
+            return new SqlConnection(connectionString);
         }
 
         public override string GetDatabaseConnectionString()
@@ -78,6 +76,7 @@ namespace NotoriousTest.SqlServer
 
         protected override async Task CreateDatabase(DbConnection sqlConnection)
         {
+
             using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"CREATE DATABASE [{FullDbName}]";

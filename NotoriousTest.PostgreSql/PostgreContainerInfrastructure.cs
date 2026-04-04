@@ -1,5 +1,7 @@
-﻿using NotoriousTest.Database;
-using NotoriousTest.Logger;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Database;
 
 using Npgsql;
 
@@ -15,7 +17,7 @@ namespace NotoriousTest.PostgreSql;
 
 public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
-    public PostgreContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
+    public PostgreContainerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
     {
     }
 
@@ -38,7 +40,7 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
     public string[] SchemasToInclude { get; init; } = [];
     public string[] SchemasToExclude { get; init; } = [];
 
-    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger) : base(contextId, logger)
+    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
         EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
@@ -51,19 +53,14 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
         }));
     }
 
+    public override DbConnection GetConnection(string connectionString)
+    {
+        return new NpgsqlConnection(connectionString);
+    }
+
     protected virtual PostgreSqlBuilder ConfigureSqlContainer(PostgreSqlBuilder builder)
     {
         return builder;
-    }
-
-    public override DbConnection GetDatabaseConnection()
-    {
-        return new NpgsqlConnection(GetDatabaseConnectionString());
-    }
-
-    public override DbConnection GetServerConnection()
-    {
-        return new NpgsqlConnection(GetServerConnectionString());
     }
 
     public override string GetDatabaseConnectionString()
@@ -85,4 +82,6 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
             await command.ExecuteNonQueryAsync();
         }
     }
+
+
 }
