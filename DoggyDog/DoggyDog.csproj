@@ -8,6 +8,7 @@
 	<PublishSingleFile>true</PublishSingleFile>
 	<VersionPrefix>4.0.0</VersionPrefix>
 	<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+	<IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
