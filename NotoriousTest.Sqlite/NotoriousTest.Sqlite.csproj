@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<Description>A Sqlite integration with NotoriousTest.</Description>
 		<PackageId>NotoriousTest.PostgreSql</PackageId>
 		<ImplicitUsings>enable</ImplicitUsings>
