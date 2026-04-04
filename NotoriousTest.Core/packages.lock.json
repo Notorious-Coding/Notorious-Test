@@ -65,7 +65,6 @@
           "Microsoft.Extensions.Primitives": "10.0.5"
         }
       }
-    },
-    ".NETStandard,Version=v2.1/win-x64": {}
+    }
   }
 }
