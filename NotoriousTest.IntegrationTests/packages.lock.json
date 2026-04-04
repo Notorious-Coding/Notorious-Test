@@ -683,15 +683,11 @@
       "notorioustest.integrationtests.web": {
         "type": "Project"
       },
-      "notorioustest.postgresql": {
+      "NotoriousTest.PostgreSql": {
         "type": "Project",
         "dependencies": {
-          "NotoriousTest": "[4.0.0, )",
-          "NotoriousTest.Database": "[4.0.0, )",
-          "NotoriousTest.TestContainers": "[4.0.0, )",
-          "Npgsql": "[10.0.2, )",
-          "Respawn": "[7.0.0, )",
-          "Testcontainers.PostgreSql": "[4.11.0, )"
+          "Microsoft.Data.Sqlite.Core": "[10.0.5, )",
+          "NotoriousTest.Database": "[4.0.0, )"
         }
       },
       "notorioustest.sqlliteregistry": {
