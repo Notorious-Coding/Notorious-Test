@@ -48,7 +48,7 @@ try
         Logger.Red(() =>
         {
             Console.WriteLine($"[DoggyDog] Registry file not found at {cs.DataSource}");
-            Environment.Exit(-1);
+            Environment.Exit(1);
         });
     }
     else

@@ -51,7 +51,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
             await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
 
-            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(exitCode: -1, timeToExit: FAKE_PROCESS_WAIT_TIME);
+            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(exitCode: 1, timeToExit: FAKE_PROCESS_WAIT_TIME);
 
             if (process == null)
             {
@@ -97,7 +97,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
         public async Task DoggyDog_Should_Exit_When_Registry_File_Not_Found()
         {
 
-            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(exitCode: -1, timeToExit: FAKE_PROCESS_WAIT_TIME);
+            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(exitCode: 1, timeToExit: FAKE_PROCESS_WAIT_TIME);
             var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
             await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
 
@@ -109,7 +109,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             string stdout = await doggyDogProcess.StandardOutput.ReadToEndAsync(TestContext.Current.CancellationToken);
 
             await DoggyDogTestFramework.Assert.ShouldHaveNotFoundRegistryFile(stdout, FAKE_REGISTRY_PATH);
-            doggyDogProcess.ExitCode.Should().Be(-1);
+            doggyDogProcess.ExitCode.Should().Be(1);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
             await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
 
-            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(-1, timeToExit: FAKE_PROCESS_WAIT_TIME);
+            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(1, timeToExit: FAKE_PROCESS_WAIT_TIME);
 
             if (process == null)
             {
@@ -149,7 +149,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
             await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
 
-            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(-1, timeToExit: FAKE_PROCESS_WAIT_TIME);
+            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(1, timeToExit: FAKE_PROCESS_WAIT_TIME);
 
             if (process == null)
             {
@@ -170,7 +170,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             await DoggyDogTestFramework.Assert.ShouldHaveMonitoredProcess(stdout, process);
             await DoggyDogTestFramework.Assert.ShouldHaveFoundRegistryFile(stdout, registry.GetPath());
             await DoggyDogTestFramework.Assert.ShouldHaveInitiatedRecovery(stdout, process);
-            await DoggyDogTestFramework.Assert.ShouldHaveFoundInfrastructureToClean(stdout, 1, process.Id);
+            await DoggyDogTestFramework.Assert.ShouldHaveFoundInfrastructureToClean(stdout, count: 1, process.Id);
             await DoggyDogTestFramework.Assert.ShouldHaveNotFoundCleanerAttribute(stdout, registry, fakeEntry);
             doggyDogProcess.ExitCode.Should().Be(0);
         }
@@ -181,7 +181,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
             await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
 
-            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(-1, timeToExit: FAKE_PROCESS_WAIT_TIME);
+            Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(1, timeToExit: FAKE_PROCESS_WAIT_TIME);
 
             if (process == null)
             {
