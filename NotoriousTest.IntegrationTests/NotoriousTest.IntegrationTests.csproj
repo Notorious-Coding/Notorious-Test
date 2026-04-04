@@ -2,20 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.4" />
-    <PackageReference Include="Dapper" Version="2.1.72" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="Npgsql" Version="10.0.2" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="4.11.0" />
-	<PackageReference Include="xunit.v3" Version="3.2.2" />
-	<PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
-	<PackageReference Include="AwesomeAssertions" Version="9.4.0" />
-	<PackageReference Include="FakeItEasy" Version="9.0.1" />
+    <PackageReference Include="coverlet.collector" VersionOverride="6.0.4" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" VersionOverride="17.14.1" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+	<PackageReference Include="xunit.v3" />
+	<PackageReference Include="xunit.runner.visualstudio" VersionOverride="3.1.4" />
+	<PackageReference Include="AwesomeAssertions" />
+	<PackageReference Include="FakeItEasy" />
   </ItemGroup>
 
   <ItemGroup>
