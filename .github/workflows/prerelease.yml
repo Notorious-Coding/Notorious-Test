@@ -43,7 +43,6 @@ jobs:
             -p:PublishSingleFile=true \
             -o ./tools/win-x64 \
             --version-suffix "beta.${{ github.run_number }}" \
-            --no-build
 
     - name: Publish DoggyDog for Linux
       run: |
@@ -53,7 +52,6 @@ jobs:
             -p:PublishSingleFile=true \
             -o ./tools/linux-x64 \
             --version-suffix "beta.${{ github.run_number }}" \
-            --no-build
 
     - name: Pack
       run: dotnet pack -c ${{ env.CONFIGURATION }}  -o out --version-suffix "beta.${{ github.run_number }}"

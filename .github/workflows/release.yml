@@ -30,7 +30,6 @@ jobs:
             --self-contained \
             -p:PublishSingleFile=true \
             -o ./tools/win-x64 \
-            --no-build
 
     - name: Publish DoggyDog for Linux
       run: |
@@ -39,7 +38,6 @@ jobs:
             --self-contained \
             -p:PublishSingleFile=true \
             -o ./tools/linux-x64 \
-            --no-build
 
     - name: Test
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
