@@ -198,13 +198,6 @@
           "System.Threading.Tasks.Extensions": "4.6.3"
         }
       }
-    },
-    ".NETStandard,Version=v2.1/win-x64": {
-      "SQLitePCLRaw.lib.e_sqlite3": {
-        "type": "Transitive",
-        "resolved": "2.1.11",
-        "contentHash": "Ev2ytaXiOlWZ4b3R67GZBsemTINslLD1DCJr2xiacpn4tbapu0Q4dHEzSvZSMnVWeE5nlObU3VZN2p81q3XOYQ=="
-      }
     }
   }
 }
