@@ -26,7 +26,11 @@
         ";
 
         public const string GET_BY_PROCESS_ID = @"
-            SELECT * FROM InfrastructureRegistry WHERE ProcessID = @ProcessID 
+            SELECT * FROM InfrastructureRegistry WHERE ProcessID = @ProcessID;
+        ";
+
+        public const string GET_BY_ENVIRONMENT_ID = @"
+            SELECT * FROM InfrastructureRegistry WHERE EnvironmentId = @EnvironmentId;
         ";
     }
 }

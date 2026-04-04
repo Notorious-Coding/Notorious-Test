@@ -8,7 +8,7 @@ namespace NotoriousTest.PostgreSql
 {
     public class SqliteInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
-        public async Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
+        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
         {
             File.Delete(new SqliteConnectionStringBuilder(metadata.ServerConnectionString).DataSource);
         }

@@ -1,9 +1,8 @@
-﻿using NotoriousTest.Core.Watchdog;
+﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Watchdog;
 using NotoriousTest.SqlLiteRegistry;
 
-using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -18,7 +17,7 @@ namespace NotoriousTest.Watchdog
             _registyConfiguration = registryConfiguration;
         }
 
-        public Process Start(Assembly currentAssembly, int currentPid)
+        public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId contextId)
         {
             var watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
             var assemblyPath = currentAssembly.Location;
@@ -26,7 +25,7 @@ namespace NotoriousTest.Watchdog
             Process process = Process.Start(new ProcessStartInfo
             {
                 FileName = watchdogPath,
-                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\" --connectionString \"{_registyConfiguration.ConnectionString}\"",
+                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\" --connectionString \"{_registyConfiguration.ConnectionString}\" --environment {contextId.Value}",
                 UseShellExecute = true,
                 CreateNoWindow = false,
             });
@@ -35,14 +34,14 @@ namespace NotoriousTest.Watchdog
             return process;
         }
 
-        public void SendSuccessSignal(int currentPid)
+        public void SendSuccessSignal(EnvironmentId contextId)
         {
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{currentPid}.signal"), "OK");
+            File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal"), "OK");
         }
 
-        public static bool ReadSuccessSignal(int currentPid)
+        public static bool ReadSuccessSignal(EnvironmentId contextId)
         {
-            var path = Path.Combine(Path.GetTempPath(), $"nt-{currentPid}.signal");
+            var path = Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal");
             var isSuccess = File.Exists(path);
             if (isSuccess) File.Delete(path);
 

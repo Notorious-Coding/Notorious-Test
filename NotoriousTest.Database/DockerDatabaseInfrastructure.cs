@@ -15,7 +15,7 @@ namespace NotoriousTest.Database
     [Cleaner(typeof(DockerInfrastructureCleaner))]
     public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration, DockerMetadata> where TContainer : IDatabaseContainer
     {
-        protected DockerDatabaseInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        protected DockerDatabaseInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
                 Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");

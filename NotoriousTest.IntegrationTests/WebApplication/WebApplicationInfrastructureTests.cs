@@ -15,7 +15,7 @@ namespace NotoriousTest.IntegrationTests.WebApplication
         [Fact]
         public async Task Initialize_Should_Start_Server()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             var infrastructure = new WebApplicationInfrastructure<TestWebApplication>(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
 
             await infrastructure.InitializeAsync();
@@ -31,7 +31,7 @@ namespace NotoriousTest.IntegrationTests.WebApplication
         [Fact]
         public async Task Destroy_Should_Kill_Server()
         {
-            ContextId contextId = Guid.NewGuid();
+            EnvironmentId contextId = Guid.NewGuid();
             var infrastructure = new WebApplicationInfrastructure<TestWebApplication>(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
 
             await infrastructure.InitializeAsync();

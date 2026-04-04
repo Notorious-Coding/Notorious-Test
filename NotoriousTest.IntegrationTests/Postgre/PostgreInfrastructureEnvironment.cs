@@ -27,7 +27,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
 
     public class PostgreServerInfrastructure : DockerContainerInfrastructure<PostgreSqlContainer, string>
     {
-        public PostgreServerInfrastructure(ContextId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public PostgreServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Container = new PostgreSqlBuilder().Build();
         }

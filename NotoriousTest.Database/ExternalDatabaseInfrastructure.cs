@@ -11,7 +11,7 @@ namespace NotoriousTest.Database
     {
         protected TSettings Settings { get; private set; }
 
-        public ExternalDatabaseInfrastructure(ContextId contextId, ITestSettingsProvider provider, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public ExternalDatabaseInfrastructure(EnvironmentId contextId, ITestSettingsProvider provider, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Settings = EnsureExtension(new SettingsExtension<TSettings>(provider)).Settings;
         }

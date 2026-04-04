@@ -8,7 +8,7 @@ namespace NotoriousTest.PostgreSql
 {
     public class PostgreInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
-        public async Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
+        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
         {
             using var connection = new NpgsqlConnection(metadata.ServerConnectionString);
             await connection.OpenAsync();

@@ -2,13 +2,8 @@
 
 using Microsoft.Data.Sqlite;
 
+using NotoriousTest.Core;
 using NotoriousTest.Core.Registry;
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 namespace NotoriousTest.SqlLiteRegistry
 {
     public partial class SqliteRegistryProvider : IRegistry, IAsyncDisposable
@@ -75,6 +70,12 @@ namespace NotoriousTest.SqlLiteRegistry
         public async Task<IEnumerable<InfrastuctureRegistryEntry>> GetByProcessId(int processId)
         {
             IEnumerable<InfrastructureRegistryEntryEntity> entries = await Connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_PROCESS_ID, new { ProcessID = processId });
+            return entries.Select(entry => entry.ToDomain());
+        }
+
+        public async Task<IEnumerable<InfrastuctureRegistryEntry>> GetByEnvironmentId(EnvironmentId environmentId)
+        {
+            IEnumerable<InfrastructureRegistryEntryEntity> entries = await Connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_ENVIRONMENT_ID, new { EnvironmentId = environmentId.Value.ToString() });
             return entries.Select(entry => entry.ToDomain());
         }
     }

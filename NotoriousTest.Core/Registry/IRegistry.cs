@@ -9,5 +9,6 @@
         Task<InfrastuctureRegistryEntry> Register(InfrastuctureRegistryEntry entry);
         Task<bool> Remove(Guid id);
         Task<IEnumerable<InfrastuctureRegistryEntry>> GetByProcessId(int processId);
+        Task<IEnumerable<InfrastuctureRegistryEntry>> GetByEnvironmentId(EnvironmentId environmentId);
     }
 }

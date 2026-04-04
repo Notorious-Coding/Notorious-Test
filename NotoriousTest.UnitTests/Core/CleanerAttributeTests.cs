@@ -12,7 +12,7 @@ public class CleanerAttributeTests
 
     class InfrastructureCleaner : IInfrastructureCleaner
     {
-        public Task CleanAfterCrash(ContextId contextId, Guid infrastructureId, object? metadata = null)
+        public Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, object? metadata = null)
         {
             return Task.CompletedTask;
         }
