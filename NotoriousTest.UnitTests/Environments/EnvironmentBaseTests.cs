@@ -218,4 +218,34 @@ public class EnvironmentBaseTests
         // The reset should be in the same order as initialize
         order.Should().Equal(1, 2, 3, 1, 2, 3);
     }
+
+    [Fact]
+    public async Task Initialize_Should_Order_MultipleInfrastructure()
+    {
+        List<int> order = new();
+        EnvironmentStub stub = new(_testLogger, _watchDog, _registry);
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(2), OnReset = async () => order.Add(2) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(2), OnReset = async () => order.Add(2) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 1) { OnInitialize = async () => order.Add(1), OnReset = async () => order.Add(1) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 1) { OnInitialize = async () => order.Add(1), OnReset = async () => order.Add(1) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 3) { OnInitialize = async () => order.Add(3), OnReset = async () => order.Add(3) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 3) { OnInitialize = async () => order.Add(3), OnReset = async () => order.Add(3) });
+        await stub.Initialize();
+        order.Should().Equal(1, 1, 2, 2, 3, 3);
+    }
+
+    [Fact]
+    public async Task Initialize_Should_Execute_IConsumer_Last_In_Each_Group()
+    {
+        List<int> order = new();
+        EnvironmentStub stub = new(_testLogger, _watchDog, _registry);
+        stub.AddInfrastructure(new ConsumerInfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(22), OnReset = async () => order.Add(2) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(2), OnReset = async () => order.Add(2) });
+        stub.AddInfrastructure(new ConsumerInfrastructureStub(_testLogger, _registry, order: 1) { OnInitialize = async () => order.Add(11), OnReset = async () => order.Add(1) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 1) { OnInitialize = async () => order.Add(1), OnReset = async () => order.Add(1) });
+        stub.AddInfrastructure(new ConsumerInfrastructureStub(_testLogger, _registry, order: 3) { OnInitialize = async () => order.Add(33), OnReset = async () => order.Add(3) });
+        stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 3) { OnInitialize = async () => order.Add(3), OnReset = async () => order.Add(3) });
+        await stub.Initialize();
+        order.Should().Equal(1, 11, 2, 22, 3, 33);
+    }
 }

@@ -103,14 +103,28 @@ namespace NotoriousTest.Core.Environments
             await StartDoggyDog();
             await ConfigureEnvironment();
 
-            foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
+            await InitializeInfrastructureInParralelAndInOrder();
+        }
+
+        private async Task InitializeInfrastructureInParralelAndInOrder()
+        {
+            var infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
+
+            var action = new Func<Infrastructure, Task>(async (i) =>
             {
-                if (infra is IConfigurationConsumer consumer)
+                if (i is IConfigurationConsumer consumer)
                 {
                     consumer.ConsumedConfiguration = AggregateInfrastructureConfiguration();
                 }
+                await i.InitializeAsync();
+            });
 
-                await infra.InitializeAsync();
+            foreach (var infrastructureGroup in infrastructureGroupedByOrder)
+            {
+                var nonConsumers = infrastructureGroup.Where(i => i is not IConfigurationConsumer);
+                var consumers = infrastructureGroup.Where(i => i is IConfigurationConsumer);
+                await Task.WhenAll(nonConsumers.Select(i => action(i)));
+                await Task.WhenAll(consumers.Select(i => action(i)));
             }
         }
 
@@ -121,21 +135,27 @@ namespace NotoriousTest.Core.Environments
 
         public virtual async Task Reset()
         {
-            foreach (Infrastructure infrastructure in _infrastructures.OrderBy(pi => pi.Order))
-            {
-                if (infrastructure.AutoReset) await infrastructure.ResetAsync();
-            }
+            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.AutoReset ? i.Reset() : Task.CompletedTask);
+
         }
 
         public virtual async Task Destroy()
         {
-            foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
-            {
-                await infra.DestroyAsync();
-            }
+            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.Destroy());
 
             WatchDog.SendSuccessSignal(EnvironmentId);
         }
+
+        private async Task ExecuteActionOnInfrastructureInParralelAndInOrder(Func<Infrastructure, Task> action)
+        {
+            var infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
+            foreach (var infrastructure in infrastructureGroupedByOrder)
+            {
+                await Task.WhenAll(infrastructure.Select(i => action(i)));
+            }
+        }
+
+
 
         private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration()
         {
