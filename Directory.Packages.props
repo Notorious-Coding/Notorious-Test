@@ -33,5 +33,7 @@
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.2" />
 	<PackageVersion Include="TUnit.Core" Version="1.27.0" />
 	<PackageVersion Include="TUnit" Version="1.27.0" />
+	<PackageVersion Include="NUnit" Version="4.3.2" />
+	<PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
   </ItemGroup>
 </Project>
