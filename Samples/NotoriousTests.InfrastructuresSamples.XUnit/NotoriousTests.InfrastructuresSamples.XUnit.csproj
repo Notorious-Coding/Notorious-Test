@@ -27,7 +27,7 @@
 	  <ProjectReference Include="..\..\NotoriousTest\NotoriousTest.csproj" />
 	  <ProjectReference Include="..\NotoriousTests.InfrastructuresSamples.TestWebApp\NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
 	</ItemGroup>
-	<Import Project="./build/NotoriousTest.InfrastructuresSamples.targets" />
+	<Import Project="./build/NotoriousTest.InfrastructuresSamples.XUnit.targets" />
 	<ItemGroup>
 	  <None Update="Tables.sql">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>

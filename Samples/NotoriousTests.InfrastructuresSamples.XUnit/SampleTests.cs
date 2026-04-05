@@ -1,12 +1,12 @@
 using NotoriousTest.Web;
 using NotoriousTest.XUnit;
 
-using NotoriousTests.InfrastructuresSamples.Environments;
-using NotoriousTests.InfrastructuresSamples.Infrastructures;
+using NotoriousTests.InfrastructuresSamples.XUnit.Environments;
+using NotoriousTests.InfrastructuresSamples.XUnit.Infrastructures;
 
 using System.Data.Common;
 
-namespace NotoriousTests.InfrastructuresSamples
+namespace NotoriousTests.InfrastructuresSamples.XUnit
 {
     public class SampleTests : IntegrationTest<TestEnvironment>
     {
