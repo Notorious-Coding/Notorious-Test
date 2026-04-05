@@ -135,15 +135,7 @@ namespace NotoriousTest.Core.Environments
 
         public virtual async Task Reset()
         {
-            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) =>
-            {
-                if (i.AutoReset)
-                {
-                    return i.ResetAsync();
-                }
-
-                return Task.CompletedTask;
-            });
+            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.AutoReset ? i.DestroyAsync() : Task.CompletedTask);
 
         }
 
