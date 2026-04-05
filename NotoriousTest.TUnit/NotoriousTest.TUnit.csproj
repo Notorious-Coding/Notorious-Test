@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Description>TUnit integration for Notorious Test.</Description>
+		<PackageId>NotoriousTest.TUnit</PackageId>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="TUnit.Core" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
+	</ItemGroup>
+</Project>

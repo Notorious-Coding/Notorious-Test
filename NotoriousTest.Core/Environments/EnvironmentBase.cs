@@ -135,13 +135,21 @@ namespace NotoriousTest.Core.Environments
 
         public virtual async Task Reset()
         {
-            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.AutoReset ? i.Reset() : Task.CompletedTask);
+            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) =>
+            {
+                if (i.AutoReset)
+                {
+                    return i.ResetAsync();
+                }
+
+                return Task.CompletedTask;
+            });
 
         }
 
         public virtual async Task Destroy()
         {
-            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.Destroy());
+            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.DestroyAsync());
 
             WatchDog.SendSuccessSignal(EnvironmentId);
         }
@@ -151,7 +159,7 @@ namespace NotoriousTest.Core.Environments
             var infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
             foreach (var infrastructure in infrastructureGroupedByOrder)
             {
-                await Task.WhenAll(infrastructure.Select(i => action(i)));
+                await Task.WhenAll(infrastructure.Select(action));
             }
         }
 

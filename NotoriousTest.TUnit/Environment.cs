@@ -2,28 +2,19 @@
 
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Environments;
-using NotoriousTest.XUnit.Logger;
+using NotoriousTest.TUnit.Logger;
 
-using Xunit;
-using Xunit.Sdk;
+using TUnit.Core.Interfaces;
 
-namespace NotoriousTest.XUnit
+namespace NotoriousTest.TUnit
 {
-    public abstract class Environment : EnvironmentBase, IAsyncLifetime
+    public abstract class Environment : EnvironmentBase, IAsyncInitializer, IAsyncDisposable
     {
-        private readonly IMessageSink _sink;
-
-        protected Environment(IMessageSink sink)
-        {
-            _sink = sink;
-        }
-
         public override void ConfigureInfrastructureServices(IServiceCollection collection)
         {
             base.ConfigureInfrastructureServices(collection);
 
             collection
-                .AddSingleton(_sink)
                 .AddSingleton<ITestLogger, TestLogger>();
         }
 
@@ -32,7 +23,8 @@ namespace NotoriousTest.XUnit
             await Destroy();
         }
 
-        public async ValueTask InitializeAsync()
+
+        async Task IAsyncInitializer.InitializeAsync()
         {
             await Initialize();
         }

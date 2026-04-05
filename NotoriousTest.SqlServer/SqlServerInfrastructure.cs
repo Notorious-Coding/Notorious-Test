@@ -89,6 +89,9 @@ namespace NotoriousTest.SqlServer
             }
         }
 
+        public override async Task Reset()
+        {
 
+        }
     }
 }
