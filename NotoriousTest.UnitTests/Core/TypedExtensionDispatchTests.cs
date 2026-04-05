@@ -69,10 +69,5 @@ public class TypedExtensionDispatchTests
         {
             return Task.CompletedTask;
         }
-
-        public override Task Reset()
-        {
-            return Task.CompletedTask;
-        }
     }
 }

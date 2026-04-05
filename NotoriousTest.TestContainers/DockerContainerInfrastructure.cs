@@ -40,9 +40,5 @@ namespace NotoriousTest.TestContainers
                 Force = true
             });
         }
-
-        public override async Task Reset()
-        {
-        }
     }
 }

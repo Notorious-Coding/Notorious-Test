@@ -52,9 +52,5 @@ namespace NotoriousTest.IntegrationTests.TestContainers
                 .WithName(nameof(ContainerInfrastructureTests))
                 .Build();
         }
-
-        public override async Task Reset()
-        {
-        }
     }
 }

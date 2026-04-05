@@ -83,9 +83,5 @@ namespace NotoriousTest.SqlServer
                 await command.ExecuteNonQueryAsync();
             }
         }
-
-        public override async Task Reset()
-        {
-        }
     }
 }
