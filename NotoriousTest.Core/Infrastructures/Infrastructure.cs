@@ -74,7 +74,10 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     }
 
     public abstract Task Initialize();
-    public abstract Task Reset();
+    public virtual Task Reset()
+    {
+        return Task.CompletedTask;
+    }
     public abstract Task Destroy();
 
     public async ValueTask DisposeAsync()

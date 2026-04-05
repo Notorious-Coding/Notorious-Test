@@ -37,9 +37,5 @@ namespace NotoriousTest.IntegrationTests.Postgre
             await base.Initialize();
             AddEntry("ConnectionStrings:Default", Container.GetConnectionString());
         }
-
-        public override async Task Reset()
-        {
-        }
     }
 }

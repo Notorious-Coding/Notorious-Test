@@ -43,10 +43,5 @@ namespace NotoriousTest.Web.Infrastructures
             HttpClient = _webApplicationFactory.CreateDefaultClient();
             return Task.CompletedTask;
         }
-
-        public override Task Reset()
-        {
-            return Task.CompletedTask;
-        }
     }
 }

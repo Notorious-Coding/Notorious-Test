@@ -95,11 +95,6 @@ namespace NotoriousTest.IntegrationTests
                 {
                     return Task.CompletedTask;
                 }
-
-                public override Task Reset()
-                {
-                    return Task.CompletedTask;
-                }
             }
 
             [Cleaner(typeof(FakeCleaner))]
@@ -118,11 +113,6 @@ namespace NotoriousTest.IntegrationTests
                 {
                     return Task.CompletedTask;
                 }
-
-                public override Task Reset()
-                {
-                    return Task.CompletedTask;
-                }
             }
 
             public class FakeInfrastructureWithoutCleanerAttribute : Infrastructure<string>
@@ -135,10 +125,6 @@ namespace NotoriousTest.IntegrationTests
                     return Task.CompletedTask;
                 }
                 public override Task Initialize()
-                {
-                    return Task.CompletedTask;
-                }
-                public override Task Reset()
                 {
                     return Task.CompletedTask;
                 }
