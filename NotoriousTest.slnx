@@ -42,7 +42,7 @@
   </Folder>
   <Folder Name="/src/5. Samples/">
     <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples/NotoriousTests.InfrastructuresSamples.csproj" />
+    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.XUnit/NotoriousTests.InfrastructuresSamples.XUnit.csproj" />
     <Project Path="Samples/NotoriousTests.InfrastructuresSamples.MSTest/NotoriousTests.InfrastructuresSamples.MSTest.csproj" />
   </Folder>
   <Folder Name="/src/6. Dependencies/">

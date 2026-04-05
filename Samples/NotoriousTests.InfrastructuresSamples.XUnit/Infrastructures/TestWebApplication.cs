@@ -1,6 +1,6 @@
 ﻿
 using NotoriousTest.Web.Applications;
-namespace NotoriousTests.InfrastructuresSamples.Infrastructures
+namespace NotoriousTests.InfrastructuresSamples.XUnit.Infrastructures
 {
     /// <summary>
     /// A web application will automatically consume configuration from the environment ! No more code needed. 

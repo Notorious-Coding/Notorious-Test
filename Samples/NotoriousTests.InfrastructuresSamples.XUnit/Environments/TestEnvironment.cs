@@ -1,12 +1,12 @@
 ﻿using NotoriousTest.Web;
 
-using NotoriousTests.InfrastructuresSamples.Infrastructures;
+using NotoriousTests.InfrastructuresSamples.XUnit.Infrastructures;
 
 using System.Reflection;
 
 using Xunit.Sdk;
 
-namespace NotoriousTests.InfrastructuresSamples.Environments
+namespace NotoriousTests.InfrastructuresSamples.XUnit.Environments
 {
     // In fact, this is a test fixture (xUnit terminology).
     public class TestEnvironment : NotoriousTest.XUnit.Environment

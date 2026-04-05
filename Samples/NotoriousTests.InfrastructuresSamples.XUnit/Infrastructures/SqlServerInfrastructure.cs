@@ -5,7 +5,7 @@ using NotoriousTest.SqlServer;
 
 using System.Data.Common;
 
-namespace NotoriousTests.InfrastructuresSamples.Infrastructures
+namespace NotoriousTests.InfrastructuresSamples.XUnit.Infrastructures
 {
     public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
