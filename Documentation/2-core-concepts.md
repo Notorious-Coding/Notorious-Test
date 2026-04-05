@@ -1,18 +1,21 @@
 # 🏗️ Core Concepts
 
-NotoriousTest provides a structured way to manage **test infrastructures** and ensure **clean, isolated integration tests**.  
+NotoriousTest provides a structured way to manage **test infrastructures** and ensure **clean, isolated integration tests**.
 This document introduces the core concepts and how they work together.
 
 ## 🏗️ What is an Infrastructure?
 
-An **infrastructure** represents an external dependency required for testing.  
+An **infrastructure** represents an external dependency required for testing.
 This could be a **database, message queue, file storage, API client**, or any service that needs to be set up and managed during tests.
 
 ### ✨ **Example of an Infrastructure**
 
 ```csharp
-public class MyInfrastructure : AsyncInfrastructure
+public class MyInfrastructure : Infrastructure
 {
+    public MyInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
+        : base(contextId, logger, registry) { }
+
     public override Task Initialize()
     {
         // Setup logic here (e.g., start a database, configure an API)
@@ -37,7 +40,9 @@ public class MyInfrastructure : AsyncInfrastructure
 
 - `Initialize()` → Called once at the start of the test session.
 - `Reset()` → Called before each test to ensure data isolation.
-- `Destroy()` → Called at the end of the test session to clean up resources
+- `Destroy()` → Called at the end of the test session to clean up resources.
+
+> Infrastructures are resolved through dependency injection. Use `AddInfrastructure<T>()` in your environment — the framework will inject `EnvironmentId`, `ITestLogger`, and `IRegistry` automatically.
 
 ## 🌍 What is a Test Environment?
 
@@ -47,13 +52,16 @@ Instead of manually initializing infrastructures in every test, you define them 
 ✨ **Example of a Test Environment**
 
 ```csharp
-public class MyTestEnvironment : AsyncEnvironment
+public class MyTestEnvironment : NotoriousTest.XUnit.Environment
 {
-    public override async Task ConfigureEnvironmentAsync()
+    public MyTestEnvironment(IMessageSink sink) : base(sink) { }
+    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override async Task ConfigureEnvironment()
     {
-        // Register infrastructures
-        AddInfrastructure(new MyInfrastructure());
-        AddInfrastructure(new MyInfrastructure2());
+        // Register infrastructures via DI
+        AddInfrastructure<MyInfrastructure>();
+        AddInfrastructure<MyInfrastructure2>();
     }
 }
 ```
@@ -63,22 +71,23 @@ public class MyTestEnvironment : AsyncEnvironment
 - Environments encapsulate multiple infrastructures.
 - They ensure consistency across all tests.
 - They handle initialization, reset, and cleanup automatically.
+- `IMessageSink` is injected by xUnit and used for test output/logging.
 
 ## 🔄 How Does the Test Lifecycle Work?
 
 NotoriousTest manages your test lifecycle automatically to ensure clean and isolated tests.
 
 **Test Session Starts** \
-Infrastructures are initialized (Initialize()).
+Infrastructures are initialized (`Initialize()`).
 
 **Before Each Test** \
-Infrastructures are reset (Reset()).
+Infrastructures are reset (`Reset()`).
 
 **Test Runs** \
 The test executes in an isolated environment.
 
 **After Test Suite Completes** \
-Infrastructures are destroyed (Destroy()).
+Infrastructures are destroyed (`Destroy()`).
 
 🔥 **Why is this important?** \
 ✅ Guarantees clean data for each test (no unwanted side effects). \
@@ -92,7 +101,6 @@ Once a test environment is configured, you can retrieve any registered infrastru
 **✨ Example Test with an Infrastructure**
 
 ```csharp
-
 public class MyIntegrationTests : IntegrationTest<MyTestEnvironment>
 {
     public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
@@ -101,7 +109,7 @@ public class MyIntegrationTests : IntegrationTest<MyTestEnvironment>
     public async Task ExampleTest()
     {
         // Retrieve the infrastructure from the environment
-        var infra = await CurrentEnvironment.GetInfrastructureAsync<MyInfrastructure>();
+        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
 
         // Use the infrastructure
         Assert.NotNull(infra); // Example check
@@ -111,7 +119,7 @@ public class MyIntegrationTests : IntegrationTest<MyTestEnvironment>
 
 📌 **Key Takeaways:**
 
-- GetInfrastructureAsync<T>() → Retrieves an infrastructure inside a test.
+- `GetInfrastructure<T>()` → Retrieves an infrastructure inside a test.
 - No need for manual setup inside test classes.
 - Tests remain clean and focused on logic instead of infrastructure handling.
 
@@ -121,7 +129,7 @@ public class MyIntegrationTests : IntegrationTest<MyTestEnvironment>
 | Infrastructure | Represents an external dependency (DB, API, Queue). |
 | Test Environment | Groups infrastructures together for consistent tests.|
 | Lifecycle | Ensures clean initialization, reset before tests, and proper cleanup.|
-| Retrieving Infra | Use GetInfrastructureAsync<T>() inside tests. |
+| Retrieving Infra | Use `GetInfrastructure<T>()` inside tests. |
 
 Now that you understand the fundamentals, check out:
 

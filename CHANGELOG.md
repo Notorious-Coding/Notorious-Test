@@ -10,7 +10,7 @@
   - **`AsyncConfiguredEnvironment`**: An environment managing the provisioning of a global configuration from configuration infrastructures.
   - **`WebApplication`** is now automatically provided with configuration by the `AsyncWebEnvironment`.
 
-For more information, see the [Advanced Functionalities - Configuration](./README.md#configuration) and [Advanced Functionalities - Web](./README.md#web).
+For more information, see the [Advanced Features - Configuration](./Documentation/3-advanced-features.md#configuration) and [Advanced Features - Web Testing](./Documentation/3-advanced-features.md#web-testing).
 
 ## v2.1.0
 
@@ -18,7 +18,7 @@ For more information, see the [Advanced Functionalities - Configuration](./READM
 
 - Added the `AutoReset` property to toggle infrastructure reset on or off.
 
-For more information, see the [Advanced Functionalities - Advanced control over Infrastructure Reset](./README.md#advanced-control-over-infrastructure-resets)
+For more information, see the [Advanced Features - Disabling automatic reset](./Documentation/3-advanced-features.md#disabling-automatic-reset)
 
 ## v2.2.0
 
@@ -46,10 +46,10 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 - **NotoriousTest.TestContainers** is now available as a separate package.
   - Provides a simple way to use TestContainers in your tests.
-  - For more information, see the [Advanced Functionalities - TestContainers](./README.md#testcontainers).
+  - For more information, see the [Integrations - TestContainers](./Documentation/4-integrations.md#testcontainers).
 - **NotoriousTest.SqlServer** is now available as a separate package.
-  - Provide your tests with a SqlServer ready-to-use infrastructure !
-  - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sql-server).
+  - Provide your tests with a SqlServer ready-to-use infrastructure!
+  - For more information, see the [Integrations - SQL Server](./Documentation/4-integrations.md#sql-server-docker).
 
 ### 🛠 Technical
 
@@ -101,7 +101,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 #### Settings 💥NEW💥
 - By registering a `SettingsExtension`, you can now load settings from `testsettings.json` to configure infrastructure.
-git stash- Automatically loaded from the infrastructure name as config key.
+- Automatically loaded from the infrastructure name as config key.
 
 #### Output configuration 🔧 UPDATED 🔧
 - Environments no longer require a global configuration object. Configuration is now propagated automatically through extensions.

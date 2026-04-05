@@ -6,7 +6,7 @@ __Clean, isolated, and maintainable integration testing for .NET__
 [![NuGet](https://img.shields.io/nuget/v/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
 [![License](https://img.shields.io/github/license/Notorious-Coding/Notorious-Test)](https://github.com/Notorious-Coding/Notorious-Test/blob/master/LICENSE.txt)
-[![.NET](https://img.shields.io/badge/.NET-6%2B-blue)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-8%2B-blue)](https://dotnet.microsoft.com/)
 [![Build Status](https://github.com/Notorious-Coding/Notorious-Test/actions/workflows/release.yml/badge.svg)](https://github.com/Notorious-Coding/Notorious-Test/actions/workflows/release.yml)
 [![GitHub stars](https://img.shields.io/github/stars/Notorious-Coding/Notorious-Test?style=social)](https://github.com/Notorious-Coding/Notorious-Test/stargazers)
 
@@ -60,8 +60,11 @@ For now, we’ll define an empty infrastructure to illustrate the setup.
 You can replace `MyInfrastructure` with any real infrastructure later.
 
 ```csharp
-public class MyInfrastructure : AsyncInfrastructure
+public class MyInfrastructure : Infrastructure
 {
+    public MyInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
+        : base(contextId, logger, registry) { }
+
     public override Task Initialize()
     {
         // Setup logic here (e.g., start a database, configure an API)
@@ -112,12 +115,15 @@ public class SampleWebApp : WebApplication<Program>
 A test environment groups infrastructures together.
 
 ```csharp
-public class MyTestEnvironment : AsyncWebEnvironment
+public class MyTestEnvironment : NotoriousTest.XUnit.Environment
 {
-    public override async Task ConfigureEnvironmentAsync()
+    public MyTestEnvironment(IMessageSink sink) : base(sink) { }
+    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override async Task ConfigureEnvironment()
     {
-        AddInfrastructure(new MyInfrastructure()); // Register the test infrastructure
-        AddWebApplication(new SampleWebApp()); // Register the web app
+        AddInfrastructure<MyInfrastructure>(); // Register via DI
+        this.AddWebApplication<SampleWebApp>(); // Register the web app
     }
 }
 ```
@@ -132,7 +138,7 @@ public class MyTestEnvironment : AsyncWebEnvironment
 Now, let's write a basic integration test using our environment.
 
 ```csharp
-public class MyIntegrationTests : AsyncIntegrationTest<MyTestEnvironment>
+public class MyIntegrationTests : IntegrationTest<MyTestEnvironment>
 {
     public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
 
@@ -140,7 +146,7 @@ public class MyIntegrationTests : AsyncIntegrationTest<MyTestEnvironment>
     public async Task ExampleTest()
     {
         // Retrieve the infrastructure
-        var infra = await CurrentEnvironment.GetInfrastructureAsync<MyInfrastructure>();
+        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
 
         // Add test logic here (e.g., verify database state, call an API)
 
