@@ -87,6 +87,21 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 ### ✨ Features
 
+#### DoggyDog 🐶🐶🐶 💥NEW💥
+
+NotoriousTest now has a new mascot, the DoggyDog ! 🐶🐶🐶
+DoggyDog is a watchdog that clean infrastructures that may have been left dirty by previous tests, 
+and make sure that your tests are running in a clean environment.
+
+- Introducing DoggyDog - an executable that clean your infrastructures left behind a test campaign that have been killed unexpectedly.
+- DoggyDog use a registry to track all your infrastructures, and execute their cleaner.
+- [Cleaner(CleanerType)] attribute to specify the cleaner of your infrastructures.
+
+#### Test Frameworks integration 💥NEW💥
+
+- NotoriousTest is now compatible with NUnit, MSTest, TUnit, in addition to xUnit.
+- Find integration within NotoriousTest.XUnit, NotoriousTest.NUnit, NotoriousTest.MSTest and NotoriousTest.TUnit packages.
+
 #### Infrastructure extensions 💥NEW💥
 - Introducing a new concept called infrastructure extension, meant to be used to react to infrastructure setup. 
 - New interface `IInfrastructureExtension`, provide hooks such as `OnBeforeInitialize` to extends Infrastructure.
@@ -148,5 +163,5 @@ git stash- Automatically loaded from the infrastructure name as config key.
 - Synchronous classes have been removed. All `Async`-prefixed classes have been renamed without the suffix (e.g. `AsyncInfrastructure` → `Infrastructure`).
 - .NET 6 is no longer supported. Minimum target is .NET 8.
 - XUnit has been updated to xunit.v3, which introduces breaking changes of its own. See the [xunit.v3 migration guide](https://xunit.net/docs/getting-started/v3/migration).
-
+- Infrastructures are now executed in parrallel if there order are the same. IConfigurationConsumer are run after all infrastructures with the same order.
 
