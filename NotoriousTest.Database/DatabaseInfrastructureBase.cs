@@ -50,10 +50,6 @@ namespace NotoriousTest.Database
             await CreateDatabase(connection);
         }
 
-        public override async Task Reset()
-        {
-        }
-
         public override async Task Destroy()
         {
             using var connection = GetServerConnection();

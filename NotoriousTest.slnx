@@ -25,6 +25,7 @@
   </Folder>
   <Folder Name="/src/2. TestFramework/">
     <Project Path="NotoriousTest.MSTest/NotoriousTest.MSTest.csproj" />
+    <Project Path="NotoriousTest.TUnit/NotoriousTest.TUnit.csproj" Id="c69b3f8a-360e-4c1a-8177-1688454760c2" />
     <Project Path="NotoriousTest.XUnit/NotoriousTest.XUnit.csproj" Id="7936b457-1116-4175-92ee-2dd46d7b6273" />
   </Folder>
   <Folder Name="/src/3. Infrastructures/">
@@ -41,9 +42,10 @@
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
   <Folder Name="/src/5. Samples/">
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.XUnit/NotoriousTests.InfrastructuresSamples.XUnit.csproj" />
     <Project Path="Samples/NotoriousTests.InfrastructuresSamples.MSTest/NotoriousTests.InfrastructuresSamples.MSTest.csproj" />
+    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
+    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TUnit/NotoriousTests.InfrastructuresSamples.TUnit.csproj" />
+    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.XUnit/NotoriousTests.InfrastructuresSamples.XUnit.csproj" />
   </Folder>
   <Folder Name="/src/6. Dependencies/">
     <File Path="Directory.Build.props" />
