@@ -85,7 +85,7 @@ For more information, see the [Advanced Functionalities - Advanced control over 
 
 ## v4.0.0
 
-### ✨ Features
+### ✨ Core features
 
 #### DoggyDog 🐶🐶🐶 💥NEW💥
 
@@ -97,12 +97,13 @@ and make sure that your tests are running in a clean environment.
 - DoggyDog use a registry to track all your infrastructures, and execute their cleaner.
 - [Cleaner(CleanerType)] attribute to specify the cleaner of your infrastructures.
 
-#### Test Frameworks integration 💥NEW💥
-
-- NotoriousTest is now compatible with NUnit, MSTest, TUnit, in addition to xUnit.
-- Find integration within NotoriousTest.XUnit, NotoriousTest.NUnit, NotoriousTest.MSTest and NotoriousTest.TUnit packages.
-
 #### Infrastructure extensions 💥NEW💥
+
+**Infrastructure extensions** introduce a composition model for adding behaviors to your infrastructures. Instead of creating specialized subclasses to combine multiple concerns (configuration, database seeding, respawn, etc. ) 
+You register extensions on any infrastructure via `EnsureExtension<TExtension>()`.
+Each extension is self-contained, reusable across infrastructures, and hooks into the infrastructure lifecycle through dedicated callbacks such as `OnBeforeInitialize`.
+
+
 - Introducing a new concept called infrastructure extension, meant to be used to react to infrastructure setup. 
 - New interface `IInfrastructureExtension`, provide hooks such as `OnBeforeInitialize` to extends Infrastructure.
 - Configuration is now handled by extensions classes.
@@ -113,10 +114,11 @@ and make sure that your tests are running in a clean environment.
 		- `SettingsExtension<TSettings>`: Load from `testsettings.json` your infrastructure configuration. Config key default to infrastructure name, and can be override.
 	- Database
 		- `RespawnExtension`: Integration of Respawn package to reset databases between test.
+		- Included in every database infrastructures by default.
 
 #### Settings 💥NEW💥
 - By registering a `SettingsExtension`, you can now load settings from `testsettings.json` to configure infrastructure.
-git stash- Automatically loaded from the infrastructure name as config key.
+- Automatically loaded from the infrastructure name as config key.
 
 #### Output configuration 🔧 UPDATED 🔧
 - Environments no longer require a global configuration object. Configuration is now propagated automatically through extensions.
@@ -144,24 +146,37 @@ git stash- Automatically loaded from the infrastructure name as config key.
 - `ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings>`: Base class for non docker database infrastructures, that need a running server to setup.
 	- `DatabaseSettings` will be loaded directly from the `testsettings.json` file.
 - `DockerDatabaseInfrastructure<TContainer>`: Base class for testcontainers powered infrastructure. Takes a `IDatabaseContainer`.
+- SqlServer, PostgreSql and Sqlite packages are using theses classes.
 
-#### Dependency Injection 💥NEW💥
-- NotoriousTest now handle dependency injection direclty into infrastructures. 
-- Configure dependencies via `ConfigurationInfrastructureServices(IServiceCollection collection)` method in your environment ! 
+### Dependency Injection 💥NEW💥
+
+- Environments now expose an internal DI container, configurable via ConfigureInfrastructureServices(IServiceCollection collection).
+- Registered services are automatically injected into every infrastructure, removing the need for manual wiring in Initialize.
+- Available by default: ContextId, ITestSettingsProvider.
 
 #### Logging 💥NEW💥
 
 - NotoriousTest now deliver a `ITestLogger` that is injected directly in the `Infrastructure.Logger` property, and can be accessed from everywhere via DI.
-- Enable diagnostic messages in xunit.runner.json or via xunit attributes, and navigate into the tests output (in visual studio).
+- Every framework has it's own `ITestLogger` implementation that is registered in DI.
 
 #### Web
 - Web support has been moved to `NotoriousTest.Web`. 
-- `WebEnvironment` no longer need an EntryPoint in generic parameter.
-- `WebApplicationInfrastructure` is now available in environment with `WebApp` properties. Use WebApp.HttpClient to make your http calls.
+- `Environment` now has extensions to retrieve the WebApplication or add a WebApplication. You can find them in the `NotoriousTest.Web` packages, under the `NotoriousTest.Web.Environment.WebEnvironmentExtensions`.
+- `WebEnvironment` has been deleted. Use extensions to retrieve/add WebApplication.
 
-#### Misc
+### 💥 Breaking Changes
 - Synchronous classes have been removed. All `Async`-prefixed classes have been renamed without the suffix (e.g. `AsyncInfrastructure` → `Infrastructure`).
 - .NET 6 is no longer supported. Minimum target is .NET 8.
 - XUnit has been updated to xunit.v3, which introduces breaking changes of its own. See the [xunit.v3 migration guide](https://xunit.net/docs/getting-started/v3/migration).
 - Infrastructures are now executed in parrallel if there order are the same. IConfigurationConsumer are run after all infrastructures with the same order.
 
+### Integrations
+#### Sqlite integration 💥NEW💥
+
+- `SqliteInfrastructure` is now available in the `NotoriousTest.Sqlite` package.
+
+#### Test Frameworks integration 💥NEW💥
+
+- NotoriousTest is now compatible with **NUnit**, **MSTest**, **TUnit**, in addition to **xUnit**.
+- Find them within `NotoriousTest.XUnit`, `NotoriousTest.NUnit`, `NotoriousTest.MSTest` and `NotoriousTest.TUnit` packages.
+- New samples for every frameworks are available in the samples folder.
