@@ -7,9 +7,9 @@
     <File Path=".gitignore" />
     <File Path="CHANGELOG.md" />
     <File Path="Documentation/2-core-concepts.md" />
-    <File Path="Documentation/3-advanced-features.md" />
-    <File Path="Documentation/4-integrations.md" />
-    <File Path="Documentation/5-example.md" />
+    <File Path="Documentation/3-integrations.md" />
+    <File Path="Documentation/4-example.md" />
+    <File Path="Documentation/5-architecture.md" />
     <File Path="Documentation/Architecture/workspace.dsl" />
     <File Path="NotoriousTest/LICENSE.txt" />
     <File Path="README.md" />
@@ -43,11 +43,11 @@
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
   <Folder Name="/src/5. Samples/">
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.MSTest/NotoriousTests.InfrastructuresSamples.MSTest.csproj" />
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.NUnit/NotoriousTests.InfrastructuresSamples.NUnit.csproj" />
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TestWebApp/NotoriousTests.InfrastructuresSamples.TestWebApp.csproj" />
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.TUnit/NotoriousTests.InfrastructuresSamples.TUnit.csproj" />
-    <Project Path="Samples/NotoriousTests.InfrastructuresSamples.XUnit/NotoriousTests.InfrastructuresSamples.XUnit.csproj" />
+    <Project Path="Samples/NotoriousTest.Sample.MSTest/NotoriousTest.Sample.MSTest.csproj" />
+    <Project Path="Samples/NotoriousTest.Sample.NUnit/NotoriousTest.Sample.NUnit.csproj" />
+    <Project Path="Samples/NotoriousTest.Sample.TestWebApp/NotoriousTest.Sample.TestWebApp.csproj" />
+    <Project Path="Samples/NotoriousTest.Sample.TUnit/NotoriousTest.Sample.TUnit.csproj" />
+    <Project Path="Samples/NotoriousTest.Sample.XUnit/NotoriousTest.Sample.XUnit.csproj" />
   </Folder>
   <Folder Name="/src/6. Dependencies/">
     <File Path="Directory.Build.props" />

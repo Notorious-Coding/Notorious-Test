@@ -6,7 +6,7 @@ __Clean, isolated, and maintainable integration testing for .NET__
 [![NuGet](https://img.shields.io/nuget/v/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NotoriousTest)](https://www.nuget.org/packages/NotoriousTest/)
 [![License](https://img.shields.io/github/license/Notorious-Coding/Notorious-Test)](https://github.com/Notorious-Coding/Notorious-Test/blob/master/LICENSE.txt)
-[![.NET](https://img.shields.io/badge/.NET-6%2B-blue)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-8%2B-blue)](https://dotnet.microsoft.com/)
 [![Build Status](https://github.com/Notorious-Coding/Notorious-Test/actions/workflows/release.yml/badge.svg)](https://github.com/Notorious-Coding/Notorious-Test/actions/workflows/release.yml)
 [![GitHub stars](https://img.shields.io/github/stars/Notorious-Coding/Notorious-Test?style=social)](https://github.com/Notorious-Coding/Notorious-Test/stargazers)
 
@@ -14,7 +14,13 @@ If you plan to use this NuGet package, let me know in the [Tell me if you use th
 
 ## Summary
 - [Purpose](#purpose)
-- [Hello World](#hello-word)
+- [Hello World](#hello-world)
+  - [Setup](#setup)
+  - [Define a Basic Infrastructure](#define-a-basic-infrastructure)
+  - [Create a Test Environment](#create-a-test-environment)
+  - [Write your first test](#write-your-first-test)
+  - [Running Your First Test](#-running-your-first-test)
+- [Multi-Framework Support](#multi-framework-support)
 - [Resources & Community](#resources--community)
   - [Documentation](#documentation)
   - [Changelog](#changelog)
@@ -26,7 +32,7 @@ If you plan to use this NuGet package, let me know in the [Tell me if you use th
 Have you ever had to write and rewrite boilerplate code to set up a database, reset data between each test, or tear down containers?
 All that setup required to keep your integration tests fully isolated, and ensure their maintainability, reproducibility, and efficiency.
 
-**NotoriousTests** removes the need to build all of that yourself.
+**NotoriousTest** removes the need to build all of that yourself.
 
 The concept is simple:
 
@@ -34,33 +40,43 @@ The concept is simple:
 2. Add it to an **environment**.
 3. Access it directly from your **integration tests**.
 
-**NotoriousTests** will automatically manage the **lifecycle of your infrastructures.**
+**NotoriousTest** will automatically manage the **lifecycle of your infrastructures.**
+Even after the tests have crashed unexpectedly, thanks to the DoggyDog 🐶.
 
 ## Hello World
 
 ## Setup
 
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install [NotoriousTest](https://www.nuget.org/packages/NotoriousTest/) from the package manager console:
+First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install the package matching your test framework:
+
+| Framework | Package |
+|-----------|---------|
+| xUnit | `NotoriousTest.XUnit` |
+| NUnit | `NotoriousTest.NUnit` |
+| MSTest | `NotoriousTest.MSTest` |
+| TUnit | `NotoriousTest.TUnit` |
 
 ```
-PM> Install-Package NotoriousTest
+PM> Install-Package NotoriousTest.XUnit
 ```
 
-Or from the .NET CLI as:
+Or from the .NET CLI:
 
 ```
-dotnet add package NotoriousTest
+dotnet add package NotoriousTest.XUnit
 ```
+
+> **Note:** .NET 8 or higher is required.
 
 ## Define a Basic Infrastructure
 
 An **infrastructure** represents an **external dependency** (database, message bus, etc.).
 
-For now, we’ll define an empty infrastructure to illustrate the setup.
+For now, we'll define an empty infrastructure to illustrate the setup.
 You can replace `MyInfrastructure` with any real infrastructure later.
 
 ```csharp
-public class MyInfrastructure : AsyncInfrastructure
+public class MyInfrastructure : Infrastructure
 {
     public override Task Initialize()
     {
@@ -90,49 +106,42 @@ public class MyInfrastructure : AsyncInfrastructure
 - Defines a basic infrastructure with lifecycle methods.
 - This is where you would add setup logic for databases, APIs, queues, etc.
 
-## Create a Web Application
-
-Now, let's create a basic web application for our tests.
-
-```csharp
-public class SampleWebApp : WebApplication<Program>
-{
-    // Override WebApplicationFactory methods.
-}
-```
-
-> ❗ This is a **`WebApplicationFactory`** customized for `NotoriousTest`.
-
-📌 **What this does:**
-
-- Defines a minimal web application factory for testing.
-
 ## Create a Test Environment
 
-A test environment groups infrastructures together.
+A test environment groups infrastructures together. Extend the environment class from your framework-specific package:
 
 ```csharp
-public class MyTestEnvironment : AsyncWebEnvironment
+// xUnit
+using System.Reflection;
+using Xunit.Sdk;
+
+public class MyTestEnvironment : NotoriousTest.XUnit.Environment
 {
-    public override async Task ConfigureEnvironmentAsync()
+    public MyTestEnvironment(IMessageSink sink) : base(sink) { }
+
+    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override async Task ConfigureEnvironment()
     {
-        AddInfrastructure(new MyInfrastructure()); // Register the test infrastructure
-        AddWebApplication(new SampleWebApp()); // Register the web app
+        AddInfrastructure<MyInfrastructure>();
     }
 }
 ```
 
 📌 **What this does:**
 
-- Registers MyInfrastructure and SampleWebApp inside the test environment.
+- Registers `MyInfrastructure` inside the test environment.
 - Ensures all tests run in a clean and isolated setup.
+
+> See [Multi-Framework Support](#multi-framework-support) for NUnit, MSTest, and TUnit equivalents.
 
 ## Write your first test
 
 Now, let's write a basic integration test using our environment.
 
 ```csharp
-public class MyIntegrationTests : AsyncIntegrationTest<MyTestEnvironment>
+// xUnit
+public class MyIntegrationTests : NotoriousTest.XUnit.IntegrationTest<MyTestEnvironment>
 {
     public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
 
@@ -140,7 +149,7 @@ public class MyIntegrationTests : AsyncIntegrationTest<MyTestEnvironment>
     public async Task ExampleTest()
     {
         // Retrieve the infrastructure
-        var infra = await CurrentEnvironment.GetInfrastructureAsync<MyInfrastructure>();
+        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
 
         // Add test logic here (e.g., verify database state, call an API)
 
@@ -170,16 +179,102 @@ You should see something like:
 Passed! 1 test successful.
 ```
 
-If everything works, congrats! 🎉 You’ve successfully set up NotoriousTest.
+If everything works, congrats! 🎉 You've successfully set up NotoriousTest.
+
+## Multi-Framework Support
+
+NotoriousTest supports **xUnit**, **NUnit**, **MSTest**, and **TUnit**. The environment and test base classes differ per framework — everything else is identical.
+
+### NUnit
+
+```csharp
+// Environment
+public class MyTestEnvironment : NotoriousTest.NUnit.Environment
+{
+    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override async Task ConfigureEnvironment()
+    {
+        AddInfrastructure<MyInfrastructure>();
+    }
+}
+
+// Tests
+[TestFixture]
+public class MyIntegrationTests : NotoriousTest.NUnit.IntegrationTest<MyTestEnvironment>
+{
+    [Test]
+    public async Task ExampleTest()
+    {
+        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
+        Assert.That(infra, Is.Not.Null);
+    }
+}
+```
+
+### MSTest
+
+```csharp
+// Environment
+public class MyTestEnvironment : NotoriousTest.MSTest.Environment
+{
+    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override async Task ConfigureEnvironment()
+    {
+        AddInfrastructure<MyInfrastructure>();
+    }
+}
+
+// Tests
+[TestClass]
+public class MyIntegrationTests : NotoriousTest.MSTest.IntegrationTest<MyTestEnvironment>
+{
+    [TestMethod]
+    public async Task ExampleTest()
+    {
+        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
+        Assert.IsNotNull(infra);
+    }
+}
+```
+
+### TUnit
+
+```csharp
+// Environment
+public class MyTestEnvironment : NotoriousTest.TUnit.Environment
+{
+    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override async Task ConfigureEnvironment()
+    {
+        AddInfrastructure<MyInfrastructure>();
+    }
+}
+
+// Tests
+public class MyIntegrationTests : NotoriousTest.TUnit.IntegrationTest<MyTestEnvironment>
+{
+    public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
+
+    [Test]
+    public async Task ExampleTest()
+    {
+        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
+        await Assert.That(infra).IsNotNull();
+    }
+}
+```
 
 ## Resources & Community
 
 ### Documentation
 
 - 📖 [Core Concepts](./Documentation/2-core-concepts.md) – Learn how infrastructures and environments work.
-- ⚡ [Advanced Features](./Documentation/3-advanced-features.md) – Discover ordering, reset behaviors, and more. \
-- 🔌 [Integrations](./Documentation/4-integrations.md) – See how to integrate SQL Server, TestContainers, and more.
-- 📚 [Examples](./Documentation/5-example.md) – Hands-on use cases with real-world setups.
+- 🔌 [Integrations](./Documentation/3-integrations.md) – See how to integrate SQL Server, TestContainers, and more.
+- 📚 [Examples](./Documentation/4-example.md) – Hands-on use cases with real-world setups.
+- 🏛️ [Architecture Guidelines](./Documentation/5-architecture.md) – Best practices for structuring your test setup.
 
 ### Changelog
 
@@ -187,7 +282,7 @@ You can find the changelog [here](./CHANGELOG.md).
 
 ### Contact
 
-Have questions, ideas, or feedback about NotoriousTests?
+Have questions, ideas, or feedback about NotoriousTest?
 Feel free to reach out! I'd love to hear from you. Here's how you can get in touch:
 
 - GitHub Issues: [Open an issue](https://github.com/Notorious-Coding/Notorious-Test/issues) to report a problem, request a feature, or share an idea.
