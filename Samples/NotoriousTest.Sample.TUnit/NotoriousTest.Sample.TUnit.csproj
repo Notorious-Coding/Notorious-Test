@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<IsIntegrationTest>true</IsIntegrationTest>
+	</PropertyGroup>
 
-  <ItemGroup>
+
+	<ItemGroup>
     <PackageReference Include="TUnit" />
   </ItemGroup>
 
@@ -17,7 +17,6 @@
     <ProjectReference Include="..\..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
     <ProjectReference Include="..\NotoriousTest.Sample.TestWebApp\NotoriousTest.Sample.TestWebApp.csproj" />
   </ItemGroup>
-  <Import Project="./build/NotoriousTest.InfrastructuresSamples.MSTest.targets" />
   <ItemGroup>
     <None Update="Tables.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

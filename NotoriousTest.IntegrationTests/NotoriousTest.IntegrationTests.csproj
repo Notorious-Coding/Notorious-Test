@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <IsIntegrationTest>true</IsIntegrationTest>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
@@ -26,7 +27,6 @@
     <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
     <ProjectReference Include="..\NotoriousTest.XUnit\NotoriousTest.XUnit.csproj" />
   </ItemGroup>
-  <Import Project="./build/NotoriousTest.IntegrationTests.targets" />
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
