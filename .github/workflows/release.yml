@@ -25,20 +25,20 @@ jobs:
 
     - name: Publish DoggyDog for Windows
       run: |
-        dotnet publish ./NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj \
+        dotnet publish ./DoggyDog/DoggyDog.csproj \
             -r win-x64 \
             --self-contained \
             -p:PublishSingleFile=true \
-            -o ./tools/win-x64
+            -o ./tools/win-x64 \
 
     - name: Publish DoggyDog for Linux
       run: |
-        dotnet publish ./NotoriousTest.DoggyDog/NotoriousTest.DoggyDog.csproj \
+        dotnet publish ./DoggyDog/DoggyDog.csproj \
             -r linux-x64 \
             --self-contained \
             -p:PublishSingleFile=true \
+            -o ./tools/linux-x64 \
 
-            -o ./tools/linux-x64
     - name: Test
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal
     
