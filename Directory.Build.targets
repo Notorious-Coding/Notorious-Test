@@ -4,4 +4,16 @@
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="False" />
     <None Include="$(MSBuildThisFileDirectory)LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
   </ItemGroup>
+
+  <Target Name="CopyDoggyDogDev" AfterTargets="Build" Condition="'$(IsIntegrationTest)' == 'true'">
+    <PropertyGroup>
+      <DoggyDogRuntime Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</DoggyDogRuntime>
+      <DoggyDogRuntime Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-x64</DoggyDogRuntime>
+    </PropertyGroup>
+
+    <Message Text="Publishing DoggyDog to $(MSBuildThisFileDirectory) $(OutDir)" Importance="high" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)DoggyDog/DoggyDog.csproj"
+             Targets="Publish"
+             Properties="RuntimeIdentifier=$(DoggyDogRuntime);SelfContained=true;PublishSingleFile=true;PublishDir=$(MSBuildProjectDirectory)\$(OutDir)" />
+  </Target>
 </Project>
