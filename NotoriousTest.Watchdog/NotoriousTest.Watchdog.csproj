@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Description>Watchdog provider used by NotoriousTest.</Description>
+		<PackageId>NotoriousTest.Watchdog</PackageId>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
