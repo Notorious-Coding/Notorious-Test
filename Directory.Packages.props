@@ -20,6 +20,9 @@
     <PackageVersion Include="MSTest" Version="3.8.3" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.8.3" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.8.3" />
+    <PackageVersion Include="NotoriousTest.SqlServer" Version="4.0.1-beta.118" />
+    <PackageVersion Include="NotoriousTest.Web" Version="4.0.1-beta.118" />
+    <PackageVersion Include="NotoriousTest.XUnit" Version="4.0.1-local" />
     <PackageVersion Include="Npgsql" Version="10.0.2" />
     <PackageVersion Include="Respawn" Version="7.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -31,9 +34,9 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="xunit.v3.extensibility.core" Version="3.2.2" />
-	<PackageVersion Include="TUnit.Core" Version="1.27.0" />
-	<PackageVersion Include="TUnit" Version="1.27.0" />
-	<PackageVersion Include="NUnit" Version="4.3.2" />
-	<PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageVersion Include="TUnit.Core" Version="1.27.0" />
+    <PackageVersion Include="TUnit" Version="1.27.0" />
+    <PackageVersion Include="NUnit" Version="4.3.2" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
   </ItemGroup>
 </Project>

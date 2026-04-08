@@ -13,4 +13,11 @@
 	  <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
 	  <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+		<None Include="../tools/win-x64/DoggyDog.exe" Pack="true" PackagePath="/tools/win-x64/" />
+		<None Include="../tools/win-x64/e_sqlite3.dll" Pack="true" PackagePath="/tools/win-x64/" />
+		<None Include="../tools/linux-x64/DoggyDog" Pack="true" PackagePath="/tools/linux-x64/" />
+		<None Include="../tools/linux-x64/libe_sqlite3.so" Pack="true" PackagePath="/tools/linux-x64/" />
+		<None Include="build/NotoriousTest.XUnit.targets" Pack="true" PackagePath="build/" />
+	</ItemGroup>
 </Project>
