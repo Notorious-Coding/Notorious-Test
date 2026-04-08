@@ -180,3 +180,9 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 - NotoriousTest is now compatible with **NUnit**, **MSTest**, **TUnit**, in addition to **xUnit**.
 - Find them within `NotoriousTest.XUnit`, `NotoriousTest.NUnit`, `NotoriousTest.MSTest` and `NotoriousTest.TUnit` packages.
 - New samples for every frameworks are available in the samples folder.
+
+## v4.0.1
+
+### 🐛 Bug Fixes
+
+- Fixed a bug where internal packages of NotoriousTest were not available at installation.

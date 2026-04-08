@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<IsPackable>false</IsPackable>
+		<Description>Sqlite Infrastructure Registry used by NotoriousTest.</Description>
+		<PackageId>NotoriousTest.SqlLiteRegistry</PackageId>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
