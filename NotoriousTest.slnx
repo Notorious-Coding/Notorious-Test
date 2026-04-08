@@ -47,8 +47,6 @@
     <Project Path="Samples/NotoriousTest.Sample.NUnit/NotoriousTest.Sample.NUnit.csproj" />
     <Project Path="Samples/NotoriousTest.Sample.TestWebApp/NotoriousTest.Sample.TestWebApp.csproj" />
     <Project Path="Samples/NotoriousTest.Sample.TUnit/NotoriousTest.Sample.TUnit.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.With/NotoriousTest.Sample.With.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.Without/NotoriousTest.Sample.Without.csproj" />
     <Project Path="Samples/NotoriousTest.Sample.XUnit/NotoriousTest.Sample.XUnit.csproj" />
   </Folder>
   <Folder Name="/src/6. Dependencies/">
