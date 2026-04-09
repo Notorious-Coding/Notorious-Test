@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<IsPackable>false</IsPackable>
+		<Description>Test Settings Provider used by NotoriousTest.</Description>
+		<PackageId>NotoriousTest.TestSettings</PackageId>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

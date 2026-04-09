@@ -19,7 +19,6 @@ dotnet publish ./DoggyDog/DoggyDog.csproj `
     -o ./tools/linux-x64
 
 # Pack NotoriousTest.Core
-Write-Host "Packing NotoriousTest.Core..."
-dotnet pack ./NotoriousTest.Core/NotoriousTest.Core.csproj -o ./local-packages
-
+Write-Host "Packing TestFrameworks..."
+dotnet pack ./NotoriousTest.slnx -o ./local-packages --version-suffix local
 Write-Host "Done!"
