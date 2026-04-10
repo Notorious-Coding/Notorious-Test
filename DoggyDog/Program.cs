@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using DoggyDog;
+
+using Microsoft.Data.Sqlite;
 
 using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures.Cleaner;
@@ -9,6 +11,8 @@ using NotoriousTest.Watchdog;
 
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Loader;
+using System.Text.Json;
 
 try
 {
@@ -20,26 +24,32 @@ try
 
     Banner.Print(version, arguments.Pid, arguments.EnvironmentId);
 
-    AppDomain.CurrentDomain.AssemblyResolve += (sender, resolveArgs) =>
+    var testAssemblyDir = Path.GetDirectoryName(arguments.AssemblyPath)!;
+    var assemblyLoader = new DoggyDogAssemblyLoadContext(arguments.AssemblyPath);
+    Assembly testAssembly = assemblyLoader.LoadFromAssemblyPath(arguments.AssemblyPath);
+
+    AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
     {
-        var assemblyName = new AssemblyName(resolveArgs.Name);
-        var name = assemblyName.Name + ".dll";
-        var baseDir = Path.GetDirectoryName(arguments.AssemblyPath)!;
+        var name = new AssemblyName(args.Name);
+        var resolver = new AssemblyDependencyResolver(arguments.AssemblyPath);
 
-        var testPath = Path.Combine(baseDir, name);
-        if (File.Exists(testPath)) return Assembly.LoadFrom(testPath);
+        var path = resolver.ResolveAssemblyToPath(name);
 
-        if (!string.IsNullOrEmpty(assemblyName.CultureName))
+        if (path == null)
         {
-            var culturePath = Path.Combine(baseDir, assemblyName.CultureName, name);
-            if (File.Exists(culturePath)) return Assembly.LoadFrom(culturePath);
+            var trustedAssemblies = (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") as string)
+                ?.Split(Path.PathSeparator);
+
+
+            path = trustedAssemblies?.FirstOrDefault(p =>
+                Path.GetFileNameWithoutExtension(p).Equals(name.Name, StringComparison.OrdinalIgnoreCase));
         }
 
-        return null;
+        return path != null ? assemblyLoader.LoadFromAssemblyPath(path) : null;
     };
 
     int processId = arguments.Pid;
-    Assembly testAssembly = Assembly.LoadFrom(arguments.AssemblyPath);
+
     Logger.Cyan(() => Console.WriteLine($"[DoggyDog] Attached to test process with PID {processId} and EID {arguments.EnvironmentId}"));
 
     var cs = new SqliteConnectionStringBuilder(arguments.ConnectionString); // Validate connection string format early
@@ -106,17 +116,34 @@ try
         Logger.Yellow(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleanup in progress..."));
 
         Type? infrastructureType = testAssembly.GetLoadableTypes().FirstOrDefault(t => t.AssemblyQualifiedName == entry.InfrastructureType.AssemblyQualifiedName);
-        CleanerAttribute? attr = infrastructureType?.GetCustomAttribute<CleanerAttribute>();
+        Attribute? attr = infrastructureType?.GetCustomAttributes().FirstOrDefault(attr => attr.GetType().Name == typeof(CleanerAttribute).Name);
 
         if (attr != null)
         {
-            Logger.DarkGray(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleaning using {attr.CleanerType.Name}."));
+            PropertyInfo info = attr.GetType().GetProperty(nameof(CleanerAttribute.CleanerType));
+            Type cleanerType = (Type)info.GetValue(attr);
 
-            IInfrastructureCleaner? cleaner = Activator.CreateInstance(attr.CleanerType) as IInfrastructureCleaner;
+            Logger.DarkGray(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleaning using {cleanerType.Name}."));
+
+            object? cleaner = Activator.CreateInstance(cleanerType);
 
             if (cleaner != null)
             {
-                await cleaner.CleanAfterCrash(entry.EnvironmentId, entry.InfrastructureId, entry.Metadata);
+                var coreAssemblyName = testAssembly.GetReferencedAssemblies()
+                    .First(a => a.Name == typeof(EnvironmentId).Assembly.GetName().Name);
+
+                var coreAssembly = assemblyLoader.LoadFromAssemblyName(coreAssemblyName);
+                var envType = coreAssembly.GetType(typeof(EnvironmentId).FullName);
+                ConstructorInfo ctorInfo = envType.GetConstructor([typeof(Guid)]);
+                object envId = ctorInfo.Invoke([entry.EnvironmentId]);
+
+                MethodInfo method = cleaner.GetType().GetMethod(nameof(IInfrastructureCleaner<>.CleanAfterCrash));
+
+                var metadataType = method.GetParameters()[2].ParameterType;
+                var json = JsonSerializer.Serialize(entry.Metadata);
+                var metadata = JsonSerializer.Deserialize(json, metadataType);
+                await (method.Invoke(cleaner, [envId, entry.InfrastructureId, metadata]) as Task);
+
                 Logger.Green(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleanup successful. Removing registry entry..."));
                 await registry.Remove(entry.InfrastructureId);
                 Logger.DarkGray(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Registry entry removed."));

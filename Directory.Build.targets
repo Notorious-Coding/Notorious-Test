@@ -14,6 +14,6 @@
     <Message Text="Publishing DoggyDog to $(MSBuildThisFileDirectory) $(OutDir)" Importance="high" />
     <MSBuild Projects="$(MSBuildThisFileDirectory)DoggyDog/DoggyDog.csproj"
              Targets="Publish"
-             Properties="RuntimeIdentifier=$(DoggyDogRuntime);SelfContained=true;PublishSingleFile=true;PublishDir=$(MSBuildProjectDirectory)\$(OutDir)" />
+             Properties="RuntimeIdentifier=$(DoggyDogRuntime);PublishSingleFile=true;PublishDir=$(MSBuildProjectDirectory)\$(OutDir);Configuration=$(Configuration)" />
   </Target>
 </Project>

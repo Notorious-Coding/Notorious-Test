@@ -1,6 +1,5 @@
 ﻿using NotoriousTest.Core.Registry;
 
-using System;
 using System.Globalization;
 using System.Text.Json;
 
@@ -48,7 +47,7 @@ namespace NotoriousTest.SqlLiteRegistry
             return new InfrastuctureRegistryEntry()
             {
                 InfrastructureId = Guid.Parse(InfrastructureId),
-                InfrastructureType = Type.GetType(InfrastructureType),
+                InfrastructureType = infraType,
                 EnvironmentId = Guid.Parse(EnvironmentId),
                 ProcessID = ProcessID,
                 Metadata = !(Metadata is null) && !(metadataType is null)

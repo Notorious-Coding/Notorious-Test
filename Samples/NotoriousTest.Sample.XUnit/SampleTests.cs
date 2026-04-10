@@ -1,8 +1,7 @@
-using NotoriousTest.Web;
-using NotoriousTest.XUnit;
-
 using NotoriousTest.Sample.XUnit.Environments;
 using NotoriousTest.Sample.XUnit.Infrastructures;
+using NotoriousTest.Web;
+using NotoriousTest.XUnit;
 
 using System.Data.Common;
 
@@ -21,6 +20,7 @@ namespace NotoriousTest.Sample.XUnit
         [Fact]
         public async Task Test1()
         {
+            System.Environment.Exit(1);
             // You can access an infrastructure directly from the CurrentEnvironment property of the test class.
             // This is useful to access the database connection for example.
             HttpClient client = CurrentEnvironment.GetWebApplication().HttpClient;
