@@ -1,4 +1,5 @@
 ﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Watchdog;
 using NotoriousTest.SqlLiteRegistry;
 
@@ -11,16 +12,36 @@ namespace NotoriousTest.Watchdog
     public class DoggyDogWatchDog : IWatchDog
     {
         private readonly SqliteRegistryProviderConfiguration _registyConfiguration;
+        private readonly ITestLogger _logger;
 
-        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration)
+        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration, ITestLogger logger)
         {
             _registyConfiguration = registryConfiguration;
+            _logger = logger;
         }
 
         public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId contextId)
         {
             var watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
             var assemblyPath = currentAssembly.Location;
+
+#if (DEBUG)
+            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_CS", _registyConfiguration.ConnectionString, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_ENVIRONMENT", contextId.Value.ToString(), EnvironmentVariableTarget.User);
+
+            Process? doggyDogProcess = null;
+            do
+            {
+                _logger.Log("Waiting for DoggyDog to launch...");
+                doggyDogProcess = Process.GetProcessesByName("DoggyDog")?.FirstOrDefault();
+                Thread.Sleep(5000);
+
+            } while (doggyDogProcess == null);
+
+            return doggyDogProcess;
+#endif
 
             Process process = Process.Start(new ProcessStartInfo
             {
