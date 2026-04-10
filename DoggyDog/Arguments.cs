@@ -5,6 +5,21 @@ namespace NotoriousTest.DoggyDog
     {
         public static Arguments From(string[] args)
         {
+#if DEBUG
+            Logger.Magenta(() => Console.WriteLine("/!\\ DEBUG MODE /!\\"));
+            string debugcs = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_CS", EnvironmentVariableTarget.User);
+            string debugenv = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_ENVIRONMENT", EnvironmentVariableTarget.User);
+            string debugassembly = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_ASSEMBLY", EnvironmentVariableTarget.User);
+            string debugpid = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_PID", EnvironmentVariableTarget.User);
+            Logger.Magenta(() => Console.WriteLine("[DEBUG] PARAMETRE DE DEBUG : "));
+            Logger.Magenta(() => Console.WriteLine($"[DEBUG] ConnectionString : {debugcs} "));
+            Logger.Magenta(() => Console.WriteLine($"[DEBUG] Environment : {debugenv} "));
+            Logger.Magenta(() => Console.WriteLine($"[DEBUG] Assembly : {debugassembly} "));
+            Logger.Magenta(() => Console.WriteLine($"[DEBUG] PID : {debugpid} "));
+
+            return new Arguments(int.Parse(debugpid), debugassembly, debugcs, Guid.Parse(debugenv));
+#endif
+
             static Dictionary<string, string> ParseArgs(string[] args)
             {
                 var result = new Dictionary<string, string>();
