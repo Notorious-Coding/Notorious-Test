@@ -4,7 +4,7 @@ using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Database;
 
-namespace NotoriousTest.PostgreSql
+namespace NotoriousTest.Sqlite
 {
     public class SqliteInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {

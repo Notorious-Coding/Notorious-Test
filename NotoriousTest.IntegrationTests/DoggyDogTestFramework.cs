@@ -7,11 +7,12 @@ using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
-using NotoriousTest.PostgreSql;
+using NotoriousTest.Sqlite;
 using NotoriousTest.SqlLiteRegistry;
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 
 namespace NotoriousTest.IntegrationTests
@@ -133,7 +134,7 @@ namespace NotoriousTest.IntegrationTests
 
         public static class Act
         {
-            public static Process? StartDoggyDog(int processId, string assembly, string connectionString, Guid environmentId)
+            public static (Process? Process, StringBuilder StdoutBuilder) StartDoggyDog(int processId, string assembly, string connectionString, Guid environmentId)
             {
                 var doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
                 Process? doggyDogProcess = Process.Start(new ProcessStartInfo
@@ -143,11 +144,17 @@ namespace NotoriousTest.IntegrationTests
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
                     UseShellExecute = false,
-                    CreateNoWindow = false,
                 });
 
                 doggyDogProcess!.StandardInput.Close();
-                return doggyDogProcess;
+                var stdoutBuilder = new StringBuilder();
+
+                doggyDogProcess.OutputDataReceived += (_, e) =>
+                {
+                    if (e.Data is not null) stdoutBuilder.AppendLine(e.Data);
+                };
+                doggyDogProcess.BeginOutputReadLine(); // consomme le buffer de façon async
+                return (doggyDogProcess, stdoutBuilder);
             }
         }
 

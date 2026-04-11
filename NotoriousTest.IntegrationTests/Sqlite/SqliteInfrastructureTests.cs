@@ -8,7 +8,7 @@ using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
-using NotoriousTest.PostgreSql;
+using NotoriousTest.Sqlite;
 namespace NotoriousTest.IntegrationTests.Sqlite
 {
     public class SqliteInfrastructureTests

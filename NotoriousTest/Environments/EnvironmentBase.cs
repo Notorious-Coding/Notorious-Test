@@ -5,8 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
+using NotoriousTest.Runtime;
 using NotoriousTest.SqlLiteRegistry;
 using NotoriousTest.Watchdog;
 
@@ -31,7 +33,8 @@ namespace NotoriousTest.Environments
 
             collection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>()
                 .AddSingleton<IRegistry>((_) => new SqliteRegistryProvider(registryConfig))
-                .AddSingleton<IWatchDog>((_) => new DoggyDogWatchDog(registryConfig, _.GetRequiredService<ITestLogger>()));
+                .AddSingleton<IWatchDog>((_) => new DoggyDogWatchDog(registryConfig, _.GetRequiredService<ITestLogger>()))
+                .AddSingleton<IRuntime, RuntimeConfigurationProvider>();
 
         }
     }

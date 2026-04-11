@@ -186,3 +186,9 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 ### 🐛 Bug Fixes
 
 - Fixed a bug where internal packages of NotoriousTest were not available at installation.
+
+## v4.0.2
+
+### 🐛 Bug Fixes
+
+- Fixed a bug where DoggyDog could not resolve shared frameworks assembly, preventing cleaners from being executed.
