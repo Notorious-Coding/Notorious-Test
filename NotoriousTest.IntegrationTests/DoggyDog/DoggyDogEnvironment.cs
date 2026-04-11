@@ -1,4 +1,4 @@
-﻿using NotoriousTest.PostgreSql;
+﻿using NotoriousTest.Sqlite;
 
 using System.Reflection;
 

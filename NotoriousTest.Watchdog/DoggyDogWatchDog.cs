@@ -20,16 +20,45 @@ namespace NotoriousTest.Watchdog
             _logger = logger;
         }
 
-        public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId contextId)
+        public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId contextId, IEnumerable<string>? runtimePaths)
         {
-            var watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
             var assemblyPath = currentAssembly.Location;
+            string? runtimesParams = runtimePaths == null ? null : string.Join("|", runtimePaths);
 
 #if (DEBUG)
+            return WaitForDoggyDogToLaunch(currentPid, contextId, assemblyPath, runtimesParams);
+#endif
+            return LaunchDoggyDog(currentPid, contextId, assemblyPath, runtimesParams);
+        }
+
+        private Process LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
+        {
+            var watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+
+            var runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\"";
+            Process process = Process.Start(new ProcessStartInfo
+            {
+                FileName = watchdogPath,
+                Arguments = $"--pid {currentPid} " +
+                            $"--assembly \"{assemblyPath}\" " +
+                            $"--connectionString \"{_registyConfiguration.ConnectionString}\" " +
+                            $"--environment {contextId.Value} " +
+                            runtimeParameter,
+                UseShellExecute = true,
+                CreateNoWindow = false,
+            });
+
+
+            return process;
+        }
+
+        private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId contextId, string assemblyPath, string runtimesParams)
+        {
             Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_CS", _registyConfiguration.ConnectionString, EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_ENVIRONMENT", contextId.Value.ToString(), EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_RUNTIMES", runtimesParams, EnvironmentVariableTarget.User);
 
             Process? doggyDogProcess = null;
             do
@@ -41,18 +70,6 @@ namespace NotoriousTest.Watchdog
             } while (doggyDogProcess == null);
 
             return doggyDogProcess;
-#endif
-
-            Process process = Process.Start(new ProcessStartInfo
-            {
-                FileName = watchdogPath,
-                Arguments = $"--pid {currentPid} --assembly \"{assemblyPath}\" --connectionString \"{_registyConfiguration.ConnectionString}\" --environment {contextId.Value}",
-                UseShellExecute = true,
-                CreateNoWindow = false,
-            });
-
-
-            return process;
         }
 
         public void SendSuccessSignal(EnvironmentId contextId)

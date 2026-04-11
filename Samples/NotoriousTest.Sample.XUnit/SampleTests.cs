@@ -1,8 +1,7 @@
-using NotoriousTest.Web;
-using NotoriousTest.XUnit;
-
 using NotoriousTest.Sample.XUnit.Environments;
 using NotoriousTest.Sample.XUnit.Infrastructures;
+using NotoriousTest.Web;
+using NotoriousTest.XUnit;
 
 using System.Data.Common;
 

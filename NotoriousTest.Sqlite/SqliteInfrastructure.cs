@@ -13,7 +13,7 @@ using Respawn.Graph;
 
 using System.Data.Common;
 
-namespace NotoriousTest.PostgreSql
+namespace NotoriousTest.Sqlite
 {
     public class SqliteInfrastructure : SqliteInfrastructure<string, DatabaseSettings>
     {

@@ -9,31 +9,49 @@ using NotoriousTest.Watchdog;
 
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Loader;
 
 try
 {
     Arguments arguments = Arguments.From(args);
     var version = Assembly
-        .GetExecutingAssembly()
-        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-        ?.InformationalVersion ?? "?";
+        .GetExecutingAssembly().GetName().Version!;
 
-    Banner.Print(version, arguments.Pid, arguments.EnvironmentId);
-
-    AppDomain.CurrentDomain.AssemblyResolve += (sender, resolveArgs) =>
+    Banner.Print($"{version.Major}.{version.Minor}.{version.Build}", arguments.Pid, arguments.EnvironmentId);
+    Console.WriteLine(string.Join(" ", arguments.runtimesPath));
+    var resolver = new AssemblyDependencyResolver(arguments.AssemblyPath);
+    AppDomain.CurrentDomain.AssemblyResolve += (_, args) =>
     {
-        var assemblyName = new AssemblyName(resolveArgs.Name);
-        var name = assemblyName.Name + ".dll";
-        var baseDir = Path.GetDirectoryName(arguments.AssemblyPath)!;
+        var assemblyName = new AssemblyName(args.Name);
+        Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Resolving {args.Name} in test assembly"));
+        string? assemblyPathFromTestAssembly = resolver.ResolveAssemblyToPath(assemblyName);
 
-        var testPath = Path.Combine(baseDir, name);
-        if (File.Exists(testPath)) return Assembly.LoadFrom(testPath);
-
-        if (!string.IsNullOrEmpty(assemblyName.CultureName))
+        if (assemblyPathFromTestAssembly != null && File.Exists(assemblyPathFromTestAssembly))
         {
-            var culturePath = Path.Combine(baseDir, assemblyName.CultureName, name);
-            if (File.Exists(culturePath)) return Assembly.LoadFrom(culturePath);
+            Logger.Gray(() => Console.WriteLine($"[DoggyDog] Assembly {assemblyName.ToString()} found in test assembly"));
+            return Assembly.LoadFrom(assemblyPathFromTestAssembly);
         }
+        Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Assembly {args.Name} not found in test assembly."));
+
+        if ((assemblyName.Name!.StartsWith("Microsoft") || assemblyName.Name.StartsWith("System")) && arguments.runtimesPath.Length > 0)
+        {
+            foreach (var runtimePath in arguments.runtimesPath)
+            {
+                var parts = runtimePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                var version = parts[^1];
+                var name = parts[^2];
+
+                Logger.DarkGray(() => Console.WriteLine($"[DoggyDog] Resolving {args.Name} from test assembly runtime {name} v{version}"));
+
+                var candidate = Path.Combine(runtimePath, assemblyName.Name + ".dll");
+                if (File.Exists(candidate))
+                {
+                    Logger.Gray(() => Console.WriteLine($"[DoggyDog] Assembly {assemblyName.ToString()} found in {name} v{version}"));
+                    return Assembly.LoadFrom(candidate);
+                }
+            }
+        }
+        Logger.Gray(() => Console.WriteLine($"[DoggyDog] Unable to load {args.Name} assembly."));
 
         return null;
     };
@@ -81,6 +99,7 @@ try
     await process.WaitForExitAsync();
 
 
+
     if (DoggyDogWatchDog.ReadSuccessSignal(arguments.EnvironmentId))
     {
         Logger.Green(() => Console.WriteLine($"[DoggyDog] Process {processId} for EID {arguments.EnvironmentId} exited cleanly. No recovery needed."));
@@ -101,12 +120,23 @@ try
 
     Logger.Cyan(() => Console.WriteLine($"[DoggyDog] {entries.Count} infrastructure(s) registered for EID {arguments.EnvironmentId}. Starting cleanup..."));
 
+
     foreach (var entry in entries)
     {
         Logger.Yellow(() => Console.WriteLine($"  > [{entry.InfrastructureType.Name}] Cleanup in progress..."));
 
-        Type? infrastructureType = testAssembly.GetLoadableTypes().FirstOrDefault(t => t.AssemblyQualifiedName == entry.InfrastructureType.AssemblyQualifiedName);
-        CleanerAttribute? attr = infrastructureType?.GetCustomAttribute<CleanerAttribute>();
+        var assemblyName = new AssemblyName(entry.InfrastructureType.AssemblyQualifiedName
+            .Split(',')
+            .Skip(1)
+            .First()
+            .Trim());
+
+        var targetAssembly = AppDomain.CurrentDomain
+            .GetAssemblies()
+            .FirstOrDefault(a => a.GetName().Name == assemblyName.Name);
+
+        Type? infrastructureType = targetAssembly?.GetType(entry.InfrastructureType.FullName!);
+        CleanerAttribute? attr = infrastructureType?.GetCustomAttribute<CleanerAttribute>(inherit: true);
 
         if (attr != null)
         {
@@ -135,7 +165,7 @@ try
     }
 
     Logger.Green(() => Console.WriteLine($"[DoggyDog] Crash recovery complete for PID {processId} and EID {arguments.EnvironmentId}."));
-    Console.ReadLine();
+    Console.Read();
     Environment.Exit(0);
 }
 catch (Exception ex)
@@ -146,6 +176,6 @@ catch (Exception ex)
         Console.WriteLine(ex.ToString());
         Console.WriteLine("Press any key to exit...");
     });
-    Console.ReadKey();
+    Console.Read();
     Environment.Exit(1);
 }

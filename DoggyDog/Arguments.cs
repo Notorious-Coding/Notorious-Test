@@ -1,23 +1,26 @@
 ﻿
 namespace NotoriousTest.DoggyDog
 {
-    internal record Arguments(int Pid, string AssemblyPath, string ConnectionString, Guid EnvironmentId)
+    internal record Arguments(int Pid, string AssemblyPath, string ConnectionString, Guid EnvironmentId, string[] runtimesPath)
     {
         public static Arguments From(string[] args)
         {
 #if DEBUG
             Logger.Magenta(() => Console.WriteLine("/!\\ DEBUG MODE /!\\"));
-            string debugcs = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_CS", EnvironmentVariableTarget.User);
-            string debugenv = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_ENVIRONMENT", EnvironmentVariableTarget.User);
-            string debugassembly = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_ASSEMBLY", EnvironmentVariableTarget.User);
-            string debugpid = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_PID", EnvironmentVariableTarget.User);
+            string debugcs = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_CS", EnvironmentVariableTarget.User) ?? "";
+            string debugenv = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_ENVIRONMENT", EnvironmentVariableTarget.User) ?? "";
+            string debugassembly = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_ASSEMBLY", EnvironmentVariableTarget.User) ?? "";
+            string debugpid = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_PID", EnvironmentVariableTarget.User) ?? "";
+            string debugruntimes = Environment.GetEnvironmentVariable("DEBUG_DOGGYDOG_RUNTIMES", EnvironmentVariableTarget.User) ?? "";
+
             Logger.Magenta(() => Console.WriteLine("[DEBUG] PARAMETRE DE DEBUG : "));
             Logger.Magenta(() => Console.WriteLine($"[DEBUG] ConnectionString : {debugcs} "));
             Logger.Magenta(() => Console.WriteLine($"[DEBUG] Environment : {debugenv} "));
             Logger.Magenta(() => Console.WriteLine($"[DEBUG] Assembly : {debugassembly} "));
             Logger.Magenta(() => Console.WriteLine($"[DEBUG] PID : {debugpid} "));
+            Logger.Magenta(() => Console.WriteLine($"[DEBUG] runtimesPaths : {debugruntimes} "));
 
-            return new Arguments(int.Parse(debugpid), debugassembly, debugcs, Guid.Parse(debugenv));
+            return new Arguments(int.Parse(debugpid), debugassembly, debugcs, Guid.Parse(debugenv), debugruntimes.Split("|"));
 #endif
 
             static Dictionary<string, string> ParseArgs(string[] args)
@@ -58,14 +61,14 @@ namespace NotoriousTest.DoggyDog
                 Logger.Red(() => Console.WriteLine("[DoggyDog] --environment parameter is missing."));
             }
 
+            parsedArgs.TryGetValue("runtimes", out string? runtimes);
+
             if (pid == default || assemblyPath == null || connectionString == null || environmentId == null)
             {
                 Environment.Exit(-1);
             }
 
-
-
-            return new Arguments(pid, assemblyPath, connectionString, Guid.Parse(environmentId));
+            return new Arguments(pid, assemblyPath, connectionString, Guid.Parse(environmentId), runtimes == null ? [] : runtimes.Split("|"));
         }
     }
 }

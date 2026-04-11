@@ -5,6 +5,7 @@ using FakeItEasy;
 using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Watchdog;
 using NotoriousTest.UnitTests.Stubs;
 
@@ -16,12 +17,14 @@ public class ConfigurationTests
     private readonly ITestLogger _testLogger;
     private readonly IRegistry _registry;
     private readonly IWatchDog _watchDog;
+    private readonly IRuntime _runtime;
 
     public ConfigurationTests()
     {
         _testLogger = A.Fake<ITestLogger>();
         _registry = A.Fake<IRegistry>();
         _watchDog = A.Fake<IWatchDog>();
+        _runtime = A.Fake<IRuntime>();
     }
 
     [Fact]
@@ -33,7 +36,7 @@ public class ConfigurationTests
         infrastructure1.AddEntry("key", "value");
         infrastructure2.AddEntry("key2", "value2");
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry);
+        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime);
 
         environment.AddInfrastructure(infrastructure1);
         environment.AddInfrastructure(infrastructure2);
@@ -52,7 +55,7 @@ public class ConfigurationTests
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new ConsumerInfrastructureStub(_testLogger, _registry);
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry);
+        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime);
 
 
         environment.AddInfrastructure(infrastructure1);
@@ -69,7 +72,7 @@ public class ConfigurationTests
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new ConsumerInfrastructureStub(_testLogger, _registry);
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry);
+        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime);
 
         infrastructure1.AddEntry("key", "value");
 

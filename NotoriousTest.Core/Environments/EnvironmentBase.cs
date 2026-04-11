@@ -3,7 +3,9 @@
 using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Exceptions;
 using NotoriousTest.Core.Infrastructures;
+using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Watchdog;
 
 using System.Diagnostics;
@@ -29,6 +31,12 @@ namespace NotoriousTest.Core.Environments
         private IWatchDog? _watchDog;
         protected IRegistry Registry => _registry ??= ServiceProvider.GetRequiredService<IRegistry>();
         private IRegistry? _registry;
+        protected IRuntime Runtime => _runtime ??= ServiceProvider.GetRequiredService<IRuntime>();
+        private IRuntime? _runtime;
+
+        public ITestLogger Logger => _logger ??= ServiceProvider.GetRequiredService<ITestLogger>();
+        private ITestLogger _logger;
+
 
         /// <summary>
         /// Define current test assembly.
@@ -130,7 +138,16 @@ namespace NotoriousTest.Core.Environments
 
         private async Task StartDoggyDog()
         {
-            WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id, EnvironmentId);
+            // Read runtime config.json
+            // Get all compatible frameworks
+            // Get version
+            // Send it to the watchdog
+            RuntimeConfiguration? runtimeConfiguration = Runtime.GetSupportedRuntimes(CurrentAssembly);
+            if (runtimeConfiguration == null)
+                Logger.Log($"Runtime for {CurrentAssembly.FullName} cannot be found. Cleaner resolution may not work properly.");
+
+            IEnumerable<string>? runtimesPath = runtimeConfiguration?.SupportedFrameworks?.Select(sf => sf.FilePath);
+            WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id, EnvironmentId, runtimesPath);
         }
 
         public virtual async Task Reset()
