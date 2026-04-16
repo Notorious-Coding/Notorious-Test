@@ -8,6 +8,6 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <VersionPrefix>4.0.2</VersionPrefix>
+    <VersionPrefix>4.0.3</VersionPrefix>
   </PropertyGroup>
 </Project>
