@@ -2,7 +2,7 @@
   "profiles": {
     "NotoriousTest.DoggyDog": {
       "commandName": "Project",
-      "commandLineArgs": "--pid 21964 --assembly \"C:\\Repositories\\Notorious Test\\Samples\\NotoriousTests.InfrastructuresSamples\\bin\\Debug\\net9.0\\NotoriousTests.InfrastructuresSamples.dll\""
+      "commandLineArgs": "--pid 21964 --assembly \"C:\\Repositories\\Notorious Test\\Samples\\NotoriousTests.InfrastructuresSamples\\bin\\Debug\\net9.0\\NotoriousTests.InfrastructuresSamples.dll\" --connectionString \"Data Source=C:\\Repositories\\Notorious Test\\doggydog.db\" --environment \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\" --runtimes \"C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\9.0.0\""
     }
   }
 }

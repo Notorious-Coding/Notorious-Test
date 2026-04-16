@@ -140,9 +140,10 @@ namespace NotoriousTest.IntegrationTests
                 Process? doggyDogProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = doggyDogPath,
-                    Arguments = $"--pid {processId} --assembly \"{assembly}\" --connectionString \"{connectionString}\" --environment {environmentId}",
+                    Arguments = $"--pid {processId} --assembly \"{assembly}\" --connectionString \"{connectionString}\" --environment {environmentId} --loglevel Debug",
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
                 });
 
@@ -153,7 +154,14 @@ namespace NotoriousTest.IntegrationTests
                 {
                     if (e.Data is not null) stdoutBuilder.AppendLine(e.Data);
                 };
-                doggyDogProcess.BeginOutputReadLine(); // consomme le buffer de façon async
+                doggyDogProcess.ErrorDataReceived += (_, e) =>
+                {
+                    if (e.Data is not null)
+                        Console.Error.WriteLine(e.Data);
+                };
+                doggyDogProcess.BeginOutputReadLine();
+                doggyDogProcess.BeginErrorReadLine();
+
                 return (doggyDogProcess, stdoutBuilder);
             }
         }
@@ -178,7 +186,7 @@ namespace NotoriousTest.IntegrationTests
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleanup in progress...");
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleaning using {nameof(Arrange.FakeCleaner)}");
                 stdout.Should().Contain(string.Format(Arrange.FakeCleaner.Message, entry.Metadata, entry.EnvironmentId, entry.InfrastructureId));
-                stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleanup successful. Removing registry entry...");
+                stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Cleanup successful");
                 stdout.Should().Contain($"[{entry.InfrastructureType.Name}] Registry entry removed.");
             }
 

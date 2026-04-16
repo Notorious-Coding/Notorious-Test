@@ -1,6 +1,6 @@
-﻿namespace NotoriousTest.DoggyDog
+﻿namespace DoggyDog.Logs
 {
-    public static class Logger
+    public static class LogColorScope
     {
         public static void WithColor(ConsoleColor color, Action logs)
         {

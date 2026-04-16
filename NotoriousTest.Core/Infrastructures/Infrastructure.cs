@@ -164,7 +164,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Destroy();
-        if (!DisableRegistry) await Registry.Remove(Id);
+        if (!DisableRegistry) _ = Registry.Remove(Id);
 
         foreach (var extension in _extensions)
         {
