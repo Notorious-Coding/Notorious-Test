@@ -35,7 +35,7 @@ namespace NotoriousTest.Watchdog
         {
             var watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
 
-            var runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\"";
+            var runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\" ";
             Process process = Process.Start(new ProcessStartInfo
             {
                 FileName = watchdogPath,
@@ -43,7 +43,8 @@ namespace NotoriousTest.Watchdog
                             $"--assembly \"{assemblyPath}\" " +
                             $"--connectionString \"{_registyConfiguration.ConnectionString}\" " +
                             $"--environment {contextId.Value} " +
-                            runtimeParameter,
+                            runtimeParameter +
+                            "--loglevel Debug",
                 UseShellExecute = true,
                 CreateNoWindow = false,
             });
@@ -54,11 +55,12 @@ namespace NotoriousTest.Watchdog
 
         private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId contextId, string assemblyPath, string runtimesParams)
         {
-            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_CS", _registyConfiguration.ConnectionString, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_ENVIRONMENT", contextId.Value.ToString(), EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DEBUG_DOGGYDOG_RUNTIMES", runtimesParams, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_CONNECTIONSTRING", _registyConfiguration.ConnectionString, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ENVIRONMENT", contextId.Value.ToString(), EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_RUNTIMES", runtimesParams, EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_LOGLEVEL", "Debug", EnvironmentVariableTarget.User);
 
             Process? doggyDogProcess = null;
             do

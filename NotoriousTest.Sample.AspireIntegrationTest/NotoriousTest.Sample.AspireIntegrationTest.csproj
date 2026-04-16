@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Sdk Name="Aspire.AppHost.Sdk" Version="13.2.2" />
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<IsIntegrationTest>true</IsIntegrationTest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Aspire.Hosting.SqlServer" />
+		<PackageReference Include="Aspire.Hosting.AppHost" />
+		<PackageReference Include="Aspire.Hosting.Testing" />
+
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="xunit.v3" />
+		<PackageReference Include="xunit.runner.visualstudio">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NotoriousTest.Aspire\NotoriousTest.Aspire.csproj" IsAspireProjectResource="false"/>
+		<ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj" IsAspireProjectResource="false"/>
+		<ProjectReference Include="..\NotoriousTest.Sample.Aspire\NotoriousTest.Sample.Aspire.Api\NotoriousTest.Sample.Aspire.Api.csproj" IsAspireProjectResource="false"/>
+		<ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj" IsAspireProjectResource="false"/>
+		<ProjectReference Include="..\NotoriousTest.XUnit\NotoriousTest.XUnit.csproj" IsAspireProjectResource="false"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="Xunit" />
+	</ItemGroup>
+
+</Project>
