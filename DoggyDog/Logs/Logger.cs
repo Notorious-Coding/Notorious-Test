@@ -32,10 +32,8 @@ namespace DoggyDog.Logs
         {
             if (logType > MinLogLevel) return;
             StringBuilder stringBuilder = new StringBuilder();
-            int count = _scopeStack.Count - 1;
-            var indent = string.Join(string.Empty, Enumerable.Repeat("  ", count)) + " > ";
 
-            stringBuilder.Append(indent);
+            stringBuilder.Append(" > ");
             var scopeString = string.Join(string.Empty, _scopeStack.Reverse().Select(scope => $"[{scope}]").ToArray());
 
             stringBuilder.Append(scopeString);

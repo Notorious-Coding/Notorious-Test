@@ -138,10 +138,6 @@ namespace NotoriousTest.Core.Environments
 
         private async Task StartDoggyDog()
         {
-            // Read runtime config.json
-            // Get all compatible frameworks
-            // Get version
-            // Send it to the watchdog
             RuntimeConfiguration? runtimeConfiguration = Runtime.GetSupportedRuntimes(CurrentAssembly);
             if (runtimeConfiguration == null)
                 Logger.Log($"Runtime for {CurrentAssembly.FullName} cannot be found. Cleaner resolution may not work properly.");

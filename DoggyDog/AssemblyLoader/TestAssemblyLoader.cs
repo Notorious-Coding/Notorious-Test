@@ -57,7 +57,7 @@ namespace DoggyDog.AssemblyLoader
                 Log.Debug($"Assembly {assemblyName.ToString()} found in test assembly");
                 return Assembly.LoadFrom(assemblyPathFromTestAssembly);
             }
-            Log.Warning($"Assembly {assemblyName.ToString()} not found in test assembly.");
+            Log.Debug($"Assembly {assemblyName.ToString()} not found in test assembly.");
             return null;
         }
 

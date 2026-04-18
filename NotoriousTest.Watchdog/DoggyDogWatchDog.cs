@@ -44,7 +44,7 @@ namespace NotoriousTest.Watchdog
                             $"--connectionString \"{_registyConfiguration.ConnectionString}\" " +
                             $"--environment {contextId.Value} " +
                             runtimeParameter +
-                            "--loglevel Debug",
+                            "--loglevel Info",
                 UseShellExecute = true,
                 CreateNoWindow = false,
             });

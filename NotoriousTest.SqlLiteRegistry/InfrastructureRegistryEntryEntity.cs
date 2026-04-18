@@ -1,6 +1,5 @@
 ﻿using NotoriousTest.Core.Registry;
 
-using System;
 using System.Globalization;
 using System.Text.Json;
 
@@ -14,6 +13,7 @@ namespace NotoriousTest.SqlLiteRegistry
         public int ProcessID { get; set; }
         public string? Metadata { get; set; }
         public string? MetadataType { get; set; }
+        public string? LastResetDate { get; set; }
         public string CreationDate { get; set; }
         public string UpdateDate { get; set; }
 
@@ -26,7 +26,8 @@ namespace NotoriousTest.SqlLiteRegistry
                 EnvironmentId = entry.EnvironmentId.ToString(),
                 ProcessID = entry.ProcessID,
                 Metadata = JsonSerializer.Serialize(entry.Metadata),
-                MetadataType = entry.Metadata?.GetType().AssemblyQualifiedName
+                MetadataType = entry.Metadata?.GetType().AssemblyQualifiedName,
+                LastResetDate = entry.LastResetDate?.ToString("O")
             };
         }
 
@@ -54,6 +55,7 @@ namespace NotoriousTest.SqlLiteRegistry
                 Metadata = !(Metadata is null) && !(metadataType is null)
                     ? JsonSerializer.Deserialize(Metadata, metadataType)
                     : null,
+                LastResetDate = LastResetDate != null ? DateTime.Parse(LastResetDate, null, DateTimeStyles.RoundtripKind) : null,
                 CreationDate = DateTime.Parse(CreationDate, null, DateTimeStyles.RoundtripKind),
                 UpdateDate = DateTime.Parse(UpdateDate, null, DateTimeStyles.RoundtripKind),
             };

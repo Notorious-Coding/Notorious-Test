@@ -49,10 +49,21 @@ namespace DoggyDog
 
         public async Task Run(int pid, Guid environmentId)
         {
-            _assemblyLoader.Load();
-            _logger.Info($"Attached to test process with PID {pid} and EID {environmentId}");
+            SetupRegistryHooks();
 
-            await WaitForTestProcess(pid);
+            using (var source = new CancellationTokenSource())
+            {
+                _logger.Debug("Watching registry for infrastructures updates.");
+                Task watcherTask = Task.Run(() => _registry.Watch(environmentId, source.Token));
+
+                _assemblyLoader.Load();
+                _logger.Info($"Attached to test process with PID {pid} and EID {environmentId}");
+
+                await WaitForTestProcess(pid);
+
+                source.Cancel();
+                await watcherTask;
+            }
 
             if (DoggyDogWatchDog.ReadSuccessSignal(environmentId))
             {
@@ -98,6 +109,27 @@ namespace DoggyDog
             _logger.Success($"Crash recovery complete for PID {pid} and EID {environmentId}.");
             Console.Read();
             Environment.Exit(0);
+        }
+
+        private void SetupRegistryHooks()
+        {
+            _registry.OnInfrastructureReset += (entry) =>
+            {
+                using var scope = _logger.CreateScope(entry.InfrastructureType.Name);
+                _logger.Info($"Reset has been triggered.");
+            };
+
+            _registry.OnInfrastructureCreated += (entry) =>
+            {
+                using var scope = _logger.CreateScope(entry.InfrastructureType.Name);
+                _logger.Info($"Initialization has been triggered.");
+            };
+
+            _registry.OnInfrastructureDestroyed += (entry) =>
+            {
+                using var scope = _logger.CreateScope(entry.InfrastructureType.Name);
+                _logger.Info($"Destroy has been triggered.");
+            };
         }
 
         private IInfrastructureCleaner? RetrieveCleaner(InfrastuctureRegistryEntry entry)

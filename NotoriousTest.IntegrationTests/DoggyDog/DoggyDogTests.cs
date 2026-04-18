@@ -58,7 +58,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             {
                 Assert.Fail("Fail to launch cmd.exe");
             }
-            var fakeEntry = await DoggyDogTestFramework.Arrange.PopulateRegistryWithFakeInfrastructure(registry, process, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
+            var fakeEntry = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(registry, process, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
 
             (Process? doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(process.Id, typeof(DoggyDogTests).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
 
@@ -160,7 +160,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             {
                 Assert.Fail("Fail to launch cmd.exe");
             }
-            var fakeEntry = await DoggyDogTestFramework.Arrange.PopulateRegistryWithFakeInfrastructure(registry, process, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithoutCleanerAttribute), environmentId);
+            var fakeEntry = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(registry, process, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithoutCleanerAttribute), environmentId);
 
             (Process? doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(process.Id, typeof(DoggyDogTests).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
 
@@ -193,8 +193,8 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             {
                 Assert.Fail("Fail to launch cmd.exe");
             }
-            var fakeEntry1 = await DoggyDogTestFramework.Arrange.PopulateRegistryWithFakeInfrastructure(registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
-            var fakeEntry2 = await DoggyDogTestFramework.Arrange.PopulateRegistryWithFakeInfrastructure(registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructure2WithCleaner), environmentId);
+            var fakeEntry1 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
+            var fakeEntry2 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructure2WithCleaner), environmentId);
 
             (Process? doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(fakeProcess.Id, typeof(DoggyDogTests).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
 
@@ -212,6 +212,33 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             await DoggyDogTestFramework.Assert.ShouldHaveCleanedEntry(stdout, registry, fakeEntry1);
             await DoggyDogTestFramework.Assert.ShouldHaveCleanedEntry(stdout, registry, fakeEntry2);
             doggyDogProcess.ExitCode.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task DoggyDog_Should_Display_InfrastructureLifecycleEvents()
+        {
+            Guid environmentId = Guid.NewGuid();
+            var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
+            await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
+
+            Process? fakeProcess = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: 999);
+            (Process? doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(fakeProcess.Id, typeof(DoggyDogTests).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+
+            await Task.Delay(500, TestContext.Current.CancellationToken);
+            var fakeEntry1 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
+            await Task.Delay(500, TestContext.Current.CancellationToken);
+            await DoggyDogTestFramework.Arrange.TriggerInfrastructureReset(registry, fakeEntry1.InfrastructureId);
+            await Task.Delay(500, TestContext.Current.CancellationToken);
+            await DoggyDogTestFramework.Arrange.DestroyInfrastructureFromRegistry(registry, fakeEntry1.InfrastructureId);
+
+
+            await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
+            var stdout = stdoutBuilder.ToString();
+            await DoggyDogTestFramework.Assert.ShouldHaveMonitoredProcess(stdout, fakeProcess);
+            await DoggyDogTestFramework.Assert.ShouldHaveFoundRegistryFile(stdout, registry.GetPath());
+            await DoggyDogTestFramework.Assert.ShouldHaveCatchInitEvent(stdout, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner));
+            await DoggyDogTestFramework.Assert.ShouldHaveCatchResetEvent(stdout, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner));
+            await DoggyDogTestFramework.Assert.ShouldHaveCatchDestroyEvent(stdout, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner));
         }
     }
 }
