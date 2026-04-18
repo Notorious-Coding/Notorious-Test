@@ -108,6 +108,14 @@ public class InfrastructureLifecycleTests
     }
 
     [Fact]
+    public async Task ResetAsync_Should_NotifyResetAtRegistry()
+    {
+        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
+        await infrastructure.ResetAsync();
+        A.CallTo(() => _registry.NotifyReset(infrastructure.Id)).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
     public async Task DisposeAsync_CallsDestroyAsync()
     {
         var called = false;
