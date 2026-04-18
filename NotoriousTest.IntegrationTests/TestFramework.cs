@@ -4,7 +4,12 @@ using Dapper;
 
 using Docker.DotNet;
 
+using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 using NotoriousTest.Database;
+using NotoriousTest.Sqlite;
 
 using System.Data.Common;
 
@@ -14,6 +19,14 @@ namespace NotoriousTest.IntegrationTests
     {
         public static class Arrange
         {
+            public class FakeInfrastructure : NotoriousTest.Core.Infrastructures.Infrastructure
+            {
+                public FakeInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
+                    : base(contextId, logger, registry) { }
+
+                public override Task Initialize() => Task.CompletedTask;
+                public override Task Destroy() => Task.CompletedTask;
+            }
 
             public static async Task CreateTableWithData(IDatabaseInfrastructure databaseInfrastructure)
             {
@@ -71,6 +84,33 @@ namespace NotoriousTest.IntegrationTests
                 };
                 await act.Should().ThrowAsync<DbException>();
                 await dbConnection.CloseAsync();
+            }
+
+            public static async Task InfrastructureShouldBeRegistered(SqliteInfrastructure registryDatabase, Guid infrastructureId)
+            {
+                using var connection = registryDatabase.GetDatabaseConnection();
+                var count = await connection.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId",
+                    new { InfrastructureId = infrastructureId.ToString() });
+                count.Should().Be(1);
+            }
+
+            public static async Task InfrastructureShouldHaveBeenReset(SqliteInfrastructure registryDatabase, Guid infrastructureId)
+            {
+                using var connection = registryDatabase.GetDatabaseConnection();
+                var lastResetDate = await connection.ExecuteScalarAsync<string?>(
+                    "SELECT LastResetDate FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId",
+                    new { InfrastructureId = infrastructureId.ToString() });
+                lastResetDate.Should().NotBeNull();
+            }
+
+            public static async Task InfrastructureShouldBeRemovedFromRegistry(SqliteInfrastructure registryDatabase, Guid infrastructureId)
+            {
+                using var connection = registryDatabase.GetDatabaseConnection();
+                var count = await connection.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId",
+                    new { InfrastructureId = infrastructureId.ToString() });
+                count.Should().Be(0);
             }
         }
     }

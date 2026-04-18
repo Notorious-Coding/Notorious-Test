@@ -1,5 +1,8 @@
 {
   "SqliteInfrastructure": {
     "ConnectionString": "Data Source=test.db"
+  },
+  "RegistryDatabaseInfrastructure": {
+    "ConnectionString": "Data Source=registry-test.db"
   }
 }
