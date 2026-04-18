@@ -9,11 +9,17 @@
     <PropertyGroup>
       <DoggyDogRuntime Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</DoggyDogRuntime>
       <DoggyDogRuntime Condition="$([MSBuild]::IsOSPlatform('Linux'))">linux-x64</DoggyDogRuntime>
+      <DoggyDogArtifactsDir>$(MSBuildThisFileDirectory)artifacts\doggydog\$(DoggyDogRuntime)\</DoggyDogArtifactsDir>
     </PropertyGroup>
 
-    <Message Text="Publishing DoggyDog to $(MSBuildThisFileDirectory) $(OutDir)" Importance="high" />
-    <MSBuild Projects="$(MSBuildThisFileDirectory)DoggyDog/DoggyDog.csproj"
-             Targets="Publish"
-             Properties="RuntimeIdentifier=$(DoggyDogRuntime);SelfContained=true;PublishSingleFile=true;PublishDir=$(MSBuildProjectDirectory)\$(OutDir)" />
+    <Warning Text="DoggyDog artifacts not found at '$(DoggyDogArtifactsDir)'. Build the DoggyDog project first."
+             Condition="!Exists('$(DoggyDogArtifactsDir)')" />
+
+    <ItemGroup>
+      <DoggyDogFiles Include="$(DoggyDogArtifactsDir)*" Condition="Exists('$(DoggyDogArtifactsDir)')" />
+    </ItemGroup>
+
+    <Message Text="Copying DoggyDog from $(DoggyDogArtifactsDir) to $(OutDir)" Importance="high" />
+    <Copy SourceFiles="@(DoggyDogFiles)" DestinationFolder="$(OutDir)" Condition="'@(DoggyDogFiles)' != ''" />
   </Target>
 </Project>
