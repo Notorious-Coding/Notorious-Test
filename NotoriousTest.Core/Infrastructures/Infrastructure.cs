@@ -142,7 +142,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Reset();
-
+        await Registry.NotifyReset(Id);
         foreach (var extension in _extensions)
         {
             Logger.Log($"[{extension.GetType().Name}] OnAfterReset");

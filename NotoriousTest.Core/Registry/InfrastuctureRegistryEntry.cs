@@ -7,6 +7,7 @@
         public Guid EnvironmentId { get; set; }
         public int ProcessID { get; set; }
         public object? Metadata { get; set; }
+        public DateTime? LastResetDate { get; set; }
         public DateTime CreationDate { get; set; }
         public DateTime UpdateDate { get; set; }
     }

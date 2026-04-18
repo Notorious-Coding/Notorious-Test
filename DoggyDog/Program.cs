@@ -23,6 +23,7 @@ try
 
         DoggyDogRecoveryWatchdog.Banner(parameters.Pid, parameters.EnvironmentId);
         SqliteRegistryProvider registry = GetRegistry(parameters);
+
         TestAssemblyLoader assemblyLoader = new TestAssemblyLoader(parameters.AssemblyPath, parameters.RuntimesPath);
         var watchdog = new DoggyDogRecoveryWatchdog(assemblyLoader, registry, logger);
 

@@ -21,6 +21,26 @@ namespace NotoriousTest.IntegrationTests
     {
         public static class Arrange
         {
+            public const string ENSURE_REGISTRY = @$"
+                CREATE TABLE IF NOT EXISTS InfrastructureRegistry(
+                    InfrastructureId TEXT PRIMARY KEY,
+                    InfrastructureType TEXT NOT NULL,
+                    EnvironmentId TEXT NOT NULL,
+                    ProcessID TEXT NOT NULL,
+                    Metadata TEXT,
+                    MetadataType TEXT,
+                    CreationDate TEXT NOT NULL,
+                    UpdateDate TEXT NOT NULL,
+                    LastResetDate TEXT
+                )
+            ";
+
+            public const string REGISTER_INFRASTRUCTURE = @$"
+                INSERT INTO InfrastructureRegistry(InfrastructureId, InfrastructureType, EnvironmentId, ProcessID, Metadata, MetadataType, CreationDate, UpdateDate, LastResetDate)
+                VALUES(@InfrastructureId, @InfrastructureType, @EnvironmentId, @ProcessID, @Metadata, @MetadataType, datetime('now', 'utc'), datetime('now', 'utc'), null)
+                RETURNING *
+            ";
+
             public static Process? StartFakeProcess(Guid environmentId, int exitCode = 0, int timeToExit = 5)
             {
                 ProcessStartInfo startInfo = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
@@ -51,10 +71,11 @@ namespace NotoriousTest.IntegrationTests
             public static async Task CreateRegistry(SqliteInfrastructure registryInfrastructure)
             {
                 using var connection = registryInfrastructure.GetDatabaseConnection();
-                await connection.ExecuteAsync(SqliteRegistryProvider.ENSURE_REGISTRY);
-
+                await connection.ExecuteAsync(ENSURE_REGISTRY);
             }
-            public static async Task<InfrastuctureRegistryEntry> PopulateRegistryWithFakeInfrastructure(SqliteInfrastructure registryInfrastructure, Process attachedProcess, Type fakeInfrastructureType, Guid environmentId)
+
+
+            public static async Task<InfrastuctureRegistryEntry> CreateInfrastructureInRegistry(SqliteInfrastructure registryInfrastructure, Process attachedProcess, Type fakeInfrastructureType, Guid environmentId)
             {
                 using var connection = registryInfrastructure.GetDatabaseConnection();
 
@@ -67,8 +88,20 @@ namespace NotoriousTest.IntegrationTests
                     Metadata = "Test passed !"
                 };
 
-                var entity = await connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(SqliteRegistryProvider.REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
+                var entity = await connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
                 return entity.ToDomain();
+            }
+
+            public static async Task TriggerInfrastructureReset(SqliteInfrastructure registryInfrastructure, Guid infrastructureId)
+            {
+                using var connection = registryInfrastructure.GetDatabaseConnection();
+                await connection.ExecuteAsync("UPDATE InfrastructureRegistry SET LastResetDate = strftime('%Y-%m-%dT%H:%M:%f', 'now') WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId });
+            }
+
+            public static async Task DestroyInfrastructureFromRegistry(SqliteInfrastructure registryInfrastructure, Guid infrastructureId)
+            {
+                using var connection = registryInfrastructure.GetDatabaseConnection();
+                await connection.ExecuteAsync("DELETE FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId });
             }
 
             public class FakeCleaner : IInfrastructureCleaner
@@ -246,6 +279,21 @@ namespace NotoriousTest.IntegrationTests
             public static async Task ShouldHaveNotFoundProcess(string stdout, int pid)
             {
                 stdout.Should().Contain($"[DoggyDog] No process with PID {pid} found. Exiting.");
+            }
+
+            public static async Task ShouldHaveCatchResetEvent(string stdout, Type infrastructureType)
+            {
+                stdout.Should().Contain($"[DoggyDog][{infrastructureType.Name}] Reset has been triggered.");
+            }
+
+            public static async Task ShouldHaveCatchDestroyEvent(string stdout, Type infrastructureType)
+            {
+                stdout.Should().Contain($"[DoggyDog][{infrastructureType.Name}] Destroy has been triggered.");
+            }
+
+            public static async Task ShouldHaveCatchInitEvent(string stdout, Type infrastructureType)
+            {
+                stdout.Should().Contain($"[DoggyDog][{infrastructureType.Name}] Initialization has been triggered.");
             }
         }
     }

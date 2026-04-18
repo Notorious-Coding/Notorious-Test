@@ -18,5 +18,7 @@
 	<ItemGroup>
 		<InternalsVisibleTo Include="NotoriousTest.UnitTests" />
 		<InternalsVisibleTo Include="NotoriousTest.IntegrationTests" />
+		<InternalsVisibleTo Include="NotoriousTest" />
+		<InternalsVisibleTo Include="DoggyDog" />
 	</ItemGroup>
 </Project>
