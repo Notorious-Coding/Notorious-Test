@@ -1,0 +1,33 @@
+{
+  "solution": {
+    "path": "NotoriousTest.slnx",
+    "projects": [
+      "NotoriousTest.Core\\NotoriousTest.Core.csproj",
+      "NotoriousTest.Runtime\\NotoriousTest.Runtime.csproj",
+      "NotoriousTest.SqlLiteRegistry\\NotoriousTest.SqlLiteRegistry.csproj",
+      "NotoriousTest.TestSettings\\NotoriousTest.TestSettings.csproj",
+      "NotoriousTest.Watchdog\\NotoriousTest.Watchdog.csproj",
+      "NotoriousTest\\NotoriousTest.csproj",
+      "NotoriousTest.MSTest\\NotoriousTest.MSTest.csproj",
+      "NotoriousTest.NUnit\\NotoriousTest.NUnit.csproj",
+      "NotoriousTest.TUnit\\NotoriousTest.TUnit.csproj",
+      "NotoriousTest.XUnit\\NotoriousTest.XUnit.csproj",
+      "NotoriousTest.Database\\NotoriousTest.Database.csproj",
+      "NotoriousTest.PostgreSql\\NotoriousTest.PostgreSql.csproj",
+      "NotoriousTest.Sqlite\\NotoriousTest.Sqlite.csproj",
+      "NotoriousTest.SqlServer\\NotoriousTest.SqlServer.csproj",
+      "NotoriousTest.TestContainers\\NotoriousTest.TestContainers.csproj",
+      "NotoriousTest.Web\\NotoriousTest.Web.csproj",
+      "NotoriousTest.IntegrationTests.Web\\NotoriousTest.IntegrationTests.Web.csproj",
+      "NotoriousTest.IntegrationTests\\NotoriousTest.IntegrationTests.csproj",
+      "NotoriousTest.UnitTests\\NotoriousTest.UnitTests.csproj",
+      "Samples\\NotoriousTest.Sample.MSTest\\NotoriousTest.Sample.MSTest.csproj",
+      "Samples\\NotoriousTest.Sample.NUnit\\NotoriousTest.Sample.NUnit.csproj",
+      "Samples\\NotoriousTest.Sample.TestWebApp\\NotoriousTest.Sample.TestWebApp.csproj",
+      "Samples\\NotoriousTest.Sample.TUnit\\NotoriousTest.Sample.TUnit.csproj",
+      "Samples\\NotoriousTest.Sample.With\\NotoriousTest.Sample.With.csproj",
+      "Samples\\NotoriousTest.Sample.Without\\NotoriousTest.Sample.Without.csproj",
+      "Samples\\NotoriousTest.Sample.XUnit\\NotoriousTest.Sample.XUnit.csproj"
+    ]
+  }
+}

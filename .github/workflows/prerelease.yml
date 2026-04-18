@@ -26,17 +26,15 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build
-      run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
-
     - name: Publish DoggyDog for Windows
       run: |
         dotnet publish ./DoggyDog/DoggyDog.csproj \
             -r win-x64 \
             --self-contained \
             -p:PublishSingleFile=true \
-            -o ./tools/win-x64 \
-            --version-suffix "beta.${{ github.run_number }}" \
+            -p:PublishDoggyDogToArtifactsOnBuild=false \
+            -o ./artifacts/doggydog/win-x64 \
+            --version-suffix "beta.${{ github.run_number }}"
 
     - name: Publish DoggyDog for Linux
       run: |
@@ -44,8 +42,13 @@ jobs:
             -r linux-x64 \
             --self-contained \
             -p:PublishSingleFile=true \
-            -o ./tools/linux-x64 \
-            --version-suffix "beta.${{ github.run_number }}" \
+            -p:PublishDoggyDogToArtifactsOnBuild=false \
+            -o ./artifacts/doggydog/linux-x64 \
+            --no-restore \
+            --version-suffix "beta.${{ github.run_number }}"
+
+    - name: Build
+      run: dotnet build NotoriousTest.NoDoggyDog.slnf --configuration ${{ env.CONFIGURATION }} --no-restore
 
     - name: Run Unit Tests
       run: dotnet test NotoriousTest.UnitTests --no-build --verbosity normal

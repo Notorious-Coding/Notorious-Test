@@ -166,7 +166,7 @@ namespace DoggyDog
             catch (ArgumentException)
             {
                 _logger.Error($"No process with PID {pid} found. Exiting.");
-                Console.ReadLine();
+                Console.Read();
                 Environment.Exit(0);
             }
 

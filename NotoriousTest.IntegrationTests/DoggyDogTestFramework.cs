@@ -95,13 +95,13 @@ namespace NotoriousTest.IntegrationTests
             public static async Task TriggerInfrastructureReset(SqliteInfrastructure registryInfrastructure, Guid infrastructureId)
             {
                 using var connection = registryInfrastructure.GetDatabaseConnection();
-                await connection.ExecuteAsync("UPDATE InfrastructureRegistry SET LastResetDate = strftime('%Y-%m-%dT%H:%M:%f', 'now') WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId });
+                await connection.ExecuteAsync("UPDATE InfrastructureRegistry SET LastResetDate = strftime('%Y-%m-%dT%H:%M:%f', 'now') WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId.ToString() });
             }
 
             public static async Task DestroyInfrastructureFromRegistry(SqliteInfrastructure registryInfrastructure, Guid infrastructureId)
             {
                 using var connection = registryInfrastructure.GetDatabaseConnection();
-                await connection.ExecuteAsync("DELETE FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId });
+                await connection.ExecuteAsync("DELETE FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId.ToString() });
             }
 
             public class FakeCleaner : IInfrastructureCleaner
@@ -281,19 +281,31 @@ namespace NotoriousTest.IntegrationTests
                 stdout.Should().Contain($"[DoggyDog] No process with PID {pid} found. Exiting.");
             }
 
-            public static async Task ShouldHaveCatchResetEvent(string stdout, Type infrastructureType)
+            public static async Task ShouldHaveCatchResetEvent(StringBuilder stdoutBuilder, Type infrastructureType, CancellationToken cancellationToken = default)
             {
-                stdout.Should().Contain($"[DoggyDog][{infrastructureType.Name}] Reset has been triggered.");
+                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog][{infrastructureType.Name}] Reset has been triggered.", cancellationToken);
             }
 
-            public static async Task ShouldHaveCatchDestroyEvent(string stdout, Type infrastructureType)
+            public static async Task ShouldHaveCatchDestroyEvent(StringBuilder stdoutBuilder, Type infrastructureType, CancellationToken cancellationToken = default)
             {
-                stdout.Should().Contain($"[DoggyDog][{infrastructureType.Name}] Destroy has been triggered.");
+                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog][{infrastructureType.Name}] Destroy has been triggered.", cancellationToken);
             }
 
-            public static async Task ShouldHaveCatchInitEvent(string stdout, Type infrastructureType)
+            public static async Task ShouldHaveCatchInitEvent(StringBuilder stdoutBuilder, Type infrastructureType, CancellationToken cancellationToken = default)
             {
-                stdout.Should().Contain($"[DoggyDog][{infrastructureType.Name}] Initialization has been triggered.");
+                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog][{infrastructureType.Name}] Initialization has been triggered.", cancellationToken);
+            }
+
+            private static async Task WaitUntilStdoutContains(StringBuilder stdoutBuilder, string expected, CancellationToken cancellationToken, int timeoutMs = 5000)
+            {
+                var sw = Stopwatch.StartNew();
+                while (sw.ElapsedMilliseconds < timeoutMs)
+                {
+                    if (stdoutBuilder.ToString().Contains(expected))
+                        break;
+                    await Task.Delay(50, cancellationToken);
+                }
+                stdoutBuilder.ToString().Should().Contain(expected);
             }
         }
     }

@@ -223,22 +223,22 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
 
             Process? fakeProcess = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: 999);
             (Process? doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(fakeProcess.Id, typeof(DoggyDogTests).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+            await Task.Delay(1000, TestContext.Current.CancellationToken);
 
-            await Task.Delay(500, TestContext.Current.CancellationToken);
             var fakeEntry1 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
-            await Task.Delay(500, TestContext.Current.CancellationToken);
+            await DoggyDogTestFramework.Assert.ShouldHaveCatchInitEvent(stdoutBuilder, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), TestContext.Current.CancellationToken);
+
             await DoggyDogTestFramework.Arrange.TriggerInfrastructureReset(registry, fakeEntry1.InfrastructureId);
-            await Task.Delay(500, TestContext.Current.CancellationToken);
+            await DoggyDogTestFramework.Assert.ShouldHaveCatchResetEvent(stdoutBuilder, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), TestContext.Current.CancellationToken);
+
             await DoggyDogTestFramework.Arrange.DestroyInfrastructureFromRegistry(registry, fakeEntry1.InfrastructureId);
+            await DoggyDogTestFramework.Assert.ShouldHaveCatchDestroyEvent(stdoutBuilder, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), TestContext.Current.CancellationToken);
 
-
+            fakeProcess.Kill(true);
             await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
             var stdout = stdoutBuilder.ToString();
             await DoggyDogTestFramework.Assert.ShouldHaveMonitoredProcess(stdout, fakeProcess);
             await DoggyDogTestFramework.Assert.ShouldHaveFoundRegistryFile(stdout, registry.GetPath());
-            await DoggyDogTestFramework.Assert.ShouldHaveCatchInitEvent(stdout, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner));
-            await DoggyDogTestFramework.Assert.ShouldHaveCatchResetEvent(stdout, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner));
-            await DoggyDogTestFramework.Assert.ShouldHaveCatchDestroyEvent(stdout, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner));
         }
     }
 }
