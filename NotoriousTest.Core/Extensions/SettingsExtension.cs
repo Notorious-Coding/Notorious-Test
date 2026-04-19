@@ -18,7 +18,8 @@ public class SettingsExtension<TSettings> : IInfrastructureExtension
 
     public Task OnBeforeInitialize(IInfrastructure infrastructure)
     {
-        var configuration = _settingsProvider.Get<TSettings>(SectionName ?? infrastructure.GetType().Name);
+        Settings = _settingsProvider.Get<TSettings>(SectionName ?? infrastructure.GetType().Name) ?? throw new InfrastructureSettingsNotFound($"Settings for {typeof(TSettings).Name} not found. Verify that the section '{SectionName ?? infrastructure.GetType().Name}' exists in the configuration.");
+
         return Task.CompletedTask;
     }
 }
