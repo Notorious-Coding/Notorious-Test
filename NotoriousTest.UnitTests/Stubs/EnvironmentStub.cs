@@ -4,6 +4,7 @@ using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
 
 using System.Reflection;
@@ -16,6 +17,7 @@ namespace NotoriousTest.UnitTests.Stubs
         private readonly IWatchDog _watchDog;
         private readonly IRegistry _registry;
         private readonly IRuntime _runtime;
+        private readonly ITestSettingsProvider _settings;
 
         public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
         public Func<Task>? OnConfigureEnvironment { get; set; }
@@ -24,13 +26,15 @@ namespace NotoriousTest.UnitTests.Stubs
         public IServiceProvider PublicServiceProvider => ServiceProvider;
 
 
-        public EnvironmentStub(ITestLogger logger, IWatchDog watchDog, IRegistry registry, IRuntime runtime)
+        public EnvironmentStub(ITestLogger logger, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestSettingsProvider settings)
         {
             _logger = logger;
             _watchDog = watchDog;
             _registry = registry;
             _runtime = runtime;
+            _settings = settings;
         }
+
         public override Task ConfigureEnvironment() => OnConfigureEnvironment?.Invoke() ?? Task.CompletedTask;
 
         public override void ConfigureInfrastructureServices(IServiceCollection collection)
@@ -41,6 +45,7 @@ namespace NotoriousTest.UnitTests.Stubs
             collection.AddSingleton(_registry);
             collection.AddSingleton(_watchDog);
             collection.AddSingleton(_runtime);
+            collection.AddSingleton(_settings);
 
             OnConfigureInfrastructureServices?.Invoke(collection);
         }

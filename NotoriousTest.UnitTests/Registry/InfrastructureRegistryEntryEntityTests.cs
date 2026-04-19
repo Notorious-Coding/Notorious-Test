@@ -15,7 +15,7 @@ public class InfrastructureRegistryEntryEntityTests
     private record TestMetadata(string Name, int Value);
 
     [Fact]
-    public void FromDomain_MapsAllFields()
+    public void FromDomain_Should_MapAllFields()
     {
         var infrastructureId = Guid.NewGuid();
         var environmentId = Guid.NewGuid();
@@ -41,7 +41,7 @@ public class InfrastructureRegistryEntryEntityTests
     }
 
     [Fact]
-    public void FromDomain_NullMetadata_MetadataSerializedAsNullAndMetadataTypeIsNull()
+    public void FromDomain_Should_SerializeMetadataAsNull_WhenMetadataIsNull()
     {
         var entry = new InfrastuctureRegistryEntry
         {
@@ -59,7 +59,7 @@ public class InfrastructureRegistryEntryEntityTests
     }
 
     [Fact]
-    public void ToDomain_MapsAllFields()
+    public void ToDomain_Should_MapAllFields()
     {
         var infrastructureId = Guid.NewGuid();
         var environmentId = Guid.NewGuid();
@@ -90,7 +90,7 @@ public class InfrastructureRegistryEntryEntityTests
     }
 
     [Fact]
-    public void ToDomain_UnknownInfrastructureType_ThrowsTypeLoadException()
+    public void ToDomain_Should_ThrowTypeLoadException_WhenInfrastructureTypeIsUnknown()
     {
         var entity = new InfrastructureRegistryEntryEntity
         {
@@ -110,7 +110,7 @@ public class InfrastructureRegistryEntryEntityTests
     }
 
     [Fact]
-    public void ToDomain_RoundTrip_PreservesAllData()
+    public void ToDomain_Should_PreserveAllData_WhenRoundTripped()
     {
         var creationDate = new DateTime(2024, 3, 10, 8, 0, 0, DateTimeKind.Utc);
         var updateDate = new DateTime(2024, 4, 5, 16, 0, 0, DateTimeKind.Utc);

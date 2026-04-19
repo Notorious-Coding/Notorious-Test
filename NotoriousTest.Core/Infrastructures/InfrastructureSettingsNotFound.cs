@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace NotoriousTest.Core.Extensions
+namespace NotoriousTest.Core.Infrastructures
 {
     [Serializable]
-    public class InfrastructureSettingsNotFound : Exception
+    internal class InfrastructureSettingsNotFound : Exception
     {
         public InfrastructureSettingsNotFound()
         {

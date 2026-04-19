@@ -85,7 +85,7 @@ namespace NotoriousTest.IntegrationTests.DoggyDog
             var registry = CurrentEnvironment.GetInfrastructure<SqliteInfrastructure>();
             await DoggyDogTestFramework.Arrange.CreateRegistry(registry);
 
-            const int PROCESS_ID = 12345;
+            const int PROCESS_ID = 999999;
             (Process? doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(PROCESS_ID, typeof(DoggyDogTests).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
 
             await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);

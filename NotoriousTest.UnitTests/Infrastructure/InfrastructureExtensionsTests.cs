@@ -21,7 +21,7 @@ public class InfrastructureExtensionsTests
     }
 
     [Fact]
-    public async Task Extensions_OnBeforeInitialize_CalledBeforeInitialize()
+    public async Task Extensions_Should_CallOnBeforeInitialize_BeforeInitialize()
     {
         List<int> order = new();
 
@@ -40,11 +40,10 @@ public class InfrastructureExtensionsTests
         await infrastructure.InitializeAsync();
 
         order.Should().Equal(1, 2);
-
     }
 
     [Fact]
-    public async Task Extensions_OnAfterInitialize_CalledAfterInitialize()
+    public async Task Extensions_Should_CallOnAfterInitialize_AfterInitialize()
     {
         List<int> order = new();
 
@@ -67,7 +66,7 @@ public class InfrastructureExtensionsTests
     }
 
     [Fact]
-    public async Task Extensions_OnBeforeReset_CalledBeforeReset()
+    public async Task Extensions_Should_CallOnBeforeReset_BeforeReset()
     {
         List<int> order = new();
 
@@ -90,7 +89,7 @@ public class InfrastructureExtensionsTests
     }
 
     [Fact]
-    public async Task Extensions_OnAfterReset_CalledAfterReset()
+    public async Task Extensions_Should_CallOnAfterReset_AfterReset()
     {
         List<int> order = new();
 
@@ -113,7 +112,7 @@ public class InfrastructureExtensionsTests
     }
 
     [Fact]
-    public async Task Extensions_OnBeforeDestroy_CalledBeforeDestroy()
+    public async Task Extensions_Should_CallOnBeforeDestroy_BeforeDestroy()
     {
         List<int> order = new();
 
@@ -137,7 +136,7 @@ public class InfrastructureExtensionsTests
     }
 
     [Fact]
-    public async Task Extensions_OnAfterDestroy_CalledAfterDestroy()
+    public async Task Extensions_Should_CallOnAfterDestroy_AfterDestroy()
     {
         List<int> order = new();
 
@@ -159,8 +158,9 @@ public class InfrastructureExtensionsTests
 
         order.Should().Equal(1, 2);
     }
+
     [Fact]
-    public void EnsureExtension_ExistingExtension_ReturnsSameInstance()
+    public void EnsureExtension_Should_ReturnSameInstance_WhenExtensionAlreadyExists()
     {
         InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry);
         var extension1 = infrastructure.EnsureExtension<ExtensionStub<InfrastructureStub>>();

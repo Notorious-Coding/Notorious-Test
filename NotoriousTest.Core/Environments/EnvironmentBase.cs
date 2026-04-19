@@ -93,7 +93,7 @@ namespace NotoriousTest.Core.Environments
         public EnvironmentBase AddInfrastructure(Infrastructure infrastructure)
         {
             infrastructure.EnvironmentId = EnvironmentId;
-            infrastructure.WatchdogDisabled = Settings.DisableWatchdog;
+            infrastructure.WatchdogDisabled = Settings?.DisableWatchdog ?? false;
             _infrastructures.Add(infrastructure);
             return this;
         }
@@ -163,7 +163,8 @@ namespace NotoriousTest.Core.Environments
         {
             await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.DestroyAsync());
 
-            WatchDog.SendSuccessSignal(EnvironmentId);
+            if (!Settings.DisableWatchdog)
+                WatchDog.SendSuccessSignal(EnvironmentId);
         }
 
         private async Task ExecuteActionOnInfrastructureInParralelAndInOrder(Func<Infrastructure, Task> action)
