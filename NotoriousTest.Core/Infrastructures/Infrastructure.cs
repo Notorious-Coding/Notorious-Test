@@ -46,7 +46,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     public bool AutoReset { get; set; } = true;
 
     public virtual bool DisableRegistry { get; } = false;
-    public bool WatchdogDisabled { get; internal set; } = false;
+    internal bool WatchdogDisabled { get; set; } = false;
     ///<inheritdoc/>
     public EnvironmentId EnvironmentId { get; set; }
     public Guid Id = Guid.NewGuid();
