@@ -2,12 +2,11 @@
 
 using FakeItEasy;
 
-using Microsoft.Extensions.Configuration;
-
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
+using NotoriousTest.Database.Settings;
 using NotoriousTest.Sqlite;
 namespace NotoriousTest.IntegrationTests.Sqlite
 {
@@ -16,7 +15,7 @@ namespace NotoriousTest.IntegrationTests.Sqlite
         private ITestSettingsProvider _testSettingsProvider = A.Fake<ITestSettingsProvider>();
         public SqliteInfrastructureTests()
         {
-            A.CallTo(() => _testSettingsProvider.Find()).Returns(new ConfigurationBuilder().AddInMemoryCollection([new($"{nameof(SqliteInfrastructure)}:ConnectionString", "DataSource=testdb.db")]).Build());
+            A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(SqliteInfrastructure))).Returns(new DatabaseSettings { ConnectionString = "DataSource=testdb.db" });
         }
 
 

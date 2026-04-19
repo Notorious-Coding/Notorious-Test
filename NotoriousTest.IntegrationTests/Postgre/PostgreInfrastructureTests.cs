@@ -2,12 +2,11 @@
 
 using FakeItEasy;
 
-using Microsoft.Extensions.Configuration;
-
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
+using NotoriousTest.Database.Settings;
 using NotoriousTest.PostgreSql;
 using NotoriousTest.XUnit;
 namespace NotoriousTest.IntegrationTests.Postgre
@@ -19,7 +18,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
         public PostgreInfrastructureTests(PostgreInfrastructureEnvironment environment) : base(environment)
         {
             string serverConnectionString = CurrentEnvironment.GetInfrastructure<PostgreServerInfrastructure>().OutputConfiguration[0].Value;
-            A.CallTo(() => _testSettingsProvider.Find()).Returns(new ConfigurationBuilder().AddInMemoryCollection([new($"{nameof(PostgreInfrastructure)}:ConnectionString", serverConnectionString + ";Pooling=false")]).Build());
+            A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(PostgreInfrastructure))).Returns(new DatabaseSettings { ConnectionString = serverConnectionString + ";Pooling=false" });
         }
 
 

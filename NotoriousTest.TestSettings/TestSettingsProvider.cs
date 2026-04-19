@@ -11,12 +11,16 @@ namespace NotoriousTest.Core.Settings
             {
                 string? settingsPath = FindFile("testsettings.json");
 
-                if (settingsPath == null)
-                    throw new FileNotFoundException("testsettings.json not found. Make sure the file exist and that CopyToOutputDirectory property is to PreserveNewest.");
 
-                _cache = new ConfigurationBuilder()
-                .AddJsonFile(settingsPath)
-                .Build();
+                var configurationBuilder = new ConfigurationBuilder();
+                if (settingsPath != null)
+                {
+                    configurationBuilder.AddJsonFile(settingsPath);
+
+                }
+
+                _cache = configurationBuilder.Build();
+
             }
 
             return _cache;

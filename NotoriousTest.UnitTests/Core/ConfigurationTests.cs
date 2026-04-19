@@ -6,6 +6,7 @@ using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
 using NotoriousTest.UnitTests.Stubs;
 
@@ -18,6 +19,7 @@ public class ConfigurationTests
     private readonly IRegistry _registry;
     private readonly IWatchDog _watchDog;
     private readonly IRuntime _runtime;
+    private readonly ITestSettingsProvider _settings;
 
     public ConfigurationTests()
     {
@@ -25,10 +27,11 @@ public class ConfigurationTests
         _registry = A.Fake<IRegistry>();
         _watchDog = A.Fake<IWatchDog>();
         _runtime = A.Fake<IRuntime>();
+        _settings = A.Fake<ITestSettingsProvider>();
     }
 
     [Fact]
-    public async Task AggregateConfiguration_MultipleProducers_MergesAllEntries()
+    public async Task AggregateConfiguration_Should_MergeAllEntries_WhenMultipleProducers()
     {
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new InfrastructureStub(_testLogger, _registry);
@@ -36,11 +39,16 @@ public class ConfigurationTests
         infrastructure1.AddEntry("key", "value");
         infrastructure2.AddEntry("key2", "value2");
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime);
+        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime, _settings);
 
-        environment.AddInfrastructure(infrastructure1);
-        environment.AddInfrastructure(infrastructure2);
-        environment.AddInfrastructure(infrastructure3);
+        environment.OnConfigureEnvironment += () =>
+        {
+            environment.AddInfrastructure(infrastructure1);
+            environment.AddInfrastructure(infrastructure2);
+            environment.AddInfrastructure(infrastructure3);
+            return Task.CompletedTask;
+        };
+
 
         await environment.Initialize();
 
@@ -50,39 +58,44 @@ public class ConfigurationTests
     }
 
     [Fact]
-    public async Task AggregateConfiguration_NoConfigurationProduced_ReturnsEmptyList()
+    public async Task AggregateConfiguration_Should_ReturnEmptyList_WhenNoConfigurationProduced()
     {
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new ConsumerInfrastructureStub(_testLogger, _registry);
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime);
+        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime, _settings);
 
-
-        environment.AddInfrastructure(infrastructure1);
-        environment.AddInfrastructure(infrastructure2);
-
+        environment.OnConfigureEnvironment += () =>
+        {
+            environment.AddInfrastructure(infrastructure1);
+            environment.AddInfrastructure(infrastructure2);
+            return Task.CompletedTask;
+        };
         await environment.Initialize();
 
         infrastructure2.ConsumedConfiguration.Should().BeEmpty();
     }
 
     [Fact]
-    public async Task ConfigurationConsumer_ReceivesConfigurationBeforeItsOwnInitialization()
+    public async Task ConfigurationConsumer_Should_ReceiveConfigurationBeforeItsOwnInitialization()
     {
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new ConsumerInfrastructureStub(_testLogger, _registry);
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime);
+        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime, _settings);
 
         infrastructure1.AddEntry("key", "value");
 
         infrastructure2.OnInitialize = async () =>
         {
-            // During initialization, the consumer should already have access to the configuration produced by infrastructure1
             infrastructure2.ConsumedConfiguration.Should().Contain(entry => entry.Key == "key" && entry.Value.Equals("value"));
         };
-        environment.AddInfrastructure(infrastructure1);
-        environment.AddInfrastructure(infrastructure2);
+        environment.OnConfigureEnvironment += () =>
+        {
+            environment.AddInfrastructure(infrastructure1);
+            environment.AddInfrastructure(infrastructure2);
+            return Task.CompletedTask;
+        };
 
         await environment.Initialize();
 

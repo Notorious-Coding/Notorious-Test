@@ -7,7 +7,7 @@ namespace NotoriousTest.UnitTests.Core;
 public class ContextIdTests
 {
     [Fact]
-    public void ContextId_ImplicitConversionFromGuid_PreservesValue()
+    public void ContextId_Should_PreserveValue_WhenImplicitlyConvertedFromGuid()
     {
         Guid expectedGuid = Guid.NewGuid();
         EnvironmentId guid = expectedGuid;
@@ -16,7 +16,7 @@ public class ContextIdTests
     }
 
     [Fact]
-    public void ContextId_ImplicitConversionToGuid_PreservesValue()
+    public void ContextId_Should_PreserveValue_WhenImplicitlyConvertedToGuid()
     {
         EnvironmentId expectedGuid = new EnvironmentId(Guid.NewGuid());
         Guid guid = expectedGuid;

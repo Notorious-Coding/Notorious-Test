@@ -32,10 +32,10 @@ public class CleanerAttributeTests
 
 
     [Fact]
-    public void CleanerAttribute_StoresCleanerType()
+    public void CleanerAttribute_Should_StoreCleanerType()
         => new CleanerAttribute(typeof(InfrastructureCleaner)).CleanerType.Should().Be(typeof(InfrastructureCleaner));
 
     [Fact]
-    public void CleanerAttribute_Inherited_FoundOnSubclassViaGetCustomAttribute()
+    public void CleanerAttribute_Should_BeFoundOnSubclassViaGetCustomAttribute()
         => new InheritedCleanedInfrastructure().GetType().GetCustomAttribute<CleanerAttribute>().Should().NotBeNull();
 }

@@ -22,8 +22,9 @@ public class TypedExtensionDispatchTests
         _registry = A.Fake<IRegistry>();
         _watchDog = A.Fake<IWatchDog>();
     }
+
     [Fact]
-    public async Task TypedExtension_CalledWithMatchingType_InvokesTypedHooks()
+    public async Task TypedExtension_Should_InvokeTypedHooks_WhenCalledWithMatchingType()
     {
         var infra1 = new InfrastructureStub(_testLogger, _registry);
         InfrastructureStub? actualInfra = null;
@@ -39,11 +40,10 @@ public class TypedExtensionDispatchTests
         await infra1.InitializeAsync();
 
         actualInfra.Should().NotBeNull().And.Be(infra1);
-
     }
 
     [Fact]
-    public async Task TypedExtension_CalledWithNonMatchingType_DoesNotInvokeTypedHooks()
+    public async Task TypedExtension_Should_NotInvokeTypedHooks_WhenCalledWithNonMatchingType()
     {
         var infra1 = new InfrastructureStub(_testLogger, _registry);
 

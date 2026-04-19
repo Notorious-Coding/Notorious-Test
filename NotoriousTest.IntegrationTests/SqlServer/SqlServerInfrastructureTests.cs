@@ -2,12 +2,11 @@
 
 using FakeItEasy;
 
-using Microsoft.Extensions.Configuration;
-
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
+using NotoriousTest.Database.Settings;
 using NotoriousTest.IntegrationTests.Environment;
 using NotoriousTest.XUnit;
 namespace NotoriousTest.IntegrationTests.SqlServer
@@ -19,7 +18,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         public SqlServerInfrastructureTests(SqlServerInfrastructureEnvironment environment) : base(environment)
         {
             string serverConnectionString = CurrentEnvironment.GetInfrastructure<Environment.SqlServerInfrastructure>().OutputConfiguration[0].Value;
-            A.CallTo(() => _testSettingsProvider.Find()).Returns(new ConfigurationBuilder().AddInMemoryCollection([new($"{nameof(NotoriousTest.SqlServer.SqlServerInfrastructure)}:ConnectionString", serverConnectionString + ";Pooling=false")]).Build());
+            A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(SqlServerInfrastructure))).Returns(new DatabaseSettings { ConnectionString = serverConnectionString + ";Pooling=false" });
         }
 
 
