@@ -46,6 +46,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     public bool AutoReset { get; set; } = true;
 
     public virtual bool DisableRegistry { get; } = false;
+    public bool WatchdogDisabled { get; internal set; } = false;
     ///<inheritdoc/>
     public EnvironmentId EnvironmentId { get; set; }
     public Guid Id = Guid.NewGuid();
@@ -98,7 +99,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
             }
 
             await Initialize();
-            if (!DisableRegistry && !Registered) await Register();
+            if (!WatchdogDisabled && !DisableRegistry && !Registered) await Register();
 
 
             foreach (var extension in _extensions)
@@ -142,7 +143,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Reset();
-        await Registry.NotifyReset(Id);
+        if (!WatchdogDisabled && !DisableRegistry) await Registry.NotifyReset(Id);
         foreach (var extension in _extensions)
         {
             Logger.Log($"[{extension.GetType().Name}] OnAfterReset");
@@ -164,7 +165,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         }
 
         await Destroy();
-        if (!DisableRegistry) await Registry.Remove(Id);
+        if (!WatchdogDisabled && !DisableRegistry) await Registry.Remove(Id);
 
         foreach (var extension in _extensions)
         {

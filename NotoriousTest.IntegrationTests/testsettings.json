@@ -4,5 +4,11 @@
   },
   "RegistryDatabaseInfrastructure": {
     "ConnectionString": "Data Source=registry-test.db"
+  },
+  "Environment": {
+    "DisableWatchdog": false
+  },
+  "Watchdog": {
+    "ManualLaunch": false  
   }
 }

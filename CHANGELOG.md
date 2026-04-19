@@ -1,4 +1,4 @@
-# Changelog
+﻿# Changelog
 
 ## v2.0.0
 
@@ -192,3 +192,34 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 ### 🐛 Bug Fixes
 
 - Fixed a bug where DoggyDog could not resolve shared frameworks assembly, preventing cleaners from being executed.
+
+## v4.1.0
+
+### ✨ Features
+- DoggyDog now log when an infrastructure is initialized, reset, or destroyed normally.
+- You can now use `testsettings.json` to disable DoggyDog for the entire test project.
+```json
+{
+    "Environment": {
+      "DisableWatchdog": false
+    }
+}
+  "Watchdog": {
+    "ManualLaunch": false  
+  }
+```
+
+### 🛠 Technical
+
+- For debugging purpose, the test suite can now wait for DoggyDog to be launched manually.
+- Enable this mode by setting `ManualLaunch` to true in the `testsettings.json` file.
+```json
+{
+  "Watchdog": {
+    "ManualLaunch": false  
+  }
+}
+```
+
+By doing this, the environment will set parameters trough User Environment Variables.
+Launch DoggyDog with the --from-env flag to read those parameters.

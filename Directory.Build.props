@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
@@ -8,6 +8,6 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <VersionPrefix>4.0.3</VersionPrefix>
+    <VersionPrefix>4.1.0</VersionPrefix>
   </PropertyGroup>
 </Project>

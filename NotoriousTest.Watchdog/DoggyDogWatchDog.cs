@@ -13,11 +13,13 @@ namespace NotoriousTest.Watchdog
     {
         private readonly SqliteRegistryProviderConfiguration _registyConfiguration;
         private readonly ITestLogger _logger;
+        private readonly DoggyDogWatchdogConfiguration _config;
 
-        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration, ITestLogger logger)
+        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration, ITestLogger logger, DoggyDogWatchdogConfiguration config)
         {
             _registyConfiguration = registryConfiguration;
             _logger = logger;
+            _config = config;
         }
 
         public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId contextId, IEnumerable<string>? runtimePaths)
@@ -25,10 +27,10 @@ namespace NotoriousTest.Watchdog
             var assemblyPath = currentAssembly.Location;
             string? runtimesParams = runtimePaths == null ? null : string.Join("|", runtimePaths);
 
-#if (DEBUG)
-            return WaitForDoggyDogToLaunch(currentPid, contextId, assemblyPath, runtimesParams);
-#endif
-            return LaunchDoggyDog(currentPid, contextId, assemblyPath, runtimesParams);
+            if (_config.ManualLaunch)
+                return WaitForDoggyDogToLaunch(currentPid, contextId, assemblyPath, runtimesParams);
+            else
+                return LaunchDoggyDog(currentPid, contextId, assemblyPath, runtimesParams);
         }
 
         private Process LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
@@ -53,7 +55,7 @@ namespace NotoriousTest.Watchdog
             return process;
         }
 
-        private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId contextId, string assemblyPath, string runtimesParams)
+        private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
         {
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);

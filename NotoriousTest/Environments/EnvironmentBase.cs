@@ -16,7 +16,6 @@ namespace NotoriousTest.Environments
 {
     public abstract class EnvironmentBase : Core.Environments.EnvironmentBase
     {
-
         public override void ConfigureInfrastructureServices(IServiceCollection collection)
         {
             base.ConfigureInfrastructureServices(collection);
@@ -30,10 +29,10 @@ namespace NotoriousTest.Environments
             {
                 ConnectionString = builder.ConnectionString
             };
-
-            collection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>()
+            var settingsProvider = new TestSettingsProvider();
+            collection.AddSingleton<ITestSettingsProvider>(settingsProvider)
                 .AddSingleton<IRegistry>((_) => new SqliteRegistryProvider(registryConfig))
-                .AddSingleton<IWatchDog>((_) => new DoggyDogWatchDog(registryConfig, _.GetRequiredService<ITestLogger>()))
+                .AddSingleton<IWatchDog>((services) => new DoggyDogWatchDog(registryConfig, services.GetRequiredService<ITestLogger>(), settingsProvider.Get<DoggyDogWatchdogConfiguration>("Watchdog") ?? new DoggyDogWatchdogConfiguration()))
                 .AddSingleton<IRuntime, RuntimeConfigurationProvider>();
 
         }

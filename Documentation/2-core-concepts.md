@@ -1,4 +1,4 @@
-# 🏗️ Core Concepts
+﻿# 🏗️ Core Concepts
 
 NotoriousTest provides a structured way to manage **test infrastructures** and ensure **clean, isolated integration tests**.
 This document introduces the core concepts and how they work together.
@@ -493,6 +493,48 @@ public class MyInfrastructureCleaner : IInfrastructureCleaner<MyMetadata>
 - `Metadata` is serialized to the registry when the infrastructure initializes and passed back to the cleaner on crash recovery.
 - If an infrastructure does not need crash cleanup, no `[Cleaner]` attribute is needed.
 - Built-in infrastructures (SqlServer, PostgreSql, Sqlite via TestContainers) already implement their own cleaners.
+
+### Logging
+
+DoggyDog now logs infrastructure lifecycle events during normal test execution — not just on crash recovery. You will see log entries when an infrastructure is **initialized**, **reset**, or **destroyed** as part of a clean test run.
+
+### Configuration
+
+DoggyDog can be configured via your `testsettings.json` file.
+
+#### Disabling DoggyDog
+
+To disable DoggyDog for the entire test project, set `DisableWatchdog` to `true` under the `Environment` section:
+
+```json
+{
+  "Environment": {
+    "DisableWatchdog": true
+  }
+}
+```
+
+All registry operation and doggydog start will be skip.
+
+#### Manual Launch (debugging)
+
+For debugging purposes, you can instruct the test suite to wait for DoggyDog to be launched manually instead of spawning it automatically. Set `ManualLaunch` to `true` under the `Watchdog` section:
+
+```json
+{
+  "Watchdog": {
+    "ManualLaunch": true
+  }
+}
+```
+
+When `ManualLaunch` is enabled, the environment will publish the required parameters as **User Environment Variables**. You can then start DoggyDog manually with the `--from-env` flag:
+
+```sh
+DoggyDog --from-env
+```
+
+This lets you attach a debugger to DoggyDog or inspect its behavior before the test campaign proceeds.
 
 ---
 
