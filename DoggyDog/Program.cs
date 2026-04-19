@@ -13,11 +13,11 @@ try
     {
         WatchDogParameters parameters;
 
-#if DEBUG
-        parameters = ArgumentsParser.ParseFromEnv<WatchDogParameters>("DOGGYDOG_DEBUG");
-#else
-        parameters = ArgumentsParser.Parse<WatchDogParameters>(args);
-#endif
+        if (args.Contains("--from-env"))
+            parameters = ArgumentsParser.ParseFromEnv<WatchDogParameters>("DOGGYDOG_DEBUG");
+        else
+            parameters = ArgumentsParser.Parse<WatchDogParameters>(args);
+
         if (parameters.LogLevel != null)
             Logger.MinLogLevel = parameters.LogLevel.Value;
 

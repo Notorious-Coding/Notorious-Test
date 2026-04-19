@@ -6,6 +6,7 @@ using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
 
 using System.Diagnostics;
@@ -33,9 +34,11 @@ namespace NotoriousTest.Core.Environments
         private IRegistry? _registry;
         protected IRuntime Runtime => _runtime ??= ServiceProvider.GetRequiredService<IRuntime>();
         private IRuntime? _runtime;
-
-        public ITestLogger Logger => _logger ??= ServiceProvider.GetRequiredService<ITestLogger>();
+        protected ITestLogger Logger => _logger ??= ServiceProvider.GetRequiredService<ITestLogger>();
         private ITestLogger _logger;
+
+        protected EnvironmentConfiguration Settings => _settings ??= ServiceProvider.GetRequiredService<ITestSettingsProvider>()?.Get<EnvironmentConfiguration>(EnvironmentConfiguration.SECTION_NAME) ?? new EnvironmentConfiguration();
+        private EnvironmentConfiguration _settings;
 
 
         /// <summary>
@@ -90,6 +93,7 @@ namespace NotoriousTest.Core.Environments
         public EnvironmentBase AddInfrastructure(Infrastructure infrastructure)
         {
             infrastructure.EnvironmentId = EnvironmentId;
+            infrastructure.WatchdogDisabled = Settings.DisableWatchdog;
             _infrastructures.Add(infrastructure);
             return this;
         }
@@ -107,8 +111,11 @@ namespace NotoriousTest.Core.Environments
             // Setup registry
             ConfigureInfrastructureServices(_serviceCollection);
             ServiceProvider = _serviceCollection.BuildServiceProvider();
-            await SetupRegistry();
-            await StartDoggyDog();
+            if (!Settings.DisableWatchdog)
+            {
+                await SetupRegistry();
+                await StartDoggyDog();
+            }
             await ConfigureEnvironment();
 
             await InitializeInfrastructureInParralelAndInOrder();

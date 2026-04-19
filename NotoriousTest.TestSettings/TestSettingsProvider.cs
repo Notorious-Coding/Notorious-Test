@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-using System;
-using System.IO;
-using System.Linq;
-
 namespace NotoriousTest.Core.Settings
 {
     public class TestSettingsProvider : ITestSettingsProvider
@@ -24,6 +20,18 @@ namespace NotoriousTest.Core.Settings
             }
 
             return _cache;
+        }
+
+        public T? Get<T>(string key) where T : new()
+        {
+            IConfigurationSection section = Find().GetSection(key);
+            if (!section.Exists())
+                return default;
+
+            var config = new T();
+            section.Bind(config);
+
+            return config;
         }
         private static string? FindFile(string fileName)
         {

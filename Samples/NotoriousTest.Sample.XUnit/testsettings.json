@@ -1,0 +1,8 @@
+{
+  "Environment": {
+    "DisableWatchdog": false
+  },
+  "Watchdog": {
+    "ManualLaunch": false  
+  }
+}

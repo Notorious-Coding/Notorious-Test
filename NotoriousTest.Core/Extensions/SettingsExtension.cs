@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-using NotoriousTest.Core.Infrastructures;
+﻿using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Settings;
 
 namespace NotoriousTest.Core.Extensions;
@@ -20,15 +18,7 @@ public class SettingsExtension<TSettings> : IInfrastructureExtension
 
     public Task OnBeforeInitialize(IInfrastructure infrastructure)
     {
-        var configuration = _settingsProvider.Find();
-        var section = configuration.GetSection(SectionName ?? infrastructure.GetType().Name);
-
-        if (!section.Exists())
-        {
-            throw new SectionNotFoundException($"La section {SectionName ?? infrastructure.GetType().Name} n'a pas été trouvé dans le testsettings.json");
-        }
-        section.Bind(Settings);
-
+        var configuration = _settingsProvider.Get<TSettings>(SectionName ?? infrastructure.GetType().Name);
         return Task.CompletedTask;
     }
 }
