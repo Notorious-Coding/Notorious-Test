@@ -44,7 +44,7 @@ Please be respectful and constructive in all interactions. We want this project 
 ```
 NotoriousTest/               # Orchestration package
 NotoriousTest.Core/          # Main package (core abstractions)
-NotoriousTest.Runtime/       # Lifecycle runtime
+NotoriousTest.{Runtime, SqliteRegistry, TestSettings}/    # Internal dependencies
 DoggyDog/                    # Watchdog — cleanup after unexpected crashes
 NotoriousTest.{XUnit,NUnit,MSTest,TUnit}/   # Test framework adapters
 NotoriousTest.{Database,Sqlite,SqlServer,PostgreSql,TestContainers,Web}/  # Infrastructure implementations
@@ -207,8 +207,8 @@ Releases are handled by the maintainer via the GitHub Actions workflows:
 - **Release:** `.github/workflows/release.yml`: Triggered by github releases.
 
 Contributors do not need to worry about releases; just make sure `CHANGELOG.md` is updated in your PR.
-
 Do not hesitate to test prerelease workflow changes with [act](https://github.com/nektos/act).
+
 ---
 
 Questions? Start a [discussion](https://github.com/Notorious-Coding/Notorious-Test/discussions) or open an issue.
