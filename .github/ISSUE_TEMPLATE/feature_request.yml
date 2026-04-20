@@ -1,0 +1,60 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for NotoriousTest
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe your idea in detail so we can discuss it.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What problem or limitation are you running into? Why does the current behaviour fall short?
+      placeholder: I keep having to write boilerplate code to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or change you would like to see. Include API design ideas if you have any.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Are there other approaches you thought of? Why did you prefer the proposed solution?
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: Which part of the project does this affect?
+      multiple: true
+      options:
+        - Core / Runtime
+        - DoggyDog (Watchdog)
+        - xUnit adapter
+        - NUnit adapter
+        - MSTest adapter
+        - TUnit adapter
+        - Database infrastructure
+        - TestContainers infrastructure
+        - Web infrastructure
+        - Documentation
+        - CI/CD
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any other information, links, or references that support this request.
