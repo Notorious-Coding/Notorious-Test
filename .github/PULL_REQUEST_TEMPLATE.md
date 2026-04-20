@@ -11,3 +11,4 @@ Closes #
 - [ ] Samples are still functional.
 - [ ] Documentation updated (`README.md` and/or files in `Documentation/`).
 - [ ] `CHANGELOG.md` updated under the appropriate version heading.
+- [ ] PreRelease pipeline passes (test locally with [act](https://github.com/nektos/act) before pushing).
