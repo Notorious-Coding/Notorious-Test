@@ -14,6 +14,11 @@
     <File Path="NotoriousTest/LICENSE.txt" />
     <File Path="README.md" />
   </Folder>
+  <Folder Name="/Docs/Templates/">
+    <File Path=".github/ISSUE_TEMPLATE/bug_report.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/feature_request.yml" />
+    <File Path=".github/PULL_REQUEST_TEMPLATE.md" />
+  </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/1. Core/">
     <Project Path="DoggyDog/DoggyDog.csproj" Id="8408dd70-9d47-4f50-bab4-bcd86e50bc3d" />

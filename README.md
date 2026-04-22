@@ -13,9 +13,9 @@ __Clean, isolated, and maintainable integration testing for .NET__
 If you plan to use this NuGet package, let me know in the [Tell me if you use that package !](https://github.com/Notorious-Coding/Notorious-Test/discussions/1) discussion on Github ! Gaining insight into its usage is very important to me!
 
 ## Summary
+- [Purpose](#purpose)
 - [Why should you use Notorious Test ?](#why-should-you-use-notorious-test-)
 - [Why should you not use Notorious Test ?](#why-should-you-not-use-notorious-test-)
-- [Purpose](#purpose)
 - [Hello World](#hello-world)
   - [Setup](#setup)
   - [Define a Basic Infrastructure](#define-a-basic-infrastructure)
@@ -28,6 +28,20 @@ If you plan to use this NuGet package, let me know in the [Tell me if you use th
   - [Changelog](#changelog)
   - [Contact](#contact)
 - [Other packages i'm working on](#other-nugets-im-working-on)
+
+## Purpose
+
+Notorious Test is a testing framework designed to simplify the setup and management of integration tests in .NET applications.
+It provides a structured way to define and manage test environments, allowing developers to focus on writing tests rather than dealing with the complexities of infrastructure setup and teardown.
+
+The concept is simple:
+
+1. Create an **infrastructure** and implement its _initialization_, _reset_, and _destruction_ logic.
+2. Add it to an **environment**.
+3. Access it directly from your **integration tests**.
+
+**NotoriousTest** will automatically manage the **lifecycle of your infrastructures.**
+Even after the tests have crashed unexpectedly, thanks to the DoggyDog 🐶.
 
 ## Why should you use Notorious Test ?
 
@@ -51,20 +65,6 @@ If 2 or more of these points apply to you, Notorious Test is probably a good fit
 - You don't want to have a dependency on a third-party library for your testing framework.
 - TestContainers may be sufficient to all you needs.
 - You prefer to mock your dependencies rather than using real ones in your tests.
-
-## Purpose
-
-Notorious Test is a testing framework designed to simplify the setup and management of integration tests in .NET applications.
-It provides a structured way to define and manage test environments, allowing developers to focus on writing tests rather than dealing with the complexities of infrastructure setup and teardown.
-
-The concept is simple:
-
-1. Create an **infrastructure** and implement its _initialization_, _reset_, and _destruction_ logic.
-2. Add it to an **environment**.
-3. Access it directly from your **integration tests**.
-
-**NotoriousTest** will automatically manage the **lifecycle of your infrastructures.**
-Even after the tests have crashed unexpectedly, thanks to the DoggyDog 🐶.
 
 ## Hello World
 
