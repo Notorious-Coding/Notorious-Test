@@ -1,4 +1,4 @@
-# 🏛️ Architecture Guidelines
+﻿# 🏛️ Architecture Guidelines
 
 NotoriousTest gives you three complementary tools: **Infrastructures**, **Extensions**, and **Dependency Injection**.
 Each has a distinct responsibility. Keeping them separated makes your test setup readable, reusable, and easy to maintain.
