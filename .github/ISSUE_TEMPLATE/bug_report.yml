@@ -1,4 +1,4 @@
-name: Bug Report
+﻿name: Bug Report
 description: Report a bug or unexpected behaviour in NotoriousTest
 title: "[Bug] "
 labels: ["bug"]
@@ -49,11 +49,11 @@ body:
     attributes:
       label: Test framework
       options:
+        - Not applicable
         - xUnit
         - NUnit
         - MSTest
         - TUnit
-        - Not applicable
     validations:
       required: true
 

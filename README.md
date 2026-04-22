@@ -1,4 +1,4 @@
-## ![Logo](./Documentation/Images/NotoriousTest.png)
+﻿## ![Logo](./Documentation/Images/NotoriousTest.png)
 
 
 __Clean, isolated, and maintainable integration testing for .NET__
@@ -27,12 +27,33 @@ If you plan to use this NuGet package, let me know in the [Tell me if you use th
   - [Contact](#contact)
 - [Other packages i'm working on](#other-nugets-im-working-on)
 
+## Why should you use Notorious Test ?
+
+Notorious Test, as every software programming tool, is not made for everyone. It is designed to solve a specific problem, and if you don't have that problem, it may not be the right tool for you.
+Notorious Test is made for you if :
+
+- You have a Platform Engineering team, Dev Experience team, that could setup shared infrastructures for your needs and share them as a company framework.
+- You are working on code base that handle multiple external dependencies (databases, APIs, message buses, etc.).
+- And therefore, your application require a lot of infrastructure configuration (e.g. appsettings.json)
+- You want to setup integration test as fast as possible, with a focus on writing tests rather than writing boilerplate code to setup and teardown your environment.
+- You are working on a large team and want to have a consistent and maintainable approach to integration testing.
+- Your integration tests are not isolated by design (such as multi-tenant applications).
+- You can't use Docker (and therefore TestContainers) in your environment, but still want to have a mecanism that clean your environment after a unexpected crash.
+
+If 2 or more of these points apply to you, Notorious Test is probably a good fit for your project.
+
+## Why should you not use Notorious Test ?
+
+- Your application is a small project that doesn't have a lot of external dependencies.
+- Integration Tests are not a priority for your project, and you prefer to focus on unit tests or manual testing.
+- You don't want to have a dependency on a third-party library for your testing framework.
+- TestContainers may be sufficient to all you needs.
+- You prefer to mock your dependencies rather than using real ones in your tests.
+
 ## Purpose
 
-Have you ever had to write and rewrite boilerplate code to set up a database, reset data between each test, or tear down containers?
-All that setup required to keep your integration tests fully isolated, and ensure their maintainability, reproducibility, and efficiency.
-
-**NotoriousTest** removes the need to build all of that yourself.
+Notorious Test is a testing framework designed to simplify the setup and management of integration tests in .NET applications.
+It provides a structured way to define and manage test environments, allowing developers to focus on writing tests rather than dealing with the complexities of infrastructure setup and teardown.
 
 The concept is simple:
 

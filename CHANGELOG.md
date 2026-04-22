@@ -1,87 +1,47 @@
-﻿# Changelog
+# Changelog
 
-## v2.0.0
-
-### ✨ Features :
-
-- **Complete overhaul of configuration management:**
-  - **`AsyncConfiguredInfrastructure`** and **`AsyncConfiguredInfrastructure<TConfig>`**: Provides access to the `Configuration` property via an infrastructure.
-  - **`IConfigurationConsumer`** and **`IConfigurationProducer`**: Used to indicate whether a component consumes or produces configuration.
-  - **`AsyncConfiguredEnvironment`**: An environment managing the provisioning of a global configuration from configuration infrastructures.
-  - **`WebApplication`** is now automatically provided with configuration by the `AsyncWebEnvironment`.
-
-For more information, see the [Advanced Functionalities - Configuration](./README.md#configuration) and [Advanced Functionalities - Web](./README.md#web).
-
-## v2.1.0
+## v4.1.0
 
 ### ✨ Features
-
-- Added the `AutoReset` property to toggle infrastructure reset on or off.
-
-For more information, see the [Advanced Functionalities - Advanced control over Infrastructure Reset](./README.md#advanced-control-over-infrastructure-resets)
-
-## v2.2.0
-
-### ✨ Features
-
-- Introduced `ContextId` to uniquely identify infrastructures. For example, you can name your database with it.
-  - In standalone mode, `ContextId` will be a random GUID.
-  - Within an Environment, `ContextId` will be the environment identifier `Environment.EnvironmentId`
-- Removal of `IConfigurationProducer` and `IConfigurationConsumer`, as it was not necessary.
-- `Order` property is now nullable and thus optional.
+- DoggyDog now log when an infrastructure is initialized, reset, or destroyed normally.
+- You can now use `testsettings.json` to disable DoggyDog for the entire test project.
+```json
+{
+    "Environment": {
+      "DisableWatchdog": false
+    }
+}
+  "Watchdog": {
+    "ManualLaunch": false  
+  }
+```
 
 ### 🛠 Technical
 
-- Implemented multiple unit tests to enhance reliability.
-- Several changes to improve consistency in package usage (naming, methods, etc.).
+- For debugging purpose, the test suite can now wait for DoggyDog to be launched manually.
+- Enable this mode by setting `ManualLaunch` to true in the `testsettings.json` file.
+```json
+{
+  "Watchdog": {
+    "ManualLaunch": false  
+  }
+}
+```
+
+By doing this, the environment will set parameters trough User Environment Variables.
+Launch DoggyDog with the --from-env flag to read those parameters.
+
+## v4.0.2
 
 ### 🐛 Bug Fixes
 
-- Fixed a bug where `EnvironmentId` generated a new GUID on every reference.
-- Fixed a bug where the configuration was erased when using an object as the configuration in `AsyncConfiguredEnvironment<TConfig>`.
+- Fixed a bug where DoggyDog could not resolve shared frameworks assembly, preventing cleaners from being executed.
 
-## v2.3.0
-
-### ✨ Features
-
-- **NotoriousTest.TestContainers** is now available as a separate package.
-  - Provides a simple way to use TestContainers in your tests.
-  - For more information, see the [Advanced Functionalities - TestContainers](./README.md#testcontainers).
-- **NotoriousTest.SqlServer** is now available as a separate package.
-  - Provide your tests with a SqlServer ready-to-use infrastructure !
-  - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sql-server).
-
-### 🛠 Technical
-
-- Simplified management of generic types in the `AsyncConfiguredInfrastructure` and `AsyncConfiguredEnvironment` classes.
-
-## v2.3.1
+## v4.0.1
 
 ### 🐛 Bug Fixes
 
-- Fixed a bug in **NotoriousTest.SqlServer** where the `SqlServerContainerAsyncInfrastructure` did not changes the database connection to point to the newly created database.
-
-## v3.0.0
-
-### ✨ Features
-
-- `ConfiguredInfrastructure` and `AsyncConfiguredInfrastructure` are replaced with `IConfigurableInfrastructure` interfaces. Every infrastructures can be marked as configurable just by implementing this interface.
-
-### 🛠 Technical
-
-- Added C4 model architecture schema
-
-## v3.1.0 
-
-### ✨ Features
-
-- Added PostgreSql integration
-
-### 🛠 Technical
-
-- `GetInfrastructuresAsync` in AsyncEnvironment is no longer Async
-- Migrate to slnx
-- Extended target frameworks: NotoriousTest now builds for .NET 6, .NET 8, and .NET 9 (previously only .NET 6)
+- Fixed a bug where internal packages of NotoriousTest were not available at installation.
 
 ## v4.0.0
 
@@ -181,45 +141,85 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 - Find them within `NotoriousTest.XUnit`, `NotoriousTest.NUnit`, `NotoriousTest.MSTest` and `NotoriousTest.TUnit` packages.
 - New samples for every frameworks are available in the samples folder.
 
-## v4.0.1
-
-### 🐛 Bug Fixes
-
-- Fixed a bug where internal packages of NotoriousTest were not available at installation.
-
-## v4.0.2
-
-### 🐛 Bug Fixes
-
-- Fixed a bug where DoggyDog could not resolve shared frameworks assembly, preventing cleaners from being executed.
-
-## v4.1.0
+## v3.1.0 
 
 ### ✨ Features
-- DoggyDog now log when an infrastructure is initialized, reset, or destroyed normally.
-- You can now use `testsettings.json` to disable DoggyDog for the entire test project.
-```json
-{
-    "Environment": {
-      "DisableWatchdog": false
-    }
-}
-  "Watchdog": {
-    "ManualLaunch": false  
-  }
-```
+
+- Added PostgreSql integration
 
 ### 🛠 Technical
 
-- For debugging purpose, the test suite can now wait for DoggyDog to be launched manually.
-- Enable this mode by setting `ManualLaunch` to true in the `testsettings.json` file.
-```json
-{
-  "Watchdog": {
-    "ManualLaunch": false  
-  }
-}
-```
+- `GetInfrastructuresAsync` in AsyncEnvironment is no longer Async
+- Migrate to slnx
+- Extended target frameworks: NotoriousTest now builds for .NET 6, .NET 8, and .NET 9 (previously only .NET 6)
 
-By doing this, the environment will set parameters trough User Environment Variables.
-Launch DoggyDog with the --from-env flag to read those parameters.
+## v3.0.0
+
+### ✨ Features
+
+- `ConfiguredInfrastructure` and `AsyncConfiguredInfrastructure` are replaced with `IConfigurableInfrastructure` interfaces. Every infrastructures can be marked as configurable just by implementing this interface.
+
+### 🛠 Technical
+
+- Added C4 model architecture schema
+
+## v2.3.1
+
+### 🐛 Bug Fixes
+
+- Fixed a bug in **NotoriousTest.SqlServer** where the `SqlServerContainerAsyncInfrastructure` did not changes the database connection to point to the newly created database.
+
+## v2.3.0
+
+### ✨ Features
+
+- **NotoriousTest.TestContainers** is now available as a separate package.
+  - Provides a simple way to use TestContainers in your tests.
+  - For more information, see the [Advanced Functionalities - TestContainers](./README.md#testcontainers).
+- **NotoriousTest.SqlServer** is now available as a separate package.
+  - Provide your tests with a SqlServer ready-to-use infrastructure !
+  - For more information, see the [Advanced Functionalities - SqlServer](./README.md#sql-server).
+
+### 🛠 Technical
+
+- Simplified management of generic types in the `AsyncConfiguredInfrastructure` and `AsyncConfiguredEnvironment` classes.
+
+## v2.2.0
+
+### ✨ Features
+
+- Introduced `ContextId` to uniquely identify infrastructures. For example, you can name your database with it.
+  - In standalone mode, `ContextId` will be a random GUID.
+  - Within an Environment, `ContextId` will be the environment identifier `Environment.EnvironmentId`
+- Removal of `IConfigurationProducer` and `IConfigurationConsumer`, as it was not necessary.
+- `Order` property is now nullable and thus optional.
+
+### 🛠 Technical
+
+- Implemented multiple unit tests to enhance reliability.
+- Several changes to improve consistency in package usage (naming, methods, etc.).
+
+### 🐛 Bug Fixes
+
+- Fixed a bug where `EnvironmentId` generated a new GUID on every reference.
+- Fixed a bug where the configuration was erased when using an object as the configuration in `AsyncConfiguredEnvironment<TConfig>`.
+
+## v2.1.0
+
+### ✨ Features
+
+- Added the `AutoReset` property to toggle infrastructure reset on or off.
+
+For more information, see the [Advanced Functionalities - Advanced control over Infrastructure Reset](./README.md#advanced-control-over-infrastructure-resets)
+
+## v2.0.0
+
+### ✨ Features :
+
+- **Complete overhaul of configuration management:**
+  - **`AsyncConfiguredInfrastructure`** and **`AsyncConfiguredInfrastructure<TConfig>`**: Provides access to the `Configuration` property via an infrastructure.
+  - **`IConfigurationConsumer`** and **`IConfigurationProducer`**: Used to indicate whether a component consumes or produces configuration.
+  - **`AsyncConfiguredEnvironment`**: An environment managing the provisioning of a global configuration from configuration infrastructures.
+  - **`WebApplication`** is now automatically provided with configuration by the `AsyncWebEnvironment`.
+
+For more information, see the [Advanced Functionalities - Configuration](./README.md#configuration) and [Advanced Functionalities - Web](./README.md#web).
