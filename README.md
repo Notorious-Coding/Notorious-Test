@@ -13,6 +13,8 @@ __Clean, isolated, and maintainable integration testing for .NET__
 If you plan to use this NuGet package, let me know in the [Tell me if you use that package !](https://github.com/Notorious-Coding/Notorious-Test/discussions/1) discussion on Github ! Gaining insight into its usage is very important to me!
 
 ## Summary
+- [Why should you use Notorious Test ?](#why-should-you-use-notorious-test-)
+- [Why should you not use Notorious Test ?](#why-should-you-not-use-notorious-test-)
 - [Purpose](#purpose)
 - [Hello World](#hello-world)
   - [Setup](#setup)
