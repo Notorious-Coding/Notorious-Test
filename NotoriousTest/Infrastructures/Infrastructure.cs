@@ -1,4 +1,4 @@
-﻿using NotoriousTest.Configuration;
+using NotoriousTest.Configuration;
 using NotoriousTest.Extensions;
 using NotoriousTest.Logger;
 
@@ -6,17 +6,29 @@ using System.Diagnostics;
 
 namespace NotoriousTest.Infrastructures;
 
-
+/// <summary>
+/// Infrastructure base class that also produces typed configuration entries.
+/// </summary>
+/// <typeparam name="TOutputConfiguration">The type of configuration value produced by this infrastructure.</typeparam>
 public abstract class Infrastructure<TOutputConfiguration> : Infrastructure, IConfigurationProducer<TOutputConfiguration>
 {
+    /// <summary>Gets the list of typed configuration entries produced by this infrastructure.</summary>
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
 
+    /// <summary>Gets the extension managing output configuration entries.</summary>
     protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
+
+    /// <summary>Initializes a new instance with the given context and logger.</summary>
+    /// <param name="contextId">The environment context identifier.</param>
+    /// <param name="logger">The test logger.</param>
     protected Infrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
     {
         OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
     }
 
+    /// <summary>Adds a configuration entry with the specified key and value.</summary>
+    /// <param name="key">The configuration key.</param>
+    /// <param name="value">The configuration value.</param>
     public void AddEntry(string key, TOutputConfiguration value) => OutputConfigurationExtension.AddEntry(key, value);
 }
 
@@ -34,18 +46,27 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     ///<inheritdoc/>
     public ContextId ContextId { get; set; }
 
+    /// <summary>Gets the logger used to emit diagnostic messages during infrastructure lifecycle.</summary>
     protected readonly ITestLogger Logger;
 
     private readonly List<IInfrastructureExtension> _extensions = new();
 
+    /// <summary>Initializes a new instance with the given context and logger.</summary>
+    /// <param name="contextId">The environment context identifier.</param>
+    /// <param name="logger">The test logger.</param>
     public Infrastructure(ContextId contextId, ITestLogger logger)
     {
         ContextId = contextId;
         Logger = logger;
     }
 
+    ///<inheritdoc/>
     public abstract Task Initialize();
+
+    ///<inheritdoc/>
     public abstract Task Reset();
+
+    ///<inheritdoc/>
     public abstract Task Destroy();
 
     async ValueTask IAsyncDisposable.DisposeAsync()

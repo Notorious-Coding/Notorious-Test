@@ -1,4 +1,4 @@
-﻿namespace NotoriousTest.Configuration
+namespace NotoriousTest.Configuration
 {
     /// <summary>
     /// Make a class able to produce or consume configuration
@@ -6,11 +6,12 @@
     /// <typeparam name="T">Configuration type.</typeparam>
     public interface IConfigurationProducer<T> : IConfigurationProducer
     {
+        /// <summary>Gets the list of typed configuration entries produced by this instance.</summary>
         new List<ConfigurationEntry<T>> OutputConfiguration { get; }
 
         List<ConfigurationEntry<object>> IConfigurationProducer.OutputConfiguration
             => OutputConfiguration
-            .Select(ce => new ConfigurationEntry<object>(ce.Value, ce.Key))
+            .Select(ce => new ConfigurationEntry<object>(ce.Value!, ce.Key))
             .ToList();
 
         /// <summary>
@@ -21,6 +22,9 @@
         void AddEntry(string key, T value);
     }
 
+    /// <summary>
+    /// Indicates that a class can produce configuration entries for consumption by other infrastructures.
+    /// </summary>
     public interface IConfigurationProducer
     {
         /// <summary>

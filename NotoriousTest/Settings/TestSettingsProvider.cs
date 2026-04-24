@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace NotoriousTest.Settings
 {
     internal class TestSettingsProvider : ITestSettingsProvider
     {
-        private IConfiguration _cache;
+        private IConfiguration? _cache;
         public IConfiguration Find()
         {
             if (_cache == null)

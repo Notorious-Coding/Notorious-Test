@@ -40,7 +40,9 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
 
     public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger) : base(contextId, logger)
     {
+#pragma warning disable CS0618
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
+#pragma warning restore CS0618
         EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
         {
             TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 using NotoriousTest.Configuration;
 using NotoriousTest.Exceptions;
@@ -21,8 +21,10 @@ namespace NotoriousTest.Environments
         /// Gets the unique identifier for the environment instance.
         /// </summary>
         public ContextId EnvironmentId { get; private set; } = Guid.NewGuid();
-        protected IServiceProvider ServiceProvider { get; private set; }
-        private IServiceCollection _serviceCollection;
+
+        /// <summary>Gets the service provider built from the configured infrastructure services.</summary>
+        protected IServiceProvider? ServiceProvider { get; private set; }
+        private IServiceCollection? _serviceCollection;
 
         /// <summary>
         /// Gets the collection of infrastructure components associated with this instance.
@@ -30,6 +32,8 @@ namespace NotoriousTest.Environments
         private List<Infrastructure> _infrastructures = [];
         private readonly IMessageSink _sink;
 
+        /// <summary>Initializes a new instance of <see cref="Environment"/> with the specified message sink.</summary>
+        /// <param name="sink">The xUnit message sink used for diagnostic output.</param>
         protected Environment(IMessageSink sink)
         {
             _sink = sink;
@@ -63,10 +67,10 @@ namespace NotoriousTest.Environments
         /// <returns></returns>
         public virtual async Task ConfigureInfrastructureServices(IServiceCollection collection)
         {
-            _serviceCollection.AddSingleton(EnvironmentId);
-            _serviceCollection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>();
-            _serviceCollection.AddSingleton(_sink);
-            _serviceCollection.AddSingleton<ITestLogger, TestLogger>();
+            collection.AddSingleton(EnvironmentId);
+            collection.AddSingleton<ITestSettingsProvider, TestSettingsProvider>();
+            collection.AddSingleton(_sink);
+            collection.AddSingleton<ITestLogger, TestLogger>();
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace NotoriousTest.Environments
         /// Add an infrastructure within environment.
         /// </summary>
         public Environment AddInfrastructure<T>() where T : Infrastructure
-            => AddInfrastructure(ActivatorUtilities.CreateInstance<T>(ServiceProvider));
+            => AddInfrastructure(ActivatorUtilities.CreateInstance<T>(ServiceProvider!));
 
         /// <summary>
         /// Add an infrastructure within environment.
@@ -106,6 +110,7 @@ namespace NotoriousTest.Environments
             return this;
         }
 
+        /// <summary>Initializes all registered infrastructures in order, injecting consumed configuration where needed.</summary>
         public virtual async Task Initialize()
         {
             foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
@@ -119,6 +124,7 @@ namespace NotoriousTest.Environments
             }
         }
 
+        /// <summary>Resets all infrastructures that have <see cref="IInfrastructure.AutoReset"/> enabled, in order.</summary>
         public virtual async Task Reset()
         {
             foreach (Infrastructure infrastructure in _infrastructures.OrderBy(pi => pi.Order))
@@ -127,6 +133,7 @@ namespace NotoriousTest.Environments
             }
         }
 
+        /// <summary>Destroys all registered infrastructures in order.</summary>
         public virtual async Task Destroy()
         {
             foreach (Infrastructure infra in _infrastructures.OrderBy(i => i.Order))
@@ -139,7 +146,7 @@ namespace NotoriousTest.Environments
         {
             return _infrastructures
                     .Where(i => i is IConfigurationProducer)
-                    .SelectMany(i => (i as IConfigurationProducer).OutputConfiguration)
+                    .SelectMany(i => ((IConfigurationProducer)i).OutputConfiguration)
                     .ToList();
         }
     }

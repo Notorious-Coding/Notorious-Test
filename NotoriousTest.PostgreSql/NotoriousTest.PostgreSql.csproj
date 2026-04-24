@@ -22,9 +22,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Npgsql" Version="10.0.2" />
-		<PackageReference Include="Respawn" Version="7.0.0" />
-		<PackageReference Include="Testcontainers.PostgreSql" Version="4.11.0" />
+		<PackageReference Include="Npgsql" />
+		<PackageReference Include="Respawn" />
+		<PackageReference Include="Testcontainers.PostgreSql" />
 	</ItemGroup>
 
 	<ItemGroup>

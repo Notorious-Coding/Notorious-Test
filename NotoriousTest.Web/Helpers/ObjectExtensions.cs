@@ -1,16 +1,24 @@
-﻿using NotoriousTest.Web.Helpers;
-
 using System.Collections;
+
 namespace NotoriousTest.Web.Helpers
 {
+    /// <summary>
+    /// Extension methods for converting objects to flat string dictionaries suitable for configuration injection.
+    /// </summary>
     public static class ObjectExtensions
     {
-        public static Dictionary<string, string> ToDictionary(
+        /// <summary>
+        /// Flattens an object into a dictionary of string key/value pairs using colon-separated paths as keys.
+        /// </summary>
+        /// <param name="obj">The object to flatten.</param>
+        /// <param name="name">Optional prefix for all keys.</param>
+        /// <returns>A flat dictionary with colon-separated keys and nullable string values.</returns>
+        public static Dictionary<string, string?> ToDictionary(
             this object obj,
             string name = "")
         {
 
-            if (obj is Dictionary<string, string> dict)
+            if (obj is Dictionary<string, string?> dict)
             {
                 return dict.ToDictionary(
                     kvp => string.IsNullOrEmpty(name) ? kvp.Key : $"{name}:{kvp.Key}",
@@ -26,7 +34,7 @@ namespace NotoriousTest.Web.Helpers
         }
 
         private static void Flatten(
-            IDictionary<string, string> dictionary,
+            IDictionary<string, string?> dictionary,
             object? obj,
             string prefix)
         {
@@ -68,7 +76,4 @@ namespace NotoriousTest.Web.Helpers
             }
         }
     }
-
-
-
 }

@@ -1,5 +1,8 @@
-﻿using NotoriousTest.Infrastructures;
+using NotoriousTest.Infrastructures;
 
+/// <summary>
+/// Allows extending infrastructure lifecycle with custom hooks for initialize, reset, and destroy events.
+/// </summary>
 public interface IInfrastructureExtension
 {
     /// <summary>
@@ -33,6 +36,10 @@ public interface IInfrastructureExtension
     Task OnAfterDestroy(IInfrastructure infrastructure) => Task.CompletedTask;
 }
 
+/// <summary>
+/// Strongly-typed variant of <see cref="IInfrastructureExtension"/> that receives a specific infrastructure type.
+/// </summary>
+/// <typeparam name="T">The concrete infrastructure type this extension handles.</typeparam>
 public interface IInfrastructureExtension<T> : IInfrastructureExtension where T : IInfrastructure
 {
     Task IInfrastructureExtension.OnBeforeInitialize(IInfrastructure infrastructure)
@@ -56,30 +63,30 @@ public interface IInfrastructureExtension<T> : IInfrastructureExtension where T 
     /// <summary>
     /// Called before the infrastructure is initialized.
     /// </summary>
-    new Task OnBeforeInitialize(T infrastructure) => Task.CompletedTask;
+    Task OnBeforeInitialize(T infrastructure) => Task.CompletedTask;
 
     /// <summary>
     /// Called after the infrastructure is initialized.
     /// </summary>
-    new Task OnAfterInitialize(T infrastructure) => Task.CompletedTask;
+    Task OnAfterInitialize(T infrastructure) => Task.CompletedTask;
 
     /// <summary>
     /// Called before the infrastructure is reset.
     /// </summary>
-    new Task OnBeforeReset(T infrastructure) => Task.CompletedTask;
+    Task OnBeforeReset(T infrastructure) => Task.CompletedTask;
 
     /// <summary>
     /// Called after the infrastructure is reset.
     /// </summary>
-    new Task OnAfterReset(T infrastructure) => Task.CompletedTask;
+    Task OnAfterReset(T infrastructure) => Task.CompletedTask;
 
     /// <summary>
     /// Called before the infrastructure is destroyed.
     /// </summary>
-    new Task OnBeforeDestroy(T infrastructure) => Task.CompletedTask;
+    Task OnBeforeDestroy(T infrastructure) => Task.CompletedTask;
 
     /// <summary>
     /// Called after the infrastructure is destroyed.
     /// </summary>
-    new Task OnAfterDestroy(T infrastructure) => Task.CompletedTask;
+    Task OnAfterDestroy(T infrastructure) => Task.CompletedTask;
 }

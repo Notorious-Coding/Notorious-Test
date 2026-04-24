@@ -39,7 +39,9 @@ namespace NotoriousTest.SqlServer
 
         public SqlServerContainerInfrastructure(ContextId contextId, ITestLogger logger) : base(contextId, logger)
         {
+#pragma warning disable CS0618
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
+#pragma warning restore CS0618
             EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
             {
                 TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),

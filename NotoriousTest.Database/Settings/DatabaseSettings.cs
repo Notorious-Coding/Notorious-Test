@@ -1,7 +1,11 @@
-﻿namespace NotoriousTest.Database.Settings
+namespace NotoriousTest.Database.Settings
 {
+    /// <summary>
+    /// Holds database connection settings loaded from test settings.
+    /// </summary>
     public class DatabaseSettings
     {
-        public string ConnectionString { get; set; }
+        /// <summary>Gets or sets the database connection string.</summary>
+        public string ConnectionString { get; set; } = string.Empty;
     }
 }

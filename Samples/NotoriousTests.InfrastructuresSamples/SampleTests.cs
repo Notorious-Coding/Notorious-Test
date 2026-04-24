@@ -22,8 +22,8 @@ namespace NotoriousTests.InfrastructuresSamples
         {
             // You can access an infrastructure directly from the CurrentEnvironment property of the test class.
             // This is useful to access the database connection for example.
-            HttpClient client = CurrentEnvironment.WebApp.HttpClient;
-            HttpResponseMessage response = await client.PostAsync("users", null);
+            HttpClient client = CurrentEnvironment.WebApp.HttpClient!;
+            HttpResponseMessage response = await client.PostAsync("users", null, TestContext.Current.CancellationToken);
 
             // Then assert that the database is in the expected state
             Assert.True(response.IsSuccessStatusCode);
@@ -36,7 +36,7 @@ namespace NotoriousTests.InfrastructuresSamples
                 using (DbCommand command = sql.CreateCommand())
                 {
                     command.CommandText = "SELECT COUNT(*) FROM Users";
-                    int count = (int)await command.ExecuteScalarAsync(TestContext.Current.CancellationToken);
+                    int count = (int)(await command.ExecuteScalarAsync(TestContext.Current.CancellationToken))!;
                     Assert.Equal(1, count);
                 }
             }
