@@ -1,9 +1,9 @@
-{
+﻿{
   "commands": {
-    "Publish DoggyDog": {
+    "Publish Local Nugets": {
       "fileName": "powershell",
       "workingDirectory": ".",
-      "arguments": "-ExecutionPolicy Bypass -File ./Commands/publish-doggydog.ps1"
+      "arguments": "-ExecutionPolicy Bypass -File ./Commands/publish-local-nugets.ps1"
     }
   }
 }

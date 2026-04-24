@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
@@ -20,9 +20,9 @@
     <PackageVersion Include="MSTest" Version="3.8.3" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.8.3" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.8.3" />
-    <PackageVersion Include="NotoriousTest.SqlServer" Version="4.0.1" />
-    <PackageVersion Include="NotoriousTest.Web" Version="4.0.1" />
-    <PackageVersion Include="NotoriousTest.XUnit" Version="4.0.1" />
+    <PackageVersion Include="NotoriousTest.SqlServer" Version="4.1.1-local" />
+    <PackageVersion Include="NotoriousTest.Web" Version="4.1.1-local" />
+    <PackageVersion Include="NotoriousTest.XUnit" Version="4.1.1-local" />
     <PackageVersion Include="Npgsql" Version="10.0.2" />
     <PackageVersion Include="Respawn" Version="7.0.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
