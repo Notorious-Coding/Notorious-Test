@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<Description>Test Settings Provider used by NotoriousTest.</Description>
-		<PackageId>NotoriousTest.TestSettings</PackageId>
-		<IsPackable>true</IsPackable>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	</PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />

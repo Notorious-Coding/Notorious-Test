@@ -1,4 +1,11 @@
-# Changelog
+﻿# Changelog
+
+## v4.1.1
+
+### 🛠 Technical
+
+- Internal packages (such as NotoriousTest.Runtimes|Watchdog|SqliteRegistry|TestSettings) are now includes in NotoriousTest.
+  And can no longer be downloaded via Nuget Packages.
 
 ## v4.1.0
 

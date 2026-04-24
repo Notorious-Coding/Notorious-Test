@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<Description>Runtime provider used by NotoriousTest.</Description>
-		<PackageId>NotoriousTest.Runtime</PackageId>
-		<IsPackable>true</IsPackable>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	</PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="System.Text.Json" />
 	</ItemGroup>

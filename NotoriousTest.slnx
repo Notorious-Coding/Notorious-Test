@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/Commands/">
     <File Path="commands.json" />
-    <File Path="Commands/publish-doggydog.ps1" />
+    <File Path="Commands/publish-local-nugets.ps1" />
   </Folder>
   <Folder Name="/Docs/">
     <File Path=".gitignore" />

@@ -1,11 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
-		<Description>Sqlite Infrastructure Registry used by NotoriousTest.</Description>
-		<PackageId>NotoriousTest.SqlLiteRegistry</PackageId>
-		<IsPackable>true</IsPackable>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-	</PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
