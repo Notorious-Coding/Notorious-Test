@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Description>A Database integration with NotoriousTest.</Description>
 		<PackageId>NotoriousTest.Database</PackageId>
 		<IsPackable>true</IsPackable>

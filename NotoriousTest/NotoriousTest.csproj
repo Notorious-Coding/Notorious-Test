@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<Description>A simple way to handle integration tests environment, with complete isolation of every tests.</Description>
 		<PackageId>NotoriousTest</PackageId>
 		<IsPackable>true</IsPackable>
