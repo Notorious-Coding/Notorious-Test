@@ -1,5 +1,4 @@
 ﻿using NotoriousTest.Core.Configuration;
-using NotoriousTest.Core.Extensions;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
@@ -11,15 +10,17 @@ namespace NotoriousTest.Core.Infrastructures;
 public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastructure<TMetadata>, IConfigurationProducer<TOutputConfiguration>
     where TMetadata : class
 {
-    public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration => OutputConfigurationExtension.OutputConfiguration;
+    public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration { get; } = new();
 
-    protected OutputConfigurationExtension<TOutputConfiguration> OutputConfigurationExtension { get; private set; }
     protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
     {
-        OutputConfigurationExtension = EnsureExtension(new OutputConfigurationExtension<TOutputConfiguration>());
     }
 
-    public void AddEntry(string key, TOutputConfiguration value) => OutputConfigurationExtension.AddEntry(key, value);
+    public void AddEntry(string key, TOutputConfiguration value)
+        => OutputConfiguration.Add(new ConfigurationEntry<TOutputConfiguration>(value, key));
+
+    public void AddEntry(TOutputConfiguration value)
+        => OutputConfiguration.Add(new ConfigurationEntry<TOutputConfiguration>(value, value!.GetType().Name));
 }
 
 public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata : class
