@@ -2,7 +2,7 @@
 {
     public class DoggyDogWatchdogConfiguration
     {
-        public static string SECTION_NAME = "Watchdog";
+        public const string SECTION_NAME = "Watchdog";
         public bool ManualLaunch { get; set; } = false;
     }
 }

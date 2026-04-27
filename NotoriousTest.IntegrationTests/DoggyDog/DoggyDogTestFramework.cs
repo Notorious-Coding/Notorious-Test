@@ -1,4 +1,5 @@
-﻿using AwesomeAssertions;
+﻿using System.Data.Common;
+using AwesomeAssertions;
 
 using Dapper;
 
@@ -21,27 +22,13 @@ namespace NotoriousTest.IntegrationTests
     {
         public static class Arrange
         {
-            public const string ENSURE_REGISTRY = @$"
-                CREATE TABLE IF NOT EXISTS InfrastructureRegistry(
-                    InfrastructureId TEXT PRIMARY KEY,
-                    InfrastructureType TEXT NOT NULL,
-                    EnvironmentId TEXT NOT NULL,
-                    ProcessID TEXT NOT NULL,
-                    Metadata TEXT,
-                    MetadataType TEXT,
-                    CreationDate TEXT NOT NULL,
-                    UpdateDate TEXT NOT NULL,
-                    LastResetDate TEXT
-                )
-            ";
-
             public const string REGISTER_INFRASTRUCTURE = @$"
                 INSERT INTO InfrastructureRegistry(InfrastructureId, InfrastructureType, EnvironmentId, ProcessID, Metadata, MetadataType, CreationDate, UpdateDate, LastResetDate)
                 VALUES(@InfrastructureId, @InfrastructureType, @EnvironmentId, @ProcessID, @Metadata, @MetadataType, datetime('now', 'utc'), datetime('now', 'utc'), null)
                 RETURNING *
             ";
 
-            public static Process? StartFakeProcess(Guid environmentId, int exitCode = 0, int timeToExit = 5)
+            public static Process StartFakeProcess(Guid environmentId, int exitCode = 0, int timeToExit = 5)
             {
                 ProcessStartInfo startInfo = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? new ProcessStartInfo
@@ -59,8 +46,14 @@ namespace NotoriousTest.IntegrationTests
                         CreateNoWindow = false,
                     };
 
-                Process? fakeProcess = Process.Start(startInfo);
-                if (exitCode == 0 && fakeProcess != null)
+                var fakeProcess = Process.Start(startInfo);
+
+                if (fakeProcess == null)
+                {
+                    Xunit.Assert.Fail("Fail to launch cmd.exe");
+                }
+
+                if (exitCode == 0)
                 {
                     File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{environmentId}.signal"), "OK");
                 }
@@ -68,16 +61,10 @@ namespace NotoriousTest.IntegrationTests
                 return fakeProcess;
             }
 
-            public static async Task CreateRegistry(SqliteInfrastructure registryInfrastructure)
-            {
-                using var connection = registryInfrastructure.GetDatabaseConnection();
-                await connection.ExecuteAsync(ENSURE_REGISTRY);
-            }
-
 
             public static async Task<InfrastuctureRegistryEntry> CreateInfrastructureInRegistry(SqliteInfrastructure registryInfrastructure, Process attachedProcess, Type fakeInfrastructureType, Guid environmentId)
             {
-                using var connection = registryInfrastructure.GetDatabaseConnection();
+                await using DbConnection connection = registryInfrastructure.GetDatabaseConnection();
 
                 var entry = new InfrastuctureRegistryEntry
                 {
@@ -88,89 +75,68 @@ namespace NotoriousTest.IntegrationTests
                     Metadata = "Test passed !"
                 };
 
-                var entity = await connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
+                InfrastructureRegistryEntryEntity entity = await connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
                 return entity.ToDomain();
             }
 
             public static async Task TriggerInfrastructureReset(SqliteInfrastructure registryInfrastructure, Guid infrastructureId)
             {
-                using var connection = registryInfrastructure.GetDatabaseConnection();
+                await using DbConnection connection = registryInfrastructure.GetDatabaseConnection();
                 await connection.ExecuteAsync("UPDATE InfrastructureRegistry SET LastResetDate = strftime('%Y-%m-%dT%H:%M:%f', 'now') WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId.ToString() });
             }
 
             public static async Task DestroyInfrastructureFromRegistry(SqliteInfrastructure registryInfrastructure, Guid infrastructureId)
             {
-                using var connection = registryInfrastructure.GetDatabaseConnection();
+                await using DbConnection connection = registryInfrastructure.GetDatabaseConnection();
                 await connection.ExecuteAsync("DELETE FROM InfrastructureRegistry WHERE InfrastructureId = @InfrastructureId", new { InfrastructureId = infrastructureId.ToString() });
             }
 
             public class FakeCleaner : IInfrastructureCleaner
             {
-                public static string Message = "[FakeCleaner] {0} with {1} for Id : {2}";
+                public static readonly string Message = "[FakeCleaner] {0} with {1} for Id : {2}";
                 public Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, object? metadata = null)
                 {
                     Console.WriteLine(Message, metadata, contextId.Value, infrastructureId);
                     return Task.CompletedTask;
                 }
             }
+
             [Cleaner(typeof(FakeCleaner))]
-            public class FakeInfrastructureWithCleaner : Infrastructure<string>
+            public class FakeInfrastructureWithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
+                : Infrastructure<string>(contextId, logger, provider)
             {
-                public FakeInfrastructureWithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
-                {
-                }
+                public override Task Destroy() => Task.CompletedTask;
 
-                public override Task Destroy()
-                {
-                    return Task.CompletedTask;
-                }
-
-                public override Task Initialize()
-                {
-                    return Task.CompletedTask;
-                }
+                public override Task Initialize() => Task.CompletedTask;
             }
 
             [Cleaner(typeof(FakeCleaner))]
-            public class FakeInfrastructure2WithCleaner : Infrastructure<string>
+            public class FakeInfrastructure2WithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
+                : Infrastructure<string>(contextId, logger, provider)
             {
-                public FakeInfrastructure2WithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
-                {
-                }
+                public override Task Destroy() => Task.CompletedTask;
 
-                public override Task Destroy()
-                {
-                    return Task.CompletedTask;
-                }
-
-                public override Task Initialize()
-                {
-                    return Task.CompletedTask;
-                }
+                public override Task Initialize() => Task.CompletedTask;
             }
 
-            public class FakeInfrastructureWithoutCleanerAttribute : Infrastructure<string>
+            public class FakeInfrastructureWithoutCleanerAttribute(
+                EnvironmentId contextId,
+                ITestLogger logger,
+                IRegistry provider)
+                : Infrastructure<string>(contextId, logger, provider)
             {
-                public FakeInfrastructureWithoutCleanerAttribute(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
-                {
-                }
-                public override Task Destroy()
-                {
-                    return Task.CompletedTask;
-                }
-                public override Task Initialize()
-                {
-                    return Task.CompletedTask;
-                }
+                public override Task Destroy() => Task.CompletedTask;
+
+                public override Task Initialize() => Task.CompletedTask;
             }
         }
 
         public static class Act
         {
-            public static (Process? Process, StringBuilder StdoutBuilder) StartDoggyDog(int processId, string assembly, string connectionString, Guid environmentId)
+            public static (Process Process, StringBuilder StdoutBuilder) StartDoggyDog(int processId, string assembly, string connectionString, Guid environmentId)
             {
-                var doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
-                Process? doggyDogProcess = Process.Start(new ProcessStartInfo
+                string doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+                var doggyDogProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = doggyDogPath,
                     Arguments = $"--pid {processId} --assembly \"{assembly}\" --connectionString \"{connectionString}\" --environment {environmentId} --loglevel Debug",
@@ -179,6 +145,11 @@ namespace NotoriousTest.IntegrationTests
                     RedirectStandardError = true,
                     UseShellExecute = false,
                 });
+
+                if (doggyDogProcess == null)
+                {
+                    Xunit.Assert.Fail("Fail to launch DoggyDog.exe");
+                }
 
                 doggyDogProcess!.StandardInput.Close();
                 var stdoutBuilder = new StringBuilder();
@@ -211,8 +182,8 @@ namespace NotoriousTest.IntegrationTests
             }
             public static async Task ShouldHaveCleanedEntry(string stdout, SqliteInfrastructure registry, InfrastuctureRegistryEntry entry)
             {
-                using var connection = registry.GetDatabaseConnection();
-                var count = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM InfrastructureRegistry WHERE EnvironmentId = @EnvironmentId", new { EnvironmentId = entry.EnvironmentId });
+                await using DbConnection connection = registry.GetDatabaseConnection();
+                int count = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM InfrastructureRegistry WHERE EnvironmentId = @EnvironmentId", new { EnvironmentId = entry.EnvironmentId });
 
                 count.Should().Be(0);
 
@@ -225,8 +196,8 @@ namespace NotoriousTest.IntegrationTests
 
             public static async Task ShouldHaveNotFoundCleanerAttribute(string stdout, SqliteInfrastructure registry, InfrastuctureRegistryEntry entry)
             {
-                using var connection = registry.GetDatabaseConnection();
-                var count = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM InfrastructureRegistry WHERE ProcessID = @ProcessId", new { ProcessId = entry.ProcessID });
+                await using DbConnection connection = registry.GetDatabaseConnection();
+                int count = await connection.ExecuteScalarAsync<int>($"SELECT COUNT(*) FROM InfrastructureRegistry WHERE ProcessID = @ProcessId", new { ProcessId = entry.ProcessID });
 
                 count.Should().Be(1);
 

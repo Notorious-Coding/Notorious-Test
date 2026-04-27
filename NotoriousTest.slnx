@@ -57,10 +57,13 @@
     <Project Path="Samples/NotoriousTest.Sample.Without/NotoriousTest.Sample.Without.csproj" />
     <Project Path="Samples/NotoriousTest.Sample.XUnit/NotoriousTest.Sample.XUnit.csproj" />
   </Folder>
-  <Folder Name="/src/6. Dependencies/">
+  <Folder Name="/src/6. Solution/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
   </Folder>
   <Folder Name="/src/7. CI/">
     <File Path=".github/workflows/prerelease.yml" />

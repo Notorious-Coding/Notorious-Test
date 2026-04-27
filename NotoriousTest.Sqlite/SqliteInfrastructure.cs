@@ -41,23 +41,12 @@ namespace NotoriousTest.Sqlite
         private string _connectionString;
         public SqliteInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
         {
-            EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
-            {
-                TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
-                TablesToInclude = TableToInclude.Select(tti => new Table(tti)).ToArray(),
-                DbAdapter = DbAdapter.Sqlite
-            }));
         }
 
-        public override DbConnection GetConnection(string connectionString)
-        {
-            return new SqliteConnection(connectionString);
-        }
+        public override DbConnection GetConnection(string connectionString) => new SqliteConnection(connectionString);
 
-        public string GetPath()
-        {
-            return new SqliteConnectionStringBuilder(GetServerConnectionString()).DataSource;
-        }
+        public string GetPath() => new SqliteConnectionStringBuilder(GetServerConnectionString()).DataSource;
+
         public override string GetServerConnectionString()
         {
             if (string.IsNullOrWhiteSpace(_connectionString))
@@ -75,20 +64,17 @@ namespace NotoriousTest.Sqlite
             return _connectionString;
         }
 
-        public override string GetDatabaseConnectionString()
-        {
+        public override string GetDatabaseConnectionString() =>
             // For SQLite, the server connection string and the database connection string are the same, since SQLite is a file-based database.
-            return GetServerConnectionString();
-        }
+            GetServerConnectionString();
 
-        protected override async Task CreateDatabase(DbConnection sqliteConnection)
-        {
-            // Since the connection is already opened, nothing to do. The database file will be created automatically when the connection is opened if it does not exist.
-        }
+        protected override Task CreateDatabase(DbConnection sqliteConnection) => Task.CompletedTask;
 
+        // Since the connection is already opened, nothing to do. The database file will be created automatically when the connection is opened if it does not exist.
         protected override async Task DropDatabase(DbConnection sqlConnection)
         {
             await sqlConnection.CloseAsync();
+            await sqlConnection.DisposeAsync();
             SqliteConnection.ClearAllPools();
             File.Delete(sqlConnection.DataSource);
         }

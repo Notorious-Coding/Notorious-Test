@@ -37,35 +37,18 @@ namespace NotoriousTest.SqlServer
 
     public class SqlServerContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<MsSqlContainer, TOutputConfiguration>
     {
-        public string[] SchemasToInclude { get; init; } = [];
-        public string[] SchemasToExclude { get; init; } = [];
-
         public SqlServerContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
         {
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
-            EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
-            {
-                TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
-                TablesToInclude = TableToInclude.Select(tti => new Table(tti)).ToArray(),
-                SchemasToExclude = SchemasToExclude,
-                SchemasToInclude = SchemasToInclude,
-                DbAdapter = DbAdapter.SqlServer
-            }));
         }
 
-        protected virtual MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder)
-        {
-            return builder;
-        }
+        private MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder) => builder;
 
-        public override DbConnection GetConnection(string connectionString)
-        {
-            return new SqlConnection(connectionString);
-        }
+        public override DbConnection GetConnection(string connectionString) => new SqlConnection(connectionString);
 
         public override string GetDatabaseConnectionString()
         {
-            SqlConnectionStringBuilder connectionString = new SqlConnectionStringBuilder(Container.GetConnectionString());
+            var connectionString = new SqlConnectionStringBuilder(Container.GetConnectionString());
             if (!string.IsNullOrEmpty(FullDbName))
             {
                 connectionString.InitialCatalog = FullDbName;
@@ -76,8 +59,7 @@ namespace NotoriousTest.SqlServer
 
         protected override async Task CreateDatabase(DbConnection sqlConnection)
         {
-
-            using (DbCommand command = sqlConnection.CreateCommand())
+            await using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"CREATE DATABASE [{FullDbName}]";
                 await command.ExecuteNonQueryAsync();

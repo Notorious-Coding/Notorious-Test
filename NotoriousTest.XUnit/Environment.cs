@@ -18,7 +18,7 @@ namespace NotoriousTest.XUnit
             _sink = sink;
         }
 
-        public override void ConfigureInfrastructureServices(IServiceCollection collection)
+        protected override void ConfigureInfrastructureServices(IServiceCollection collection)
         {
             base.ConfigureInfrastructureServices(collection);
 

@@ -1,11 +1,21 @@
 ﻿# Changelog
 
+## v5.0.0
+### 💥 Breaking Changes
+
+- Deleted support for Extensions, use dependency injection instead.
+-
+### 🐛 Bug Fixes
+
+- Fixed a bug where SqliteInfrastructure could not delete the file because it was still used by another process. Triggering DoggyDog cleaning.
+
 ## v4.1.1
 
 ### 🛠 Technical
 
 - Internal packages (such as NotoriousTest.Runtimes|Watchdog|SqliteRegistry|TestSettings) are now includes in NotoriousTest.
   And can no longer be downloaded via Nuget Packages.
+
 
 ## v4.1.0
 
@@ -18,9 +28,6 @@
       "DisableWatchdog": false
     }
 }
-  "Watchdog": {
-    "ManualLaunch": false  
-  }
 ```
 
 ### 🛠 Technical
@@ -30,7 +37,7 @@
 ```json
 {
   "Watchdog": {
-    "ManualLaunch": false  
+    "ManualLaunch": false
   }
 }
 ```
@@ -57,7 +64,7 @@ Launch DoggyDog with the --from-env flag to read those parameters.
 #### DoggyDog 🐶🐶🐶 💥NEW💥
 
 NotoriousTest now has a new mascot, the DoggyDog ! 🐶🐶🐶
-DoggyDog is a watchdog that clean infrastructures that may have been left dirty by previous tests, 
+DoggyDog is a watchdog that clean infrastructures that may have been left dirty by previous tests,
 and make sure that your tests are running in a clean environment.
 
 - Introducing DoggyDog - an executable that clean your infrastructures left behind a test campaign that have been killed unexpectedly.
@@ -66,17 +73,17 @@ and make sure that your tests are running in a clean environment.
 
 #### Infrastructure extensions 💥NEW💥
 
-**Infrastructure extensions** introduce a composition model for adding behaviors to your infrastructures. Instead of creating specialized subclasses to combine multiple concerns (configuration, database seeding, respawn, etc. ) 
+**Infrastructure extensions** introduce a composition model for adding behaviors to your infrastructures. Instead of creating specialized subclasses to combine multiple concerns (configuration, database seeding, respawn, etc. )
 You register extensions on any infrastructure via `EnsureExtension<TExtension>()`.
 Each extension is self-contained, reusable across infrastructures, and hooks into the infrastructure lifecycle through dedicated callbacks such as `OnBeforeInitialize`.
 
 
-- Introducing a new concept called infrastructure extension, meant to be used to react to infrastructure setup. 
+- Introducing a new concept called infrastructure extension, meant to be used to react to infrastructure setup.
 - New interface `IInfrastructureExtension`, provide hooks such as `OnBeforeInitialize` to extends Infrastructure.
 - Configuration is now handled by extensions classes.
 - Use `EnsureExtension<MyExtension>()` or `EnsureExtension(new MyExtension())`  to register an extension.
-- Built-in extensions : 
-	- Core 
+- Built-in extensions :
+	- Core
 		- `OutputConfigurationExtension<TOutputConfiguration>` : Provide a way to output configuration. Included in `Infrastructure` base class.
 		- `SettingsExtension<TSettings>`: Load from `testsettings.json` your infrastructure configuration. Config key default to infrastructure name, and can be override.
 	- Database
@@ -92,8 +99,8 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 - Output configuration is now handled by an extension built-in Infrastructure base class.
 - Adding a configuration output will now be made by calling `AddEntry(key, config)`.
 - Environment will gather all configuration under all keys and pass to all `IConfigurationConsumer` infrastructures, such as `WebApplicationInfrastructure`.
-- `WebApplicationInfrastructure` now maps configuration entries to appsettings format automatically. Generating the section path from the key and config structure. 
-- e.g. 
+- `WebApplicationInfrastructure` now maps configuration entries to appsettings format automatically. Generating the section path from the key and config structure.
+- e.g.
 ```json
   // Entry: "Example:Test" → { "Host": "localhost", "Port": 5432 }
   // appsettings.json
@@ -127,7 +134,7 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 - Every framework has it's own `ITestLogger` implementation that is registered in DI.
 
 #### Web
-- Web support has been moved to `NotoriousTest.Web`. 
+- Web support has been moved to `NotoriousTest.Web`.
 - `Environment` now has extensions to retrieve the WebApplication or add a WebApplication. You can find them in the `NotoriousTest.Web` packages, under the `NotoriousTest.Web.Environment.WebEnvironmentExtensions`.
 - `WebEnvironment` has been deleted. Use extensions to retrieve/add WebApplication.
 
@@ -148,7 +155,7 @@ Each extension is self-contained, reusable across infrastructures, and hooks int
 - Find them within `NotoriousTest.XUnit`, `NotoriousTest.NUnit`, `NotoriousTest.MSTest` and `NotoriousTest.TUnit` packages.
 - New samples for every frameworks are available in the samples folder.
 
-## v3.1.0 
+## v3.1.0
 
 ### ✨ Features
 

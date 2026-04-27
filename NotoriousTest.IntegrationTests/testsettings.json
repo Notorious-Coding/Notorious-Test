@@ -2,13 +2,13 @@
   "SqliteInfrastructure": {
     "ConnectionString": "Data Source=test.db"
   },
-  "RegistryDatabaseInfrastructure": {
+  "NotoriousTestRegistryInfrastructure": {
     "ConnectionString": "Data Source=registry-test.db"
   },
   "Environment": {
     "DisableWatchdog": false
   },
   "Watchdog": {
-    "ManualLaunch": false  
+    "ManualLaunch": false
   }
 }

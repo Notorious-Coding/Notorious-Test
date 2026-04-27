@@ -22,9 +22,7 @@
     </PropertyGroup>
 
     <Message Text="Publishing DoggyDog to $(DoggyDogArtifactsDir)" Importance="high" />
-    <MSBuild Projects="$(MSBuildProjectFullPath)"
-             Targets="Publish"
-             Properties="RuntimeIdentifier=$(DoggyDogRuntime);SelfContained=true;PublishSingleFile=true;PublishDir=$(DoggyDogArtifactsDir);NoBuild=true" />
+    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -r $(DoggyDogRuntime) --no-build --self-contained true /p:PublishSingleFile=true /p:PublishDir=&quot;$(DoggyDogArtifactsDir)&quot;" />
   </Target>
 
 </Project>

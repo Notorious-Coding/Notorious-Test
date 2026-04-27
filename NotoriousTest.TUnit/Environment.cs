@@ -10,7 +10,7 @@ namespace NotoriousTest.TUnit
 {
     public abstract class Environment : EnvironmentBase, IAsyncInitializer, IAsyncDisposable
     {
-        public override void ConfigureInfrastructureServices(IServiceCollection collection)
+        protected override void ConfigureInfrastructureServices(IServiceCollection collection)
         {
             base.ConfigureInfrastructureServices(collection);
 
