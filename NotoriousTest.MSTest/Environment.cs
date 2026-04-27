@@ -18,7 +18,7 @@ namespace NotoriousTest.MSTest
             _testContext = testContext;
         }
 
-        public override void ConfigureInfrastructureServices(IServiceCollection collection)
+        protected override void ConfigureInfrastructureServices(IServiceCollection collection)
         {
             base.ConfigureInfrastructureServices(collection);
 

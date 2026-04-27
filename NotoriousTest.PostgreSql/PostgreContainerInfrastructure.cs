@@ -37,35 +37,18 @@ public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<str
 
 public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<PostgreSqlContainer, TOutputConfiguration>
 {
-    public string[] SchemasToInclude { get; init; } = [];
-    public string[] SchemasToExclude { get; init; } = [];
-
     public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
-        EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
-        {
-            TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
-            TablesToInclude = TableToInclude.Select(tti => new Table(tti)).ToArray(),
-            SchemasToExclude = SchemasToExclude,
-            SchemasToInclude = SchemasToInclude,
-            DbAdapter = DbAdapter.Postgres
-        }));
     }
 
-    public override DbConnection GetConnection(string connectionString)
-    {
-        return new NpgsqlConnection(connectionString);
-    }
+    public override DbConnection GetConnection(string connectionString) => new NpgsqlConnection(connectionString);
 
-    protected virtual PostgreSqlBuilder ConfigureSqlContainer(PostgreSqlBuilder builder)
-    {
-        return builder;
-    }
+    protected virtual PostgreSqlBuilder ConfigureSqlContainer(PostgreSqlBuilder builder) => builder;
 
     public override string GetDatabaseConnectionString()
     {
-        NpgsqlConnectionStringBuilder connectionString = new NpgsqlConnectionStringBuilder(Container.GetConnectionString());
+        var connectionString = new NpgsqlConnectionStringBuilder(Container.GetConnectionString());
         if (!string.IsNullOrEmpty(FullDbName))
         {
             connectionString.Database = FullDbName;
@@ -76,7 +59,7 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
 
     protected override async Task CreateDatabase(DbConnection sqlConnection)
     {
-        using (DbCommand command = sqlConnection.CreateCommand())
+        await using (DbCommand command = sqlConnection.CreateCommand())
         {
             command.CommandText = $"CREATE DATABASE \"{FullDbName}\"";
             await command.ExecuteNonQueryAsync();

@@ -51,7 +51,6 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     ///<inheritdoc/>
     public EnvironmentId EnvironmentId { get; set; }
     public Guid Id = Guid.NewGuid();
-    private readonly List<IInfrastructureExtension> _extensions = new();
 
     /// <summary>
     /// Gets or sets the metadata associated with the current object.
@@ -93,21 +92,10 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         {
             Logger.Log($"[{GetType().Name}] Initialization ...");
             var sw = Stopwatch.StartNew();
-            foreach (var extension in _extensions)
-            {
-                Logger.Log($"[{extension.GetType().Name}] OnBeforeInitialize");
-                await extension.OnBeforeInitialize(this);
-            }
 
             await Initialize();
             if (!WatchdogDisabled && !DisableRegistry && !Registered) await Register();
 
-
-            foreach (var extension in _extensions)
-            {
-                Logger.Log($"[{extension.GetType().Name}] OnAfterInitialize");
-                await extension.OnAfterInitialize(this);
-            }
             Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
 
         }
@@ -137,20 +125,10 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     {
         Logger.Log($"[{GetType().Name}] Reset ...");
         var sw = Stopwatch.StartNew();
-        foreach (var extension in _extensions)
-        {
-            Logger.Log($"[{extension.GetType().Name}] OnBeforeReset");
-            await extension.OnBeforeReset(this);
-        }
 
         await Reset();
         if (!WatchdogDisabled && !DisableRegistry) await Registry.NotifyReset(Id);
-        foreach (var extension in _extensions)
-        {
-            Logger.Log($"[{extension.GetType().Name}] OnAfterReset");
-            await extension.OnAfterReset(this);
-        }
-        Logger.Log($"[{GetType().Name} ] Reset completed in ");
+        Logger.Log($"[{GetType().Name} ] Reset completed in {sw.ElapsedMilliseconds} ms");
 
     }
 
@@ -159,51 +137,9 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         Logger.Log($"[{GetType().Name}] Destroy ...");
         var sw = Stopwatch.StartNew();
 
-        foreach (var extension in _extensions)
-        {
-            Logger.Log($"[{extension.GetType().Name}] OnBeforeDestroy");
-            await extension.OnBeforeDestroy(this);
-        }
-
         await Destroy();
         if (!WatchdogDisabled && !DisableRegistry) await Registry.Remove(Id);
 
-        foreach (var extension in _extensions)
-        {
-            Logger.Log($"[{extension.GetType().Name}] OnAfterDestroy");
-            await extension.OnAfterDestroy(this);
-        }
-
-        Logger.Log($"[{GetType().Name} ] Destroy completed in ");
-    }
-
-    /// <summary>
-    /// Ensures that an extension of the specified type is present in the collection, returning the existing instance if
-    /// found or adding and returning the provided instance if not.
-    /// </summary>
-    /// <typeparam name="T">The type of the infrastructure extension to ensure. Must implement IInfrastructureExtension.</typeparam>
-    /// <param name="extension">The extension instance to add if an existing instance of type T is not already present. Cannot be null.</param>
-    /// <returns>The existing extension of type T if present; otherwise, the provided extension instance.</returns>
-    public T EnsureExtension<T>(T extension) where T : IInfrastructureExtension
-    {
-        var existing = _extensions.OfType<T>().FirstOrDefault();
-        if (existing != null) return existing;
-
-        _extensions.Add(extension);
-        return extension;
-    }
-
-    /// <summary>
-    /// Retrieves an existing extension of the specified type from the collection, or creates and adds a new instance if
-    /// none exists.
-    /// </summary>
-    /// <typeparam name="T">The type of extension to retrieve or create. Must implement IInfrastructureExtension and have a parameterless
-    /// constructor.</typeparam>
-    /// <returns>An instance of the specified extension type. If an extension of this type already exists in the collection, it
-    /// is returned; otherwise, a new instance is created, added to the collection, and returned.</returns>
-    public T EnsureExtension<T>() where T : IInfrastructureExtension, new()
-    {
-        T extension = new T();
-        return EnsureExtension(extension);
+        Logger.Log($"[{GetType().Name} ] Destroy completed in {sw.ElapsedMilliseconds} ms");
     }
 }

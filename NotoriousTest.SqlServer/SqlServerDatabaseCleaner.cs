@@ -8,12 +8,13 @@ namespace NotoriousTest.SqlServer
 {
     public class SqlServerInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
-        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
+        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata? metadata = null)
         {
-            using var connection = new SqlConnection(metadata.ServerConnectionString);
+            if (metadata == null) throw new ArgumentNullException(nameof(metadata));
+            await using var connection = new SqlConnection(metadata.ServerConnectionString);
 
             await connection.OpenAsync();
-            var command = connection.CreateCommand();
+            SqlCommand? command = connection.CreateCommand();
             command.CommandText = $"DROP DATABASE [{metadata.DatabaseName}]";
             await command.ExecuteNonQueryAsync();
         }

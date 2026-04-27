@@ -3,7 +3,7 @@
 namespace NotoriousTest.Core.Infrastructures
 {
     [Serializable]
-    internal class InfrastructureSettingsNotFound : Exception
+    public class InfrastructureSettingsNotFound : Exception
     {
         public InfrastructureSettingsNotFound()
         {

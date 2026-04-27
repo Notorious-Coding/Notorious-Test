@@ -37,7 +37,7 @@ namespace NotoriousTest.UnitTests.Stubs
 
         public override Task ConfigureEnvironment() => OnConfigureEnvironment?.Invoke() ?? Task.CompletedTask;
 
-        public override void ConfigureInfrastructureServices(IServiceCollection collection)
+        protected override void ConfigureInfrastructureServices(IServiceCollection collection)
         {
             base.ConfigureInfrastructureServices(collection);
 

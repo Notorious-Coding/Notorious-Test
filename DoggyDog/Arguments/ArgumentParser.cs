@@ -14,25 +14,23 @@ public static class ArgumentsParser
         return ParseInternal<T>(prop => dict.TryGetValue(prop, out var v) ? v : null);
     }
 
-    public static T ParseFromEnv<T>(string envPrefix) where T : new()
-    {
-        return ParseInternal<T>(prop =>
+    public static T ParseFromEnv<T>(string envPrefix) where T : new() =>
+        ParseInternal<T>(prop =>
         {
-            var envKey = $"{envPrefix}_{prop.Replace("-", "_").ToUpperInvariant()}";
+            string envKey = $"{envPrefix}_{prop.Replace("-", "_").ToUpperInvariant()}";
             return Environment.GetEnvironmentVariable(envKey, EnvironmentVariableTarget.User);
         });
-    }
 
     private static T ParseInternal<T>(Func<string, string?> resolver) where T : new()
     {
-        var errors = 0;
+        int errors = 0;
         var instance = new T();
-        foreach (var prop in typeof(T).GetProperties())
+        foreach (PropertyInfo prop in typeof(T).GetProperties())
         {
-            var attr = prop.GetCustomAttribute<CliArgumentAttribute>();
+            CliArgumentAttribute? attr = prop.GetCustomAttribute<CliArgumentAttribute>();
             if (attr is null) continue;
 
-            var raw = resolver(attr.Name);
+            string? raw = resolver(attr.Name);
 
             if (raw is null)
             {
@@ -43,13 +41,13 @@ public static class ArgumentsParser
 
             try
             {
-                var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
+                Type targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
 
                 object converted = targetType switch
                 {
-                    _ when targetType == typeof(Guid) => Guid.Parse(raw.ToString()!),
-                    _ when targetType == typeof(DateTimeOffset) => DateTimeOffset.Parse(raw.ToString()!),
-                    _ when targetType.IsEnum => Enum.Parse(targetType, raw.ToString()!),
+                    _ when targetType == typeof(Guid) => Guid.Parse(raw),
+                    _ when targetType == typeof(DateTimeOffset) => DateTimeOffset.Parse(raw),
+                    _ when targetType.IsEnum => Enum.Parse(targetType, raw),
                     _ when targetType == typeof(string[]) => raw.Split("|"),
                     _ => Convert.ChangeType(raw, targetType)
                 };

@@ -1,5 +1,5 @@
 ﻿using NotoriousTest.Core;
-using NotoriousTest.Core.Extensions;
+using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
@@ -17,10 +17,7 @@ namespace NotoriousTest.Database
             Settings = provider.Get<TSettings>(SectionName ?? this.GetType().Name) ?? throw new InfrastructureSettingsNotFound($"Settings in section {SectionName ?? this.GetType().Name} not found.");
         }
 
-        public override string GetServerConnectionString()
-        {
-            return Settings.ConnectionString;
-        }
+        public override string GetServerConnectionString() => Settings.ConnectionString;
 
         public override async Task Initialize()
         {

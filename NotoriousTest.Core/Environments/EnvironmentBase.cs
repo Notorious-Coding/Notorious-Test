@@ -28,17 +28,14 @@ namespace NotoriousTest.Core.Environments
 
         protected IServiceProvider ServiceProvider { get; private set; }
         private IServiceCollection _serviceCollection;
-        protected IWatchDog WatchDog => _watchDog ??= ServiceProvider.GetRequiredService<IWatchDog>();
-        private IWatchDog? _watchDog;
-        protected IRegistry Registry => _registry ??= ServiceProvider.GetRequiredService<IRegistry>();
-        private IRegistry? _registry;
-        protected IRuntime Runtime => _runtime ??= ServiceProvider.GetRequiredService<IRuntime>();
-        private IRuntime? _runtime;
-        protected ITestLogger Logger => _logger ??= ServiceProvider.GetRequiredService<ITestLogger>();
-        private ITestLogger _logger;
+        protected IWatchDog WatchDog => field ??= ServiceProvider.GetRequiredService<IWatchDog>();
+        protected IRegistry Registry => field ??= ServiceProvider.GetRequiredService<IRegistry>();
+        protected IRuntime Runtime => field ??= ServiceProvider.GetRequiredService<IRuntime>();
+        protected ITestLogger Logger => field ??= ServiceProvider.GetRequiredService<ITestLogger>();
 
-        protected EnvironmentConfiguration Settings => _settings ??= ServiceProvider.GetRequiredService<ITestSettingsProvider>()?.Get<EnvironmentConfiguration>(EnvironmentConfiguration.SECTION_NAME) ?? new EnvironmentConfiguration();
-        private EnvironmentConfiguration _settings;
+        protected EnvironmentConfiguration Settings => field ??=
+            ServiceProvider.GetRequiredService<ITestSettingsProvider>()
+                ?.Get<EnvironmentConfiguration>(EnvironmentConfiguration.SECTION_NAME) ?? new EnvironmentConfiguration();
 
 
         /// <summary>
@@ -55,10 +52,7 @@ namespace NotoriousTest.Core.Environments
         /// Configuration infrastructure dependency injection.
         /// </summary>
         /// <returns></returns>
-        public virtual void ConfigureInfrastructureServices(IServiceCollection collection)
-        {
-            _serviceCollection.AddSingleton(EnvironmentId);
-        }
+        protected virtual void ConfigureInfrastructureServices(IServiceCollection collection) => _serviceCollection.AddSingleton(EnvironmentId);
 
         /// <summary>
         /// Configure environment with infrastructures. Called before environment initialization.
@@ -161,6 +155,7 @@ namespace NotoriousTest.Core.Environments
 
         public virtual async Task Destroy()
         {
+
             await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.DestroyAsync());
 
             if (!Settings.DisableWatchdog)
@@ -186,10 +181,6 @@ namespace NotoriousTest.Core.Environments
                     .ToList();
         }
 
-        private async Task SetupRegistry()
-        {
-            var registry = ServiceProvider.GetRequiredService<IRegistry>();
-            await registry.Ensure();
-        }
+        private Task SetupRegistry() => Registry.Ensure();
     }
 }

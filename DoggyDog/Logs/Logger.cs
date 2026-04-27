@@ -5,15 +5,9 @@ namespace DoggyDog.Logs
     public class Logger
     {
 
-        private static Logger _logger;
+        private static Logger? _logger;
 
-        public static Logger Instance
-        {
-            get
-            {
-                return _logger ??= new Logger();
-            }
-        }
+        public static Logger Instance => _logger ??= new Logger();
 
         private readonly Stack<string> _scopeStack = new();
         public static LogLevel MinLogLevel { get; set; } = LogLevel.Info;
@@ -24,17 +18,15 @@ namespace DoggyDog.Logs
             return new LogScope(this, scopeName);
         }
 
-        public void ExitScope(string name)
-        {
-            _scopeStack.TryPop(out _);
-        }
+        public void ExitScope(string name) => _scopeStack.TryPop(out _);
+
         public void Log(LogLevel logType, string message, Exception? exception = null)
         {
             if (logType > MinLogLevel) return;
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             stringBuilder.Append(" > ");
-            var scopeString = string.Join(string.Empty, _scopeStack.Reverse().Select(scope => $"[{scope}]").ToArray());
+            string scopeString = string.Join(string.Empty, _scopeStack.Reverse().Select(scope => $"[{scope}]").ToArray());
 
             stringBuilder.Append(scopeString);
 
@@ -51,7 +43,7 @@ namespace DoggyDog.Logs
 
             colorScope(() =>
             {
-                stringBuilder.Append(" ");
+                stringBuilder.Append(' ');
                 stringBuilder.Append(message);
                 if (exception != null) stringBuilder.Append(exception.ToString());
                 Console.WriteLine(stringBuilder.ToString());
@@ -67,10 +59,7 @@ namespace DoggyDog.Logs
     }
     public class LogScope(Logger logger, string name) : IDisposable
     {
-        public void Dispose()
-        {
-            logger.ExitScope(name);
-        }
+        public void Dispose() => logger.ExitScope(name);
     }
     public enum LogLevel
     {

@@ -4,6 +4,8 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
 using System.Data.Common;
+using Respawn;
+using Respawn.Graph;
 
 namespace NotoriousTest.Database
 {
@@ -14,6 +16,10 @@ namespace NotoriousTest.Database
         public string FullDbName => $"{DbPrefix}_{EnvironmentId.Value}";
         public string[] TableToIgnore { get; init; } = [];
         public string[] TableToInclude { get; init; } = [];
+        public string[] SchemasToInclude { get; init; } = [];
+        public string[] SchemasToExclude { get; init; } = [];
+
+        private Respawner? _respawner;
 
 
         public DatabaseInfrastructureBase(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
@@ -26,15 +32,9 @@ namespace NotoriousTest.Database
         /// Returns a SQL Server connection connected to the current infrastructure's database.
         /// </summary>
         /// <returns>A SqlConnection instance connected to the current infrastructure's database.</returns>
-        public DbConnection GetDatabaseConnection()
-        {
-            return GetConnection(GetDatabaseConnectionString());
-        }
+        public DbConnection GetDatabaseConnection() => GetConnection(GetDatabaseConnectionString());
 
-        public DbConnection GetServerConnection()
-        {
-            return GetConnection(GetServerConnectionString());
-        }
+        public DbConnection GetServerConnection() => GetConnection(GetServerConnectionString());
 
         /// <summary>
         /// Returns a SQL Server connection string pointing to the current infrastructure's database.
@@ -45,14 +45,44 @@ namespace NotoriousTest.Database
 
         public override async Task Initialize()
         {
-            using var connection = GetServerConnection();
+            await using DbConnection connection = GetServerConnection();
             await connection.OpenAsync();
             await CreateDatabase(connection);
+
+            await using DbConnection databaseConnection = GetDatabaseConnection();
+            await databaseConnection.OpenAsync();
+        }
+
+        public override async Task Reset()
+        {
+
+            try
+            {
+                await using DbConnection connection = GetDatabaseConnection();
+                await connection.OpenAsync();
+
+                _respawner ??= await Respawner.CreateAsync(connection, new RespawnerOptions()
+                {
+                    TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
+                    TablesToInclude = TableToInclude.Select(tti => new Table(tti)).ToArray(),
+                    SchemasToExclude = SchemasToExclude,
+                    SchemasToInclude = SchemasToInclude
+                });
+
+                await _respawner.ResetAsync(connection);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // This can occur if the database has no tables. In that case, we can ignore the exception and continue with the test setup.
+                Logger.Log(ex.Message);
+            }
+
+
         }
 
         public override async Task Destroy()
         {
-            using var connection = GetServerConnection();
+            await using DbConnection connection = GetServerConnection();
 
             await connection.OpenAsync();
             await DropDatabase(connection);

@@ -6,7 +6,7 @@ using NotoriousTest.Core;
 using NotoriousTest.Core.Registry;
 namespace NotoriousTest.SqlLiteRegistry
 {
-    internal partial class SqliteRegistryProvider : IRegistry, IAsyncDisposable
+    internal partial class SqliteRegistryProvider : IRegistry
     {
         private readonly SqliteRegistryProviderConfiguration _configuration;
         public event Action<InfrastuctureRegistryEntry> OnInfrastructureReset;
@@ -18,24 +18,21 @@ namespace NotoriousTest.SqlLiteRegistry
             _configuration = configuration;
         }
 
-        private SqliteConnection _connection;
-        private SqliteConnectionStringBuilder ConnectionString => new SqliteConnectionStringBuilder(_configuration.ConnectionString);
-        protected SqliteConnection Connection
+        private SqliteConnectionStringBuilder ConnectionString => new(_configuration.ConnectionString);
+
+        private SqliteConnection Connection
         {
             get
             {
-                if (_connection == null)
+                var connection = new SqliteConnection(ConnectionString.ToString());
+
+                if (connection.State != System.Data.ConnectionState.Open)
                 {
-                    _connection = new SqliteConnection(ConnectionString.ToString());
+                    connection.Open();
                 }
 
-                if (_connection.State != System.Data.ConnectionState.Open)
-                {
-                    _connection.Open();
-                }
-
-                _connection.Execute("PRAGMA SYNCHRONOUS=NORMAL;PRAGMA JOURNAL_MODE=WAL;");
-                return _connection;
+                connection.Execute("PRAGMA SYNCHRONOUS=NORMAL;PRAGMA JOURNAL_MODE=WAL;");
+                return connection;
             }
         }
 
@@ -47,48 +44,54 @@ namespace NotoriousTest.SqlLiteRegistry
             {
                 Directory.CreateDirectory(directory);
             }
-            await Connection.ExecuteAsync(ENSURE_REGISTRY);
+
+            await using SqliteConnection connection = Connection;
+
+            await connection.ExecuteAsync(ENSURE_REGISTRY);
         }
 
         public async Task<InfrastuctureRegistryEntry> Register(InfrastuctureRegistryEntry entry)
         {
-
-            InfrastructureRegistryEntryEntity entity = await Connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
+            await using SqliteConnection connection = Connection;
+            InfrastructureRegistryEntryEntity entity = await connection.QuerySingleAsync<InfrastructureRegistryEntryEntity>(REGISTER_INFRASTRUCTURE, InfrastructureRegistryEntryEntity.FromDomain(entry));
 
             return entity.ToDomain();
         }
 
-        public async ValueTask DisposeAsync()
-        {
-            await Connection.DisposeAsync();
-        }
-
         public async Task<bool> Remove(Guid id)
         {
-            int deletedRows = await Connection.ExecuteAsync(REMOVE_INFRASTRUCTURE, new { InfrastructureId = id.ToString() });
+            await using SqliteConnection connection = Connection;
+
+            int deletedRows = await connection.ExecuteAsync(REMOVE_INFRASTRUCTURE, new { InfrastructureId = id.ToString() });
             return deletedRows > 0;
         }
 
         public async Task NotifyReset(Guid id)
         {
-            await Connection.ExecuteAsync(UPDATE_INFRASTRUCTURE_RESET_DATE, new { InfrastructureId = id.ToString() });
+            await using SqliteConnection connection = Connection;
+
+            await connection.ExecuteAsync(UPDATE_INFRASTRUCTURE_RESET_DATE, new { InfrastructureId = id.ToString() });
         }
 
         public async Task<IEnumerable<InfrastuctureRegistryEntry>> GetByProcessId(int processId)
         {
-            IEnumerable<InfrastructureRegistryEntryEntity> entries = await Connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_PROCESS_ID, new { ProcessID = processId });
+            await using SqliteConnection connection = Connection;
+
+            IEnumerable<InfrastructureRegistryEntryEntity> entries = await connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_PROCESS_ID, new { ProcessID = processId });
             return entries.Select(entry => entry.ToDomain());
         }
 
         public async Task<IEnumerable<InfrastuctureRegistryEntry>> GetByEnvironmentId(EnvironmentId environmentId)
         {
-            IEnumerable<InfrastructureRegistryEntryEntity> entries = await Connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_ENVIRONMENT_ID, new { EnvironmentId = environmentId.Value.ToString() });
+            await using SqliteConnection connection = Connection;
+
+            IEnumerable<InfrastructureRegistryEntryEntity> entries = await connection.QueryAsync<InfrastructureRegistryEntryEntity>(GET_BY_ENVIRONMENT_ID, new { EnvironmentId = environmentId.Value.ToString() });
             return entries.Select(entry => entry.ToDomain());
         }
 
         public async Task Watch(EnvironmentId environmentId, CancellationToken ct)
         {
-            Dictionary<Guid, InfrastuctureRegistryEntry> snapshot = (await GetByEnvironmentId(environmentId)).ToDictionary(x => x.InfrastructureId);
+            var snapshot = (await GetByEnvironmentId(environmentId)).ToDictionary(x => x.InfrastructureId);
 
             do
             {

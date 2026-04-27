@@ -14,17 +14,17 @@ namespace DoggyDog
     internal class DoggyDogRecoveryWatchdog
     {
         private const string BANNER = """
-                                        |\     
-                               \`-. _.._| \     
-                                |_,'  __`. \    ██████╗  ██████╗  ██████╗  ██████╗ ██╗   ██╗    ██████╗  ██████╗  ██████╗ 
-                                (.\ _/.| _  |   ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝╚ ██╗ ██╔╝    ██╔══██╗██╔═══██╗██╔════╝ 
+                                        |\
+                               \`-. _.._| \
+                                |_,'  __`. \    ██████╗  ██████╗  ██████╗  ██████╗ ██╗   ██╗    ██████╗  ██████╗  ██████╗
+                                (.\ _/.| _  |   ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝╚ ██╗ ██╔╝    ██╔══██╗██╔═══██╗██╔════╝
                                ,'      __ \ |   ██║  ██║██║   ██║██║  ███╗██║  ███╗ ╚████╔╝     ██║  ██║██║   ██║██║  ███╗
                              ,'     __/||\  |   ██║  ██║██║   ██║██║   ██║██║   ██║  ╚██╔╝      ██║  ██║██║   ██║██║   ██║
                             (..)  ,/|||||/  |   ██████╔╝╚██████╔╝╚██████╔╝╚██████╔╝   ██║       ██████╔╝╚██████╔╝╚██████╔╝
-                               `-'_----   _.\   ╚═════╝  ╚═════╝  ╚═════╝  ╚═════╝    ╚═╝       ╚═════╝  ╚═════╝  ╚═════╝ 
+                               `-'_----   _.\   ╚═════╝  ╚═════╝  ╚═════╝  ╚═════╝    ╚═╝       ╚═════╝  ╚═════╝  ╚═════╝
                                   /`-._.-'_.-             -- .NET INTEGRATION TEST CRASH RECOVERY WATCHDOG --
                                   `-.__.-'
-                                              
+
                         """;
         private readonly ITestAssemblyLoader _assemblyLoader;
         private readonly IRegistry _registry;
@@ -39,7 +39,7 @@ namespace DoggyDog
         public static void Banner(int pid, Guid environmentId)
         {
             LogColorScope.DarkMagenta(() => Console.WriteLine(BANNER));
-            var version = Assembly.GetExecutingAssembly().GetName().Version!;
+            Version version = Assembly.GetExecutingAssembly().GetName().Version!;
             LogColorScope.DarkGray(() =>
             {
                 Console.WriteLine($"                      Monitoring PID {pid}  ·  EID {environmentId}  ·  v{version.Major}.{version.Minor}.{version.Build}");
@@ -54,14 +54,14 @@ namespace DoggyDog
             using (var source = new CancellationTokenSource())
             {
                 _logger.Debug("Watching registry for infrastructures updates.");
-                Task watcherTask = Task.Run(() => _registry.Watch(environmentId, source.Token));
+                var watcherTask = Task.Run(() => _registry.Watch(environmentId, source.Token), source.Token);
 
                 _assemblyLoader.Load();
                 _logger.Info($"Attached to test process with PID {pid} and EID {environmentId}");
 
                 await WaitForTestProcess(pid);
 
-                source.Cancel();
+                await source.CancelAsync();
                 await watcherTask;
             }
 

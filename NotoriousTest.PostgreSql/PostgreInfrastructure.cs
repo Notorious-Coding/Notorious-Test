@@ -8,9 +8,6 @@ using NotoriousTest.Database.Settings;
 
 using Npgsql;
 
-using Respawn;
-using Respawn.Graph;
-
 using System.Data.Common;
 
 namespace NotoriousTest.PostgreSql
@@ -38,29 +35,13 @@ namespace NotoriousTest.PostgreSql
     [Cleaner(typeof(PostgreInfrastructureCleaner))]
     public class PostgreInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
-        public string[] SchemasToInclude { get; init; } = [];
-        public string[] SchemasToExclude { get; init; } = [];
+        public PostgreInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry) {}
 
-        public PostgreInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
-        {
-            EnsureExtension(new RespawnExtension(() => new RespawnerOptions()
-            {
-                TablesToIgnore = TableToIgnore.Select(tti => new Table(tti)).ToArray(),
-                TablesToInclude = TableToInclude.Select(tti => new Table(tti)).ToArray(),
-                SchemasToExclude = SchemasToExclude,
-                SchemasToInclude = SchemasToInclude,
-                DbAdapter = DbAdapter.Postgres
-            }));
-        }
-
-        public override DbConnection GetConnection(string connectionString)
-        {
-            return new NpgsqlConnection(connectionString);
-        }
+        public override DbConnection GetConnection(string connectionString) => new NpgsqlConnection(connectionString);
 
         public override string GetDatabaseConnectionString()
         {
-            NpgsqlConnectionStringBuilder connectionString = new NpgsqlConnectionStringBuilder(Settings.ConnectionString);
+            var connectionString = new NpgsqlConnectionStringBuilder(Settings.ConnectionString);
             if (!string.IsNullOrEmpty(FullDbName))
             {
                 connectionString.Database = FullDbName;
@@ -71,7 +52,7 @@ namespace NotoriousTest.PostgreSql
 
         protected override async Task CreateDatabase(DbConnection sqlConnection)
         {
-            using (DbCommand command = sqlConnection.CreateCommand())
+            await using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"CREATE DATABASE \"{FullDbName}\"";
                 await command.ExecuteNonQueryAsync();
@@ -80,10 +61,10 @@ namespace NotoriousTest.PostgreSql
 
         protected override async Task DropDatabase(DbConnection sqlConnection)
         {
-            using var connection = (NpgsqlConnection)GetDatabaseConnection();
+            await using var connection = (NpgsqlConnection)GetDatabaseConnection();
             NpgsqlConnection.ClearPool(connection);
 
-            using (DbCommand command = sqlConnection.CreateCommand())
+            await using (DbCommand command = sqlConnection.CreateCommand())
             {
                 command.CommandText = $"DROP DATABASE \"{FullDbName}\"";
                 await command.ExecuteNonQueryAsync();

@@ -8,9 +8,10 @@ namespace NotoriousTest.Sqlite
 {
     public class SqliteInfrastructureCleaner : IInfrastructureCleaner<DatabaseMetadata>
     {
-        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata metadata = null)
+        public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DatabaseMetadata? metadata = null)
         {
-            File.Delete(new SqliteConnectionStringBuilder(metadata.ServerConnectionString).DataSource);
+            if (metadata != null)
+                File.Delete(new SqliteConnectionStringBuilder(metadata.ServerConnectionString).DataSource);
         }
     }
 }
