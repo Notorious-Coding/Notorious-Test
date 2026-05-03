@@ -7,18 +7,17 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
 using NotoriousTest.Database.Settings;
-using NotoriousTest.IntegrationTests.Environment;
+using NotoriousTest.PostgreSql;
 using NotoriousTest.XUnit;
-namespace NotoriousTest.IntegrationTests.SqlServer
+namespace NotoriousTest.IntegrationTests.Postgre
 {
-
-    public class SqlServerInfrastructureTests : IntegrationTest<SqlServerInfrastructureEnvironment>
+    public class PostgreInfrastructureTestsBase : IntegrationTest<PostgreInfrastructureEnvironment>
     {
         private ITestSettingsProvider _testSettingsProvider = A.Fake<ITestSettingsProvider>();
-        public SqlServerInfrastructureTests(SqlServerInfrastructureEnvironment environment) : base(environment)
+        public PostgreInfrastructureTestsBase(XUnitFixture<PostgreInfrastructureEnvironment> environment) : base(environment)
         {
-            string serverConnectionString = CurrentEnvironment.GetInfrastructure<Environment.SqlServerInfrastructure>().OutputConfiguration[0].Value;
-            A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(SqlServerInfrastructure))).Returns(new DatabaseSettings { ConnectionString = serverConnectionString + ";Pooling=false" });
+            string serverConnectionString = CurrentEnvironment.GetInfrastructure<PostgreServerInfrastructure>().OutputConfiguration[0].Value;
+            A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(PostgreInfrastructure))).Returns(new DatabaseSettings { ConnectionString = serverConnectionString + ";Pooling=false" });
         }
 
 
@@ -28,7 +27,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Initialize_Should_Create_Database);
 
-            await using var infrastructure = new NotoriousTest.SqlServer.SqlServerInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {
                 DbPrefix = dbPrefix,
             };
@@ -38,13 +37,14 @@ namespace NotoriousTest.IntegrationTests.SqlServer
 
             string expectedDbName = $"{dbPrefix}_{contextId.Value.ToString()}";
             infrastructure.FullDbName.Should().Be(expectedDbName);
-            cs.Should().Contain($"Initial Catalog={expectedDbName}");
+            cs.Should().Contain($"Database={expectedDbName}");
 
             using var connection = infrastructure.GetDatabaseConnection();
             var act = () => connection.OpenAsync(TestContext.Current.CancellationToken);
             await act.Should().NotThrowAsync();
 
             await connection.CloseAsync();
+
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Reset_Should_Empty_Database);
-            await using var infrastructure = new NotoriousTest.SqlServer.SqlServerInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {
                 DbPrefix = dbPrefix,
             };
@@ -70,13 +70,14 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Destroy_Should_Delete_Database);
-            var infrastructure = new NotoriousTest.SqlServer.SqlServerInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
             {
                 DbPrefix = dbPrefix,
             };
 
             await infrastructure.InitializeAsync();
             var connection = infrastructure.GetDatabaseConnection();
+
             var act = () => connection.OpenAsync(TestContext.Current.CancellationToken);
             await act.Should().NotThrowAsync();
             await connection.CloseAsync();

@@ -3,12 +3,31 @@ using NotoriousTest.Web;
 using NotoriousTest.Sample.TUnit.Infrastructures;
 
 using System.Reflection;
+using NotoriousTest.Core.Environments;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Watchdog;
 
 namespace NotoriousTest.Sample.TUnit.Environments
 {
     // In fact, this is a test fixture (MSTest terminology: ClassInitialize/ClassCleanup).
-    public class TestEnvironment : NotoriousTest.TUnit.Environment
+    public class TestEnvironment : EnvironmentBase
     {
+        public TestEnvironment(EnvironmentSettings settings,
+            IWatchDog watchDog,
+            IRegistry registry,
+            IRuntime runtime,
+            ITestLogger logger,
+            IServiceProvider serviceProvider) : base(settings,
+            watchDog,
+            registry,
+            runtime,
+            logger,
+            serviceProvider)
+        {
+        }
+
         public override Assembly CurrentAssembly => System.Reflection.Assembly.GetExecutingAssembly();
 
         // This is called at the start of the test campaign

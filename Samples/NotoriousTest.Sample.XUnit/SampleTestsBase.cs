@@ -4,12 +4,14 @@ using NotoriousTest.Web;
 using NotoriousTest.XUnit;
 
 using System.Data.Common;
+using NotoriousTest.Core.DI;
+using NotoriousTest.XUnit.DI;
 
 namespace NotoriousTest.Sample.XUnit
 {
-    public class SampleTests : IntegrationTest<TestEnvironment>
+    public class SampleTestsBase : IntegrationTest<TestEnvironment>
     {
-        public SampleTests(TestEnvironment environment) : base(environment)
+        public SampleTestsBase(XUnitFixture<TestEnvironment> fixture) : base(fixture)
         {
             // Do not hesitate to create your test framework for your app, that will use the environment.
             // Example : new MyAppTestFramework(environment);
@@ -22,13 +24,13 @@ namespace NotoriousTest.Sample.XUnit
         {
             // You can access an infrastructure directly from the CurrentEnvironment property of the test class.
             // This is useful to access the database connection for example.
-            HttpClient client = CurrentEnvironment.GetWebApplication().HttpClient;
+            HttpClient client = Environment.GetWebApplication().HttpClient;
             HttpResponseMessage response = await client.PostAsync("users", null);
 
             // Then assert that the database is in the expected state
             Assert.True(response.IsSuccessStatusCode);
 
-            SqlServerInfrastructure sqlInfrastructure = CurrentEnvironment.GetInfrastructure<SqlServerInfrastructure>();
+            SqlServerInfrastructure sqlInfrastructure = Environment.GetInfrastructure<SqlServerInfrastructure>();
             await using (DbConnection sql = sqlInfrastructure.GetDatabaseConnection())
             {
                 // Then act with a call to the API
@@ -47,13 +49,13 @@ namespace NotoriousTest.Sample.XUnit
         {
             // You can access an infrastructure directly from the CurrentEnvironment property of the test class.
             // This is useful to access the database connection for example.
-            HttpClient client = CurrentEnvironment.GetWebApplication().HttpClient;
+            HttpClient client = Environment.GetWebApplication().HttpClient;
             HttpResponseMessage response = await client.PostAsync("users", null);
 
             // Then assert that the database is in the expected state
             Assert.True(response.IsSuccessStatusCode);
 
-            SqlServerInfrastructure sqlInfrastructure = CurrentEnvironment.GetInfrastructure<SqlServerInfrastructure>();
+            SqlServerInfrastructure sqlInfrastructure = Environment.GetInfrastructure<SqlServerInfrastructure>();
             await using (DbConnection sql = sqlInfrastructure.GetDatabaseConnection())
             {
                 // Then act with a call to the API

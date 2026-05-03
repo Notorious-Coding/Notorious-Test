@@ -8,7 +8,7 @@ using NotoriousTest.XUnit;
 
 namespace NotoriousTest.IntegrationTests.Infrastructure;
 
-public class InfrastructureLifecycleTests(NotoriousTestEnvironment environment)
+public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironment> environment)
     : IntegrationTest<NotoriousTestEnvironment>(environment)
 {
     [Fact]

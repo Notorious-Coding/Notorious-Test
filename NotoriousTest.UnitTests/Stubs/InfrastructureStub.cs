@@ -1,4 +1,6 @@
-﻿using NotoriousTest.Core.Configuration;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NotoriousTest.Core;
+using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
@@ -30,6 +32,14 @@ namespace NotoriousTest.UnitTests.Stubs
             _order = order;
             _disableRegistry = disableRegistry;
             AutoReset = autoReset;
+        }
+
+        [ActivatorUtilitiesConstructor]
+        public InfrastructureStub(EnvironmentId id, ITestLogger logger, IRegistry registry): base(id, logger, registry)
+        {
+            _order = 1;
+            _disableRegistry = false;
+            AutoReset = true;
         }
 
         public override Task Destroy() => OnDestroy?.Invoke() ?? Task.CompletedTask;

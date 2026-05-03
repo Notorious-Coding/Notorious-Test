@@ -1,7 +1,7 @@
-﻿using NotoriousTest.Web.Applications;
+﻿using NotoriousTest.Core.Environments;
+using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
 
-using EnvironmentBase = NotoriousTest.Environments.EnvironmentBase;
 
 namespace NotoriousTest.Web
 {

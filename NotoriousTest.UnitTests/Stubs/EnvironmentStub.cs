@@ -8,46 +8,29 @@ using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
 
 using System.Reflection;
+using NotoriousTest.Core;
 
 namespace NotoriousTest.UnitTests.Stubs
 {
     public class EnvironmentStub : EnvironmentBase
     {
-        private readonly ITestLogger _logger;
-        private readonly IWatchDog _watchDog;
-        private readonly IRegistry _registry;
-        private readonly IRuntime _runtime;
-        private readonly ITestSettingsProvider _settings;
+        public EnvironmentStub(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider) : base(settings, watchDog, registry, runtime, logger, serviceProvider)
+        {
+
+        }
 
         public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+        public override Task ConfigureEnvironment() => OnConfigureEnvironment?.Invoke() ?? Task.CompletedTask;
+
         public Func<Task>? OnConfigureEnvironment { get; set; }
         public Action<IServiceCollection>? OnConfigureInfrastructureServices { get; set; }
 
         public IServiceProvider PublicServiceProvider => ServiceProvider;
 
 
-        public EnvironmentStub(ITestLogger logger, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestSettingsProvider settings)
-        {
-            _logger = logger;
-            _watchDog = watchDog;
-            _registry = registry;
-            _runtime = runtime;
-            _settings = settings;
-        }
 
-        public override Task ConfigureEnvironment() => OnConfigureEnvironment?.Invoke() ?? Task.CompletedTask;
 
-        protected override void ConfigureInfrastructureServices(IServiceCollection collection)
-        {
-            base.ConfigureInfrastructureServices(collection);
 
-            collection.AddSingleton(_logger);
-            collection.AddSingleton(_registry);
-            collection.AddSingleton(_watchDog);
-            collection.AddSingleton(_runtime);
-            collection.AddSingleton(_settings);
 
-            OnConfigureInfrastructureServices?.Invoke(collection);
-        }
     }
 }

@@ -4,5 +4,8 @@
     {
         public static implicit operator Guid(EnvironmentId wrapper) => wrapper.Value;
         public static implicit operator EnvironmentId(Guid guid) => new(guid);
+
+
+        public static EnvironmentId Create() => new(Guid.NewGuid());
     }
 }

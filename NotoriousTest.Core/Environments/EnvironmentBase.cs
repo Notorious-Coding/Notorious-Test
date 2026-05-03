@@ -23,36 +23,30 @@ namespace NotoriousTest.Core.Environments
         /// <summary>
         /// Gets the unique identifier for the environment instance.
         /// </summary>
-        public EnvironmentId EnvironmentId { get; private set; } = Guid.NewGuid();
+        public EnvironmentId EnvironmentId { get;  } = EnvironmentId.Create();
         public abstract Assembly CurrentAssembly { get; }
+        protected IWatchDog WatchDog { get; }
+        protected IRegistry Registry { get; }
+        protected IRuntime Runtime { get;  }
+        protected ITestLogger Logger { get;  }
+        protected IServiceProvider ServiceProvider { get; }
 
-        protected IServiceProvider ServiceProvider { get; private set; }
-        private IServiceCollection _serviceCollection;
-        protected IWatchDog WatchDog => field ??= ServiceProvider.GetRequiredService<IWatchDog>();
-        protected IRegistry Registry => field ??= ServiceProvider.GetRequiredService<IRegistry>();
-        protected IRuntime Runtime => field ??= ServiceProvider.GetRequiredService<IRuntime>();
-        protected ITestLogger Logger => field ??= ServiceProvider.GetRequiredService<ITestLogger>();
+        protected EnvironmentSettings Settings { get;  }
 
-        protected EnvironmentConfiguration Settings => field ??=
-            ServiceProvider.GetRequiredService<ITestSettingsProvider>()
-                ?.Get<EnvironmentConfiguration>(EnvironmentConfiguration.SECTION_NAME) ?? new EnvironmentConfiguration();
-
-
-        /// <summary>
-        /// Define current test assembly.
-        /// </summary>
-
+        public EnvironmentBase(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider)
+        {
+            Settings = settings;
+            WatchDog = watchDog;
+            Registry = registry;
+            Runtime = runtime;
+            Logger = logger;
+            ServiceProvider = serviceProvider;
+        }
         /// <summary>
         /// Gets the collection of infrastructure components associated with this instance.
         /// </summary>
         private List<Infrastructure> _infrastructures = [];
 
-
-        /// <summary>
-        /// Configuration infrastructure dependency injection.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual void ConfigureInfrastructureServices(IServiceCollection collection) => _serviceCollection.AddSingleton(EnvironmentId);
 
         /// <summary>
         /// Configure environment with infrastructures. Called before environment initialization.
@@ -79,7 +73,7 @@ namespace NotoriousTest.Core.Environments
         /// Add an infrastructure within environment.
         /// </summary>
         public EnvironmentBase AddInfrastructure<T>() where T : Infrastructure
-            => AddInfrastructure(ActivatorUtilities.CreateInstance<T>(ServiceProvider));
+            => AddInfrastructure(ActivatorUtilities.CreateInstance<T>(ServiceProvider, EnvironmentId));
 
         /// <summary>
         /// Add an infrastructure within environment.
@@ -101,10 +95,7 @@ namespace NotoriousTest.Core.Environments
         /// <returns>A task that represents the asynchronous initialization operation.</returns>
         public virtual async Task Initialize()
         {
-            _serviceCollection = new ServiceCollection();
             // Setup registry
-            ConfigureInfrastructureServices(_serviceCollection);
-            ServiceProvider = _serviceCollection.BuildServiceProvider();
             if (!Settings.DisableWatchdog)
             {
                 await SetupRegistry();
@@ -117,7 +108,7 @@ namespace NotoriousTest.Core.Environments
 
         private async Task InitializeInfrastructureInParralelAndInOrder()
         {
-            var infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
+            IEnumerable<IGrouping<int?, Infrastructure>> infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
 
             var action = new Func<Infrastructure, Task>(async (i) =>
             {
@@ -128,10 +119,10 @@ namespace NotoriousTest.Core.Environments
                 await i.InitializeAsync();
             });
 
-            foreach (var infrastructureGroup in infrastructureGroupedByOrder)
+            foreach (IGrouping<int?, Infrastructure> infrastructureGroup in infrastructureGroupedByOrder)
             {
-                var nonConsumers = infrastructureGroup.Where(i => i is not IConfigurationConsumer);
-                var consumers = infrastructureGroup.Where(i => i is IConfigurationConsumer);
+                IEnumerable<Infrastructure> nonConsumers = infrastructureGroup.Where(i => i is not IConfigurationConsumer);
+                IEnumerable<Infrastructure> consumers = infrastructureGroup.Where(i => i is IConfigurationConsumer);
                 await Task.WhenAll(nonConsumers.Select(i => action(i)));
                 await Task.WhenAll(consumers.Select(i => action(i)));
             }
@@ -147,11 +138,7 @@ namespace NotoriousTest.Core.Environments
             WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id, EnvironmentId, runtimesPath);
         }
 
-        public virtual async Task Reset()
-        {
-            await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.AutoReset ? i.ResetAsync() : Task.CompletedTask);
-
-        }
+        public virtual async Task Reset() => await ExecuteActionOnInfrastructureInParralelAndInOrder((i) => i.AutoReset ? i.ResetAsync() : Task.CompletedTask);
 
         public virtual async Task Destroy()
         {
@@ -164,22 +151,18 @@ namespace NotoriousTest.Core.Environments
 
         private async Task ExecuteActionOnInfrastructureInParralelAndInOrder(Func<Infrastructure, Task> action)
         {
-            var infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
-            foreach (var infrastructure in infrastructureGroupedByOrder)
+            IEnumerable<IGrouping<int?, Infrastructure>> infrastructureGroupedByOrder = _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
+            foreach (IGrouping<int?, Infrastructure> infrastructure in infrastructureGroupedByOrder)
             {
                 await Task.WhenAll(infrastructure.Select(action));
             }
         }
 
-
-
-        private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration()
-        {
-            return _infrastructures
-                    .Where(i => i is IConfigurationProducer)
-                    .SelectMany(i => (i as IConfigurationProducer).OutputConfiguration)
-                    .ToList();
-        }
+        private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration() =>
+            _infrastructures
+                .Where(i => i is IConfigurationProducer)
+                .SelectMany(i => (i as IConfigurationProducer)!.OutputConfiguration)
+                .ToList();
 
         private Task SetupRegistry() => Registry.Ensure();
     }

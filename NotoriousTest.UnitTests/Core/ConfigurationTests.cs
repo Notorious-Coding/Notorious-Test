@@ -1,8 +1,9 @@
 using AwesomeAssertions;
 
 using FakeItEasy;
-
+using NotoriousTest.Core;
 using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
@@ -20,6 +21,7 @@ public class ConfigurationTests
     private readonly IWatchDog _watchDog;
     private readonly IRuntime _runtime;
     private readonly ITestSettingsProvider _settings;
+    private readonly IServiceProvider _provider;
 
     public ConfigurationTests()
     {
@@ -27,7 +29,7 @@ public class ConfigurationTests
         _registry = A.Fake<IRegistry>();
         _watchDog = A.Fake<IWatchDog>();
         _runtime = A.Fake<IRuntime>();
-        _settings = A.Fake<ITestSettingsProvider>();
+        _provider = A.Fake<IServiceProvider>();
     }
 
     [Fact]
@@ -39,7 +41,7 @@ public class ConfigurationTests
         infrastructure1.AddEntry("key", "value");
         infrastructure2.AddEntry("key2", "value2");
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub environment = new(settings: new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
         environment.OnConfigureEnvironment += () =>
         {
@@ -63,7 +65,7 @@ public class ConfigurationTests
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new ConsumerInfrastructureStub(_testLogger, _registry);
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub environment = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
         environment.OnConfigureEnvironment += () =>
         {
@@ -82,7 +84,7 @@ public class ConfigurationTests
         var infrastructure1 = new InfrastructureStub(_testLogger, _registry);
         var infrastructure2 = new ConsumerInfrastructureStub(_testLogger, _registry);
 
-        EnvironmentStub environment = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub environment = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
         infrastructure1.AddEntry("key", "value");
 

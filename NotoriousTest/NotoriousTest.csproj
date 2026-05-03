@@ -23,4 +23,10 @@
 	  <ProjectReference Include="..\NotoriousTest.TestSettings\NotoriousTest.TestSettings.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
 	  <ProjectReference Include="..\NotoriousTest.Watchdog\NotoriousTest.Watchdog.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
 	</ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NotoriousTest.XUnit" />
+    <InternalsVisibleTo Include="NotoriousTest.TUnit" />
+    <InternalsVisibleTo Include="NotoriousTest.NUnit" />
+    <InternalsVisibleTo Include="NotoriousTest.MSTest" />
+  </ItemGroup>
 </Project>

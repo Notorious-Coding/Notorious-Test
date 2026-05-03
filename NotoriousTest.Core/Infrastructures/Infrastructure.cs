@@ -46,8 +46,8 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     ///<inheritdoc/>
     public bool AutoReset { get; set; } = true;
 
-    public virtual bool DisableRegistry { get; } = false;
-    internal bool WatchdogDisabled { get; set; } = false;
+    public virtual bool DisableRegistry => false;
+    internal bool WatchdogDisabled { get; set; }
     ///<inheritdoc/>
     public EnvironmentId EnvironmentId { get; set; }
     public Guid Id = Guid.NewGuid();
@@ -59,13 +59,13 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// <summary>
     /// Gets the logger instance used to record test execution details and diagnostic information.
     /// </summary>
-    protected ITestLogger Logger { get; private set; }
+    protected ITestLogger Logger { get; }
 
     /// <summary>
     /// Gets the registry provider used to track infrastructure and clean them after test crash.
     /// </summary>
-    protected IRegistry Registry { get; private set; }
-    protected bool Registered { get; private set; } = false;
+    protected IRegistry Registry { get; }
+    protected bool Registered { get; private set; }
 
     public Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
     {
@@ -75,10 +75,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     }
 
     public abstract Task Initialize();
-    public virtual Task Reset()
-    {
-        return Task.CompletedTask;
-    }
+    public virtual Task Reset() => Task.CompletedTask;
     public abstract Task Destroy();
 
     public async ValueTask DisposeAsync()

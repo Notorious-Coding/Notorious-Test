@@ -30,7 +30,7 @@ namespace NotoriousTest.Runtime
                 return null;
 
 
-            var json = File.ReadAllText(runtimePath);
+            string json = File.ReadAllText(runtimePath);
 
 
             RuntimeConfigurationEntity? entity = JsonSerializer.Deserialize<RuntimeConfigurationEntity>(json, JSON_OPTIONS);
@@ -38,26 +38,24 @@ namespace NotoriousTest.Runtime
                 return null;
 
             FrameworkEntry[]? frameworkEntries = entity.RuntimeOptions.Frameworks ?? [entity.RuntimeOptions.Framework!];
-
             SupportedFramework[]? frameworks = frameworkEntries.Select(ToDomain).ToArray();
+
             var result = new RuntimeConfiguration(entity.RuntimeOptions.Tfm, frameworks);
             _cache = result;
             return result;
         }
 
-        private SupportedFramework ToDomain(FrameworkEntry entry)
-        {
-            return new SupportedFramework(entry.Name, entry.Version, GetNearestVersionDirectory(entry));
-        }
-        private string GetNearestVersionDirectory(FrameworkEntry framework)
-        {
-            var dotnetRoot = GetDotnetRoot();
+        private SupportedFramework ToDomain(FrameworkEntry entry) => new(entry.Name, entry.Version, GetNearestVersionDirectory(entry));
 
-            var frameworkPath = $"{dotnetRoot}/shared/{framework.Name}";
+        private string? GetNearestVersionDirectory(FrameworkEntry framework)
+        {
+            string dotnetRoot = GetDotnetRoot();
 
-            var prefix = $"{new Version(framework.Version).Major}.{new Version(framework.Version).Minor}.";
-            // Find the nearest version 
-            var best = Directory.GetDirectories(frameworkPath)
+            string frameworkPath = $"{dotnetRoot}/shared/{framework.Name}";
+
+            string prefix = $"{new Version(framework.Version).Major}.{new Version(framework.Version).Minor}.";
+            // Find the nearest version
+            string? best = Directory.GetDirectories(frameworkPath)
                         .Where(d => Path.GetFileName(d).StartsWith(prefix))
                         .OrderByDescending(d => new Version(Path.GetFileName(d)))
                         .FirstOrDefault();
@@ -67,17 +65,19 @@ namespace NotoriousTest.Runtime
         private string GetDotnetRoot()
         {
 
-            string dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
+            string? dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT");
 
             if (!string.IsNullOrWhiteSpace(dotnetRoot))
                 return dotnetRoot;
 
-            var mainModule = Process.GetCurrentProcess().MainModule!.FileName;
-            var isNotSelfContained = Path.GetFileNameWithoutExtension(mainModule)
+            string mainModule = Process.GetCurrentProcess().MainModule!.FileName;
+
+            // If the test project is self-contained (wich is rare), the main module will be the test executable itself.
+            bool isNotSelfContained = Path.GetFileNameWithoutExtension(mainModule)
                     .Equals("dotnet", StringComparison.OrdinalIgnoreCase);
 
             if (isNotSelfContained)
-                return Path.GetDirectoryName(mainModule);
+                return Path.GetDirectoryName(mainModule)!;
 
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),

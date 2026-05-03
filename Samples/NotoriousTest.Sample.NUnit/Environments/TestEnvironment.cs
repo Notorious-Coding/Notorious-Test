@@ -3,11 +3,20 @@ using NotoriousTest.Web;
 using NotoriousTest.Sample.NUnit.Infrastructures;
 
 using System.Reflection;
+using NotoriousTest.Core.Environments;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Watchdog;
 
 namespace NotoriousTest.Sample.NUnit.Environments
 {
-    public class TestEnvironment : NotoriousTest.NUnit.Environment
+    public class TestEnvironment : EnvironmentBase
     {
+        public TestEnvironment(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider) : base(settings, watchDog, registry, runtime, logger, serviceProvider)
+        {
+        }
+
         public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
         // This is called at the start of the test campaign
