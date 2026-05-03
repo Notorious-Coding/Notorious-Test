@@ -5,16 +5,9 @@ namespace NotoriousTest.TUnit.Logger
 {
     public class TUnitTestLogger : ITestLogger
     {
-        private readonly EnvironmentId _contextId;
-
-        public TUnitTestLogger(EnvironmentId contextId)
+        public void Log(string message, EnvironmentId environment)
         {
-            _contextId = contextId;
-        }
-
-        public void Log(string message)
-        {
-            TestContext.Current!.Output.WriteLine($"[NotoriousTest][{_contextId.Value}]{message}");
+            TestContext.Current!.Output.WriteLine($"[NotoriousTest][{environment.Value}]{message}");
         }
     }
 }

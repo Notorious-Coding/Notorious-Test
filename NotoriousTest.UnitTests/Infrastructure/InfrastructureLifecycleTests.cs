@@ -10,20 +10,14 @@ namespace NotoriousTest.UnitTests.Infrastructure;
 
 public class InfrastructureLifecycleTests
 {
-    private readonly ITestLogger _testLogger;
-    private readonly IRegistry _registry;
-
-    public InfrastructureLifecycleTests()
-    {
-        _testLogger = A.Fake<ITestLogger>();
-        _registry = A.Fake<IRegistry>();
-    }
+    private readonly ITestLogger _testLogger = A.Fake<ITestLogger>();
+    private readonly IRegistry _registry = A.Fake<IRegistry>();
 
     [Fact]
     public async Task InitializeAsync_Should_CallInitialize()
     {
         bool called = false;
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry)
+        var infrastructure = new InfrastructureStub(_testLogger, _registry)
         {
             OnInitialize = async () => called = true
         };
@@ -36,7 +30,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task InitializeAsync_Should_RegisterInRegistry()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry);
         await infrastructure.InitializeAsync();
         A.CallTo(() => _registry.Register(A<InfrastuctureRegistryEntry>._)).MustHaveHappenedOnceExactly();
     }
@@ -44,7 +38,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task InitializeAsync_Should_SkipRegistration_WhenRegistryDisabled()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
         await infrastructure.InitializeAsync();
         A.CallTo(() => _registry.Register(A<InfrastuctureRegistryEntry>._)).MustNotHaveHappened();
     }
@@ -52,7 +46,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task InitializeAsync_Should_SkipRegistration_WhenAlreadyRegistered()
     {
-        RegisteredInfrastructureStub infrastructure = new RegisteredInfrastructureStub(_testLogger, _registry);
+        var infrastructure = new RegisteredInfrastructureStub(_testLogger, _registry);
         await infrastructure.InitializeAsync();
         A.CallTo(() => _registry.Register(A<InfrastuctureRegistryEntry>._)).MustHaveHappenedOnceExactly();
     }
@@ -60,17 +54,18 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task InitializeAsync_Should_LogStartAndCompletionTimes()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry);
         await infrastructure.InitializeAsync();
-        A.CallTo(() => _testLogger.Log(A<string>.That.Matches(s => s.Contains($"[{infrastructure.GetType().Name}] Initialization ...")))).MustHaveHappenedOnceExactly();
-        A.CallTo(() => _testLogger.Log(A<string>.That.Matches(s => s.Contains($"[{infrastructure.GetType().Name}] Initialization completed in")))).MustHaveHappenedOnceExactly();
+
+        A.CallTo(() => _testLogger.Log(A<string>.That.Matches(s => s.Contains($"[{infrastructure.GetType().Name}] Initialization ...")), infrastructure.EnvironmentId)).MustHaveHappenedOnceExactly();
+        A.CallTo(() => _testLogger.Log(A<string>.That.Matches(s => s.Contains($"[{infrastructure.GetType().Name}] Initialization completed in")), infrastructure.EnvironmentId)).MustHaveHappenedOnceExactly();
     }
 
     [Fact]
     public async Task ResetAsync_Should_CallReset()
     {
         bool called = false;
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry)
+        var infrastructure = new InfrastructureStub(_testLogger, _registry)
         {
             OnReset = async () => called = true
         };
@@ -82,7 +77,7 @@ public class InfrastructureLifecycleTests
     public async Task DestroyAsync_Should_CallDestroy()
     {
         bool called = false;
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry)
+        var infrastructure = new InfrastructureStub(_testLogger, _registry)
         {
             OnDestroy = async () => called = true
         };
@@ -93,7 +88,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task DestroyAsync_Should_RemoveFromRegistry()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry);
         await infrastructure.DestroyAsync();
 
         A.CallTo(() => _registry.Remove(infrastructure.Id)).MustHaveHappenedOnceExactly();
@@ -102,7 +97,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task DestroyAsync_Should_SkipRemove_WhenRegistryDisabled()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
         await infrastructure.DestroyAsync();
         A.CallTo(() => _registry.Remove(infrastructure.Id)).MustNotHaveHappened();
     }
@@ -110,7 +105,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task ResetAsync_Should_NotifyResetAtRegistry()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: false);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: false);
         await infrastructure.ResetAsync();
         A.CallTo(() => _registry.NotifyReset(infrastructure.Id)).MustHaveHappenedOnceExactly();
     }
@@ -118,7 +113,7 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task ResetAsync_Should_NotNotifyResetAtRegistry_WhenRegistryDisabled()
     {
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
+        var infrastructure = new InfrastructureStub(_testLogger, _registry, disableRegistry: true);
         await infrastructure.ResetAsync();
         A.CallTo(() => _registry.NotifyReset(infrastructure.Id)).MustNotHaveHappened();
     }
@@ -126,8 +121,8 @@ public class InfrastructureLifecycleTests
     [Fact]
     public async Task DisposeAsync_Should_CallDestroyAsync()
     {
-        var called = false;
-        InfrastructureStub infrastructure = new InfrastructureStub(_testLogger, _registry)
+        bool called = false;
+        var infrastructure = new InfrastructureStub(_testLogger, _registry)
         {
             OnDestroy = async () => called = true
         };

@@ -7,16 +7,9 @@ namespace NotoriousTest.NUnit.Logger
 {
     public class NUnitTestLogger : ITestLogger
     {
-        private readonly EnvironmentId _contextId;
-
-        public NUnitTestLogger(EnvironmentId contextId)
+        public void Log(string message, EnvironmentId environmentId)
         {
-            _contextId = contextId;
-        }
-
-        public void Log(string message)
-        {
-            TestContext.Progress.WriteLine($"[NotoriousTest][{_contextId.Value}]{message}");
+            TestContext.Progress.WriteLine($"[NotoriousTest][{environmentId.Value}]{message}");
         }
     }
 }
