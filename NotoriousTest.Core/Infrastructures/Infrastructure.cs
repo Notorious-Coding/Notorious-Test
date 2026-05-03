@@ -87,18 +87,18 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     {
         try
         {
-            Logger.Log($"[{GetType().Name}] Initialization ...");
+            Logger.Log($"[{GetType().Name}] Initialization ...", EnvironmentId);
             var sw = Stopwatch.StartNew();
 
             await Initialize();
             if (!WatchdogDisabled && !DisableRegistry && !Registered) await Register();
 
-            Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms");
+            Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
 
         }
         catch (Exception ec)
         {
-            Logger.Log("Initialization failed with exception: " + ec.ToString());
+            Logger.Log("Initialization failed with exception: " + ec, EnvironmentId);
             await Destroy();
             throw;
         }
@@ -120,23 +120,23 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     internal async Task ResetAsync()
     {
-        Logger.Log($"[{GetType().Name}] Reset ...");
+        Logger.Log($"[{GetType().Name}] Reset ...", EnvironmentId);
         var sw = Stopwatch.StartNew();
 
         await Reset();
         if (!WatchdogDisabled && !DisableRegistry) await Registry.NotifyReset(Id);
-        Logger.Log($"[{GetType().Name} ] Reset completed in {sw.ElapsedMilliseconds} ms");
+        Logger.Log($"[{GetType().Name} ] Reset completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
 
     }
 
     internal async Task DestroyAsync()
     {
-        Logger.Log($"[{GetType().Name}] Destroy ...");
+        Logger.Log($"[{GetType().Name}] Destroy ...", EnvironmentId);
         var sw = Stopwatch.StartNew();
 
         await Destroy();
         if (!WatchdogDisabled && !DisableRegistry) await Registry.Remove(Id);
 
-        Logger.Log($"[{GetType().Name} ] Destroy completed in {sw.ElapsedMilliseconds} ms");
+        Logger.Log($"[{GetType().Name} ] Destroy completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
     }
 }

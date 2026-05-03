@@ -8,13 +8,6 @@ namespace NotoriousTest.XUnit.Logger
 {
     public class XUnitTestLogger : ITestLogger
     {
-        private readonly EnvironmentId _contextId;
-
-        public XUnitTestLogger(EnvironmentId contextId)
-        {
-            _contextId = contextId;
-        }
-
-        public void Log(string message) => TestContext.Current.SendDiagnosticMessage($"[NotoriousTest][{_contextId.Value.ToString()}]{message}");
+        public void Log(string message, EnvironmentId environmentId) => TestContext.Current.SendDiagnosticMessage($"[NotoriousTest][{environmentId.Value.ToString()}]{message}");
     }
 }

@@ -5,20 +5,19 @@ using NotoriousTest.Core.Logger;
 
 namespace NotoriousTest.MSTest.Logger
 {
-    public class TestLogger : ITestLogger
+    public class MSTestTestLogger : ITestLogger
     {
         private readonly TestContext _testContext;
         private readonly EnvironmentId _contextId;
 
-        public TestLogger(TestContext testContext, EnvironmentId contextId)
+        public MSTestTestLogger(TestContext testContext)
         {
             _testContext = testContext;
-            _contextId = contextId;
         }
 
-        public void Log(string message)
+        public void Log(string message, EnvironmentId environmentId)
         {
-            _testContext.WriteLine($"[NotoriousTest][{_contextId.Value}]{message}");
+            _testContext.WriteLine($"[NotoriousTest][{environmentId.Value}]{message}");
         }
     }
 }

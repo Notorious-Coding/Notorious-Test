@@ -22,23 +22,22 @@ namespace NotoriousTest.Watchdog
             _config = config;
         }
 
-        public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId contextId, IEnumerable<string>? runtimePaths)
+        public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId environmentId, IEnumerable<string>? runtimePaths)
         {
-            var assemblyPath = currentAssembly.Location;
+            string assemblyPath = currentAssembly.Location;
             string? runtimesParams = runtimePaths == null ? null : string.Join("|", runtimePaths);
 
             if (_config.ManualLaunch)
-                return WaitForDoggyDogToLaunch(currentPid, contextId, assemblyPath, runtimesParams);
-            else
-                return LaunchDoggyDog(currentPid, contextId, assemblyPath, runtimesParams);
+                return WaitForDoggyDogToLaunch(currentPid, environmentId, assemblyPath, runtimesParams);
+            return LaunchDoggyDog(currentPid, environmentId, assemblyPath, runtimesParams) ?? throw new Exception("Could not launch DoggyDog");
         }
 
-        private Process LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
+        private Process? LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
         {
-            var watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+            string watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
 
-            var runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\" ";
-            Process process = Process.Start(new ProcessStartInfo
+            string runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\" ";
+            var process = Process.Start(new ProcessStartInfo
             {
                 FileName = watchdogPath,
                 Arguments = $"--pid {currentPid} " +
@@ -55,19 +54,19 @@ namespace NotoriousTest.Watchdog
             return process;
         }
 
-        private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
+        private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId environmentId, string assemblyPath, string? runtimesParams)
         {
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_CONNECTIONSTRING", _registyConfiguration.ConnectionString, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ENVIRONMENT", contextId.Value.ToString(), EnvironmentVariableTarget.User);
+            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ENVIRONMENT", environmentId.Value.ToString(), EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_RUNTIMES", runtimesParams, EnvironmentVariableTarget.User);
             Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_LOGLEVEL", "Debug", EnvironmentVariableTarget.User);
 
-            Process? doggyDogProcess = null;
+            Process? doggyDogProcess;
             do
             {
-                _logger.Log("Waiting for DoggyDog to launch...");
+                _logger.Log("Waiting for DoggyDog to launch...", environmentId);
                 doggyDogProcess = Process.GetProcessesByName("DoggyDog")?.FirstOrDefault();
                 Thread.Sleep(5000);
 
@@ -76,15 +75,12 @@ namespace NotoriousTest.Watchdog
             return doggyDogProcess;
         }
 
-        public void SendSuccessSignal(EnvironmentId contextId)
-        {
-            File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal"), "OK");
-        }
+        public void SendSuccessSignal(EnvironmentId contextId) => File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal"), "OK");
 
         public static bool ReadSuccessSignal(EnvironmentId contextId)
         {
-            var path = Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal");
-            var isSuccess = File.Exists(path);
+            string path = Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal");
+            bool isSuccess = File.Exists(path);
             if (isSuccess) File.Delete(path);
 
             return isSuccess;

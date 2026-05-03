@@ -132,7 +132,7 @@ namespace NotoriousTest.Core.Environments
         {
             RuntimeConfiguration? runtimeConfiguration = Runtime.GetSupportedRuntimes(CurrentAssembly);
             if (runtimeConfiguration == null)
-                Logger.Log($"Runtime for {CurrentAssembly.FullName} cannot be found. Cleaner resolution may not work properly.");
+                Logger.Log($"Runtime for {CurrentAssembly.FullName} cannot be found. Cleaner resolution may not work properly.", EnvironmentId);
 
             IEnumerable<string>? runtimesPath = runtimeConfiguration?.SupportedFrameworks?.Select(sf => sf.FilePath);
             WatchDog.Start(CurrentAssembly, Process.GetCurrentProcess().Id, EnvironmentId, runtimesPath);

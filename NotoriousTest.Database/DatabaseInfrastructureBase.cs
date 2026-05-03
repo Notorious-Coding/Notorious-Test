@@ -74,7 +74,7 @@ namespace NotoriousTest.Database
             catch (InvalidOperationException ex)
             {
                 // This can occur if the database has no tables. In that case, we can ignore the exception and continue with the test setup.
-                Logger.Log(ex.Message);
+                Logger.Log(ex.Message, EnvironmentId);
             }
 
 
