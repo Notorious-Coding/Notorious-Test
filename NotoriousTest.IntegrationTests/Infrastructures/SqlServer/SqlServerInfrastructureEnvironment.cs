@@ -4,16 +4,16 @@ using NotoriousTest.Core.Registry;
 using NotoriousTest.TestContainers;
 
 using System.Reflection;
-
+using NotoriousTest.Core.Environments;
+using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Watchdog;
 using Testcontainers.MsSql;
-
-using Xunit.Sdk;
 
 namespace NotoriousTest.IntegrationTests.Environment
 {
-    public class SqlServerInfrastructureEnvironment : XUnit.Environment
+    public class SqlServerInfrastructureEnvironment : EnvironmentBase
     {
-        public SqlServerInfrastructureEnvironment(IMessageSink sink) : base(sink)
+        public SqlServerInfrastructureEnvironment(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider) : base(settings, watchDog, registry, runtime, logger, serviceProvider)
         {
         }
 

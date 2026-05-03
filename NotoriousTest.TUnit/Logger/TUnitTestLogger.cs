@@ -3,11 +3,11 @@ using NotoriousTest.Core.Logger;
 
 namespace NotoriousTest.TUnit.Logger
 {
-    public class TestLogger : ITestLogger
+    public class TUnitTestLogger : ITestLogger
     {
         private readonly EnvironmentId _contextId;
 
-        public TestLogger(EnvironmentId contextId)
+        public TUnitTestLogger(EnvironmentId contextId)
         {
             _contextId = contextId;
         }

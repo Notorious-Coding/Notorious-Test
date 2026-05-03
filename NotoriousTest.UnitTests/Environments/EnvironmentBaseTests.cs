@@ -10,7 +10,6 @@ using NotoriousTest.Core.Exceptions;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
-using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
 using NotoriousTest.UnitTests.Stubs;
 
@@ -24,7 +23,8 @@ public class EnvironmentBaseTests
     private readonly IRegistry _registry;
     private readonly IWatchDog _watchDog;
     private readonly IRuntime _runtime;
-    private readonly ITestSettingsProvider _settings;
+    private readonly IServiceProvider _provider;
+    private readonly EnvironmentId _environmentId = EnvironmentId.Create();
 
     public EnvironmentBaseTests()
     {
@@ -32,25 +32,21 @@ public class EnvironmentBaseTests
         _registry = A.Fake<IRegistry>();
         _watchDog = A.Fake<IWatchDog>();
         _runtime = A.Fake<IRuntime>();
-        _settings = A.Fake<ITestSettingsProvider>();
+        _provider = new ServiceCollection()
+            .AddSingleton(_testLogger)
+            .AddSingleton(_registry)
+            .AddSingleton(_watchDog)
+            .AddSingleton(_runtime)
+            .AddSingleton(_environmentId)
+            .BuildServiceProvider();
     }
 
-    [Fact]
-    public async Task Initialize_Should_BuildServiceProvider()
-    {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
-        await stub.Initialize();
-        stub.PublicServiceProvider.Should().NotBeNull();
-        stub.PublicServiceProvider!.GetService<ITestLogger>().Should().NotBeNull().And.Be(_testLogger);
-        stub.PublicServiceProvider!.GetService<IRegistry>().Should().NotBeNull().And.Be(_registry);
-        stub.PublicServiceProvider!.GetService<IWatchDog>().Should().NotBeNull().And.Be(_watchDog);
-    }
 
     [Fact]
     public async Task Initialize_Should_CallConfigureEnvironment()
     {
         bool called = false;
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings)
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider)
         {
             OnConfigureEnvironment = () =>
             {
@@ -66,7 +62,7 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Initialize_Should_CallSetupRegistry()
     {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         await stub.Initialize();
 
         A.CallTo(() => _registry.Ensure()).MustHaveHappenedOnceExactly();
@@ -75,7 +71,7 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Initialize_Should_StartWatchdog()
     {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         await stub.Initialize();
         A.CallTo(() => _watchDog.Start(A<Assembly>._, A<int>._, A<EnvironmentId>._, A<IEnumerable<string>>._)).MustHaveHappenedOnceExactly();
     }
@@ -84,7 +80,7 @@ public class EnvironmentBaseTests
     public async Task Initialize_Should_InitializeInfrastructuresInAscendingOrder()
     {
         List<int> initializationOrder = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => initializationOrder.Add(2) });
@@ -98,7 +94,8 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task AddInfrastructure_Should_SetContextId_WhenGeneric()
     {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
         stub.OnConfigureEnvironment = async () =>
         {
@@ -113,7 +110,7 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task AddInfrastructure_Should_SetContextId_WhenInstance()
     {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         InfrastructureStub infra = new(_testLogger, _registry);
 
         stub.OnConfigureEnvironment = async () =>
@@ -128,7 +125,7 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task GetInfrastructure_Should_ReturnInstance_WhenTypeExists()
     {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         InfrastructureStub infra = new(_testLogger, _registry);
         stub.OnConfigureEnvironment = async () =>
         {
@@ -143,7 +140,7 @@ public class EnvironmentBaseTests
     [Fact]
     public void GetInfrastructure_Should_ThrowInfrastructureNotFoundException_WhenTypeIsMissing()
     {
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         Action act = () => stub.GetInfrastructure<InfrastructureStub>();
         act.Should().Throw<InfrastructureNotFoundException>();
     }
@@ -152,7 +149,7 @@ public class EnvironmentBaseTests
     public async Task Reset_Should_OnlyResetInfrastructuresWithAutoResetEnabled()
     {
         List<int> resetOrder = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
         stub.OnConfigureEnvironment = async () =>
         {
@@ -170,7 +167,7 @@ public class EnvironmentBaseTests
     public async Task Reset_Should_ResetInfrastructuresInAscendingOrder()
     {
         List<int> initializationOrder = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
         stub.OnConfigureEnvironment = async () =>
         {
@@ -187,7 +184,7 @@ public class EnvironmentBaseTests
     public async Task Destroy_Should_DestroyAllInfrastructures()
     {
         List<int> destroyOrder = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnDestroy = async () => destroyOrder.Add(2) });
@@ -202,8 +199,8 @@ public class EnvironmentBaseTests
     [Fact]
     public void EnvironmentId_Should_BeUniquePerInstance()
     {
-        EnvironmentStub stub1 = new(_testLogger, _watchDog, _registry, _runtime, _settings);
-        EnvironmentStub stub2 = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub1 = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        EnvironmentStub stub2 = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub1.EnvironmentId.Should().NotBeNull();
         stub1.EnvironmentId.Value.Should().NotBeEmpty();
         stub2.EnvironmentId.Should().NotBeNull();
@@ -216,7 +213,7 @@ public class EnvironmentBaseTests
     public async Task Initialize_Should_InitializeInfrastructuresInAddOrder_WhenOrderIsNull()
     {
         List<int> initializationOrder = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: null) { OnInitialize = async () => initializationOrder.Add(1) });
@@ -231,7 +228,7 @@ public class EnvironmentBaseTests
     public async Task Initialize_Should_InitializeInAscendingOrder_WhenOrdersAreMixed()
     {
         List<int> initializationOrder = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => initializationOrder.Add(2) });
@@ -246,7 +243,7 @@ public class EnvironmentBaseTests
     public async Task Reset_Should_UseTheSameOrderingAsInitialize()
     {
         List<int> order = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(2), OnReset = async () => order.Add(2) });
@@ -263,7 +260,7 @@ public class EnvironmentBaseTests
     public async Task Initialize_Should_OrderMultipleInfrastructures()
     {
         List<int> order = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(2), OnReset = async () => order.Add(2) });
@@ -281,7 +278,7 @@ public class EnvironmentBaseTests
     public async Task Initialize_Should_ExecuteIConsumerLast_InEachGroup()
     {
         List<int> order = new();
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, _settings);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new ConsumerInfrastructureStub(_testLogger, _registry, order: 2) { OnInitialize = async () => order.Add(22), OnReset = async () => order.Add(2) });
@@ -298,19 +295,12 @@ public class EnvironmentBaseTests
 
     // --- Watchdog disabled ---
 
-    private ITestSettingsProvider BuildSettingsWithWatchdog(bool disabled)
-    {
-        var settings = A.Fake<ITestSettingsProvider>();
-        A.CallTo(() => settings.Get<EnvironmentConfiguration>(EnvironmentConfiguration.SECTION_NAME))
-            .Returns(new EnvironmentConfiguration { DisableWatchdog = disabled });
-        return settings;
-    }
 
     [Fact]
     public async Task Initialize_Should_NotSetupRegistry_WhenWatchdogIsDisabled()
     {
-        var settings = BuildSettingsWithWatchdog(disabled: true);
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, settings);
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub =  new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
 
         await stub.Initialize();
 
@@ -320,8 +310,8 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Initialize_Should_NotStartWatchdog_WhenWatchdogIsDisabled()
     {
-        var settings = BuildSettingsWithWatchdog(disabled: true);
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, settings);
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub =  new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
 
         await stub.Initialize();
 
@@ -331,8 +321,8 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Destroy_Should_NotSendSuccessSignal_WhenWatchdogIsDisabled()
     {
-        var settings = BuildSettingsWithWatchdog(disabled: true);
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, settings);
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub =  new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
 
         await stub.Initialize();
         await stub.Destroy();
@@ -343,8 +333,8 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Initialize_Should_NotRegisterInfrastructureInRegistry_WhenWatchdogIsDisabled()
     {
-        var settings = BuildSettingsWithWatchdog(disabled: true);
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, settings);
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub =  new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry));
@@ -358,8 +348,8 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Reset_Should_NotNotifyResetInRegistry_WhenWatchdogIsDisabled()
     {
-        var settings = BuildSettingsWithWatchdog(disabled: true);
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, settings);
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub =  new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry));
@@ -374,8 +364,8 @@ public class EnvironmentBaseTests
     [Fact]
     public async Task Destroy_Should_NotRemoveInfrastructureFromRegistry_WhenWatchdogIsDisabled()
     {
-        var settings = BuildSettingsWithWatchdog(disabled: true);
-        EnvironmentStub stub = new(_testLogger, _watchDog, _registry, _runtime, settings);
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub = new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
         stub.OnConfigureEnvironment = async () =>
         {
             stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry));

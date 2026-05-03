@@ -15,6 +15,10 @@
 	</ItemGroup>
 	<ItemGroup>
 		<InternalsVisibleTo Include="NotoriousTest.UnitTests" />
-		<InternalsVisibleTo Include="NotoriousTest.IntegrationTests" />
+    <InternalsVisibleTo Include="NotoriousTest.IntegrationTests" />
+    <InternalsVisibleTo Include="NotoriousTest.XUnit" />
+    <InternalsVisibleTo Include="NotoriousTest.TUnit" />
+    <InternalsVisibleTo Include="NotoriousTest.NUnit" />
+    <InternalsVisibleTo Include="NotoriousTest.MSTest" />
 	</ItemGroup>
 </Project>

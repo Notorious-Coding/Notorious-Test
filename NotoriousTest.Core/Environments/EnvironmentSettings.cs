@@ -1,8 +1,8 @@
 ﻿namespace NotoriousTest.Core.Environments
 {
-    public class EnvironmentConfiguration
+    public class EnvironmentSettings
     {
         public static string SECTION_NAME = "Environment";
-        public bool DisableWatchdog { get; set; } = false;
+        public bool DisableWatchdog { get; init; }
     }
 }

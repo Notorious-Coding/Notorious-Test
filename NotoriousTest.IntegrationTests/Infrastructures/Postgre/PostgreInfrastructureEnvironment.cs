@@ -4,16 +4,18 @@ using NotoriousTest.Core.Registry;
 using NotoriousTest.TestContainers;
 
 using System.Reflection;
-
+using NotoriousTest.Core.Environments;
+using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Watchdog;
 using Testcontainers.PostgreSql;
 
 using Xunit.Sdk;
 
 namespace NotoriousTest.IntegrationTests.Postgre
 {
-    public class PostgreInfrastructureEnvironment : XUnit.Environment
+    public class PostgreInfrastructureEnvironment : EnvironmentBase
     {
-        public PostgreInfrastructureEnvironment(IMessageSink sink) : base(sink)
+        public PostgreInfrastructureEnvironment(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider) : base(settings, watchDog, registry, runtime, logger, serviceProvider)
         {
         }
 

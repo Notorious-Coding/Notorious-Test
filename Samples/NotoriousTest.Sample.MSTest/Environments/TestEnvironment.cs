@@ -5,13 +5,28 @@ using NotoriousTest.Web;
 using NotoriousTest.Sample.MSTest.Infrastructures;
 
 using System.Reflection;
+using NotoriousTest.Core.Environments;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Watchdog;
 
 namespace NotoriousTest.Sample.MSTest.Environments
 {
     // In fact, this is a test fixture (MSTest terminology: ClassInitialize/ClassCleanup).
-    public class TestEnvironment : NotoriousTest.MSTest.Environment
+    public class TestEnvironment : EnvironmentBase
     {
-        public TestEnvironment(TestContext testContext) : base(testContext)
+        public TestEnvironment(EnvironmentSettings settings,
+            IWatchDog watchDog,
+            IRegistry registry,
+            IRuntime runtime,
+            ITestLogger logger,
+            IServiceProvider serviceProvider) : base(settings,
+            watchDog,
+            registry,
+            runtime,
+            logger,
+            serviceProvider)
         {
         }
 

@@ -7,9 +7,9 @@ using Xunit;
 
 namespace NotoriousTest.Sample.With
 {
-    public class WithNotoriousTestSample : IntegrationTest<MyEnvironment>
+    public class WithNotoriousTestBaseSample : IntegrationTest<MyEnvironment>
     {
-        public WithNotoriousTestSample(MyEnvironment environment) : base(environment)
+        public WithNotoriousTestBaseSample(MyEnvironment environment) : base(environment)
         {
         }
 
