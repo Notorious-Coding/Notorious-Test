@@ -1,6 +1,20 @@
 ﻿# Changelog
 
 ## v5.0.0
+### ✨ Features
+
+- Dependency injection is now at the Environment level
+  - Create a `IDependencyInjectionConfigurator`
+    ```csharp
+    public class DependencyInjectionConfigurator : IDependencyInjectionConfigurator
+    {
+        public IServiceCollection ConfigureServices(IServiceCollection services) => services;
+    }
+    ```
+  - Add a `[InjectionConfigurator(typeof(DependencyInjectionConfigurator))]` to the test class.
+    - You could add multiple `InjectionConfiguratorAttribute` to the same test class (or parents), they will all be used.
+  - Add dependencies to the environment/infrastructure constructor !
+
 ### 💥 Breaking Changes
 
 - Deleted support for Extensions, use dependency injection instead.
