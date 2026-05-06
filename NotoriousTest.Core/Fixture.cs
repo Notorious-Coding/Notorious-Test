@@ -35,7 +35,7 @@ public class Fixture<TEnvironment> where TEnvironment : EnvironmentBase
 
     private IDependencyInjectionConfigurator[] GetInjectionConfigurators()
     {
-        IEnumerable<Type> diConfiguratorTypes = TestClass.GetCustomAttributes<InjectionConfiguratorAttribute>()
+        IEnumerable<Type> diConfiguratorTypes = TestClass!.GetCustomAttributes<InjectionConfiguratorAttribute>()
             .Select(ic => ic.DIConfiguratorType).ToArray();
         return diConfiguratorTypes.Select((dic) => Activator.CreateInstance(dic) as IDependencyInjectionConfigurator).Where(dic => dic is not null).ToArray()!;
     }
