@@ -3,6 +3,7 @@
 using FakeItEasy;
 
 using NotoriousTest.Core;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
@@ -27,7 +28,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Initialize_Should_Create_Database);
 
-            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
             {
                 DbPrefix = dbPrefix,
             };
@@ -52,7 +53,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Reset_Should_Empty_Database);
-            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
             {
                 DbPrefix = dbPrefix,
             };
@@ -70,7 +71,7 @@ namespace NotoriousTest.IntegrationTests.Postgre
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Destroy_Should_Delete_Database);
-            var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
             {
                 DbPrefix = dbPrefix,
             };

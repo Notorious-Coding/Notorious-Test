@@ -1,6 +1,6 @@
-﻿namespace NotoriousTest.Environments
+﻿namespace NotoriousTest
 {
-    internal class SettingsDefaults
+    internal static class SettingsDefaults
     {
         public static readonly string DefaultRegistryConnectionString = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "notorioustest/doggydog-registry.db");
     }

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DoggyDog.UI.Context\DoggyDog.UI.Context.csproj" />
+      <ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj" />
+      <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" />
+      <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <InternalsVisibleTo Include="DoggyDog.UI.Infrastructures.DI" />
+    </ItemGroup>
+</Project>

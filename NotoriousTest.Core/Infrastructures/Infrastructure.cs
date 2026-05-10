@@ -3,6 +3,8 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
 using System.Diagnostics;
+using System.Reflection;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.Core.Infrastructures;
 
@@ -12,7 +14,7 @@ public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastr
 {
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration { get; } = new();
 
-    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings) : base(contextId, logger, provider, settings)
     {
     }
 
@@ -30,7 +32,7 @@ public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata
     /// </summary>
     public new TMetadata? Metadata { get => (TMetadata?)base.Metadata; protected set => base.Metadata = value; }
 
-    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(contextId, logger, provider)
+    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings) : base(contextId, logger, provider, settings)
     {
     }
 }
@@ -40,22 +42,23 @@ public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata
 /// </summary>
 public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 {
+
     ///<inheritdoc/>
     public virtual int? Order { get; }
 
     ///<inheritdoc/>
     public bool AutoReset { get; set; } = true;
 
-    public virtual bool DisableRegistry => false;
-    internal bool WatchdogDisabled { get; set; }
     ///<inheritdoc/>
     public EnvironmentId EnvironmentId { get; set; }
+
     public Guid Id = Guid.NewGuid();
 
     /// <summary>
     /// Gets or sets the metadata associated with the current object.
     /// </summary>
     public object? Metadata { get; protected set; }
+
     /// <summary>
     /// Gets the logger instance used to record test execution details and diagnostic information.
     /// </summary>
@@ -66,9 +69,14 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
     /// </summary>
     protected IRegistry Registry { get; }
     protected bool Registered { get; private set; }
+    protected virtual bool DisableRegistry => false;
 
-    public Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
+    private readonly EnvironmentSettings _settings;
+
+
+    public Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings)
     {
+        _settings = settings;
         EnvironmentId = contextId;
         Logger = logger;
         Registry = provider;
@@ -91,7 +99,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
             var sw = Stopwatch.StartNew();
 
             await Initialize();
-            if (!WatchdogDisabled && !DisableRegistry && !Registered) await Register();
+            if (!_settings.DisableWatchdog && !DisableRegistry && !Registered) await Register();
 
             Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
 
@@ -124,7 +132,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         var sw = Stopwatch.StartNew();
 
         await Reset();
-        if (!WatchdogDisabled && !DisableRegistry) await Registry.NotifyReset(Id);
+        if (!_settings.DisableWatchdog && !DisableRegistry) await Registry.NotifyReset(Id);
         Logger.Log($"[{GetType().Name} ] Reset completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
 
     }
@@ -135,7 +143,7 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         var sw = Stopwatch.StartNew();
 
         await Destroy();
-        if (!WatchdogDisabled && !DisableRegistry) await Registry.Remove(Id);
+        if (!_settings.DisableWatchdog && !DisableRegistry) await Registry.Remove(Id);
 
         Logger.Log($"[{GetType().Name} ] Destroy completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
     }

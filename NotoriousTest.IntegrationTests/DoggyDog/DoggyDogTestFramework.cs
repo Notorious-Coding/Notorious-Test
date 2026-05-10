@@ -14,6 +14,7 @@ using NotoriousTest.SqlLiteRegistry;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using NotoriousTest.Core.Environments;
 
 
 namespace NotoriousTest.IntegrationTests
@@ -102,8 +103,8 @@ namespace NotoriousTest.IntegrationTests
             }
 
             [Cleaner(typeof(FakeCleaner))]
-            public class FakeInfrastructureWithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
-                : Infrastructure<string>(contextId, logger, provider)
+            public class FakeInfrastructureWithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings)
+                : Infrastructure<string>(contextId, logger, provider, settings)
             {
                 public override Task Destroy() => Task.CompletedTask;
 
@@ -111,8 +112,8 @@ namespace NotoriousTest.IntegrationTests
             }
 
             [Cleaner(typeof(FakeCleaner))]
-            public class FakeInfrastructure2WithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider)
-                : Infrastructure<string>(contextId, logger, provider)
+            public class FakeInfrastructure2WithCleaner(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings)
+                : Infrastructure<string>(contextId, logger, provider, settings)
             {
                 public override Task Destroy() => Task.CompletedTask;
 
@@ -122,8 +123,9 @@ namespace NotoriousTest.IntegrationTests
             public class FakeInfrastructureWithoutCleanerAttribute(
                 EnvironmentId contextId,
                 ITestLogger logger,
-                IRegistry provider)
-                : Infrastructure<string>(contextId, logger, provider)
+                IRegistry provider,
+                EnvironmentSettings settings)
+                : Infrastructure<string>(contextId, logger, provider, settings)
             {
                 public override Task Destroy() => Task.CompletedTask;
 
@@ -135,7 +137,7 @@ namespace NotoriousTest.IntegrationTests
         {
             public static (Process Process, StringBuilder StdoutBuilder) StartDoggyDog(int processId, string assembly, string connectionString, Guid environmentId)
             {
-                string doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+                string doggyDogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.Watchdog.exe" : "DoggyDog.Watchdog");
                 var doggyDogProcess = Process.Start(new ProcessStartInfo
                 {
                     FileName = doggyDogPath,
@@ -148,7 +150,7 @@ namespace NotoriousTest.IntegrationTests
 
                 if (doggyDogProcess == null)
                 {
-                    Xunit.Assert.Fail("Fail to launch DoggyDog.exe");
+                    Xunit.Assert.Fail("Fail to launch DoggyDog.Watchdog.exe");
                 }
 
                 doggyDogProcess!.StandardInput.Close();
@@ -174,11 +176,11 @@ namespace NotoriousTest.IntegrationTests
         {
             public static async Task ShouldHaveFoundInfrastructureToClean(string stdout, int count, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] {count} infrastructure(s) registered for EID {environmentId}. Starting cleanup...");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] {count} infrastructure(s) registered for EID {environmentId}. Starting cleanup...");
             }
             public static async Task ShouldHaveNotFoundInfrastructureToClean(string stdout, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] No registered infrastructure found for EID {environmentId}. Nothing to clean up.");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] No registered infrastructure found for EID {environmentId}. Nothing to clean up.");
             }
             public static async Task ShouldHaveCleanedEntry(string stdout, SqliteInfrastructure registry, InfrastuctureRegistryEntry entry)
             {
@@ -218,53 +220,53 @@ namespace NotoriousTest.IntegrationTests
 
             public static async Task ShouldHaveInitiatedRecovery(string stdout, Process? attachedProcess, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} for EID {environmentId} exited abnormally. Initiating crash recovery...");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] Process {attachedProcess.Id} for EID {environmentId} exited abnormally. Initiating crash recovery...");
             }
 
             public static async Task ShouldHaveMonitoredProcess(string stdout, Process? attachedProcess)
             {
-                stdout.Should().Contain($"[DoggyDog] Monitoring PID {attachedProcess.Id} - awaiting termination...");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] Monitoring PID {attachedProcess.Id} - awaiting termination...");
             }
 
             public static async Task ShouldHaveReceivedExitSignal(string stdout, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] Success signal found for {environmentId}.");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] Success signal found for {environmentId}.");
                 File.Exists(Path.Combine(Path.GetTempPath(), $"nt-{environmentId}.signal")).Should().BeFalse();
             }
 
             public static async Task ShouldHaveFoundRegistryFile(string stdout, string registryPath)
             {
-                stdout.Should().Contain($"[DoggyDog] Using registry file at {registryPath}");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] Using registry file at {registryPath}");
             }
 
             public static async Task ShouldHaveNotFoundRegistryFile(string stdout, string registryPath)
             {
-                stdout.Should().Contain($"[DoggyDog] Registry file not found at {registryPath}");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] Registry file not found at {registryPath}");
             }
 
             public static async Task ShouldHaveExitNormally(string stdout, Process? attachedProcess, Guid environmentId)
             {
-                stdout.Should().Contain($"[DoggyDog] Process {attachedProcess.Id} for EID {environmentId} exited cleanly. No recovery needed.");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] Process {attachedProcess.Id} for EID {environmentId} exited cleanly. No recovery needed.");
             }
 
             public static async Task ShouldHaveNotFoundProcess(string stdout, int pid)
             {
-                stdout.Should().Contain($"[DoggyDog] No process with PID {pid} found. Exiting.");
+                stdout.Should().Contain($"[DoggyDog.Watchdog] No process with PID {pid} found. Exiting.");
             }
 
             public static async Task ShouldHaveCatchResetEvent(StringBuilder stdoutBuilder, Type infrastructureType, CancellationToken cancellationToken = default)
             {
-                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog][{infrastructureType.Name}] Reset has been triggered.", cancellationToken);
+                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog.Watchdog][{infrastructureType.Name}] Reset has been triggered.", cancellationToken);
             }
 
             public static async Task ShouldHaveCatchDestroyEvent(StringBuilder stdoutBuilder, Type infrastructureType, CancellationToken cancellationToken = default)
             {
-                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog][{infrastructureType.Name}] Destroy has been triggered.", cancellationToken);
+                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog.Watchdog][{infrastructureType.Name}] Destroy has been triggered.", cancellationToken);
             }
 
             public static async Task ShouldHaveCatchInitEvent(StringBuilder stdoutBuilder, Type infrastructureType, CancellationToken cancellationToken = default)
             {
-                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog][{infrastructureType.Name}] Initialization has been triggered.", cancellationToken);
+                await WaitUntilStdoutContains(stdoutBuilder, $"[DoggyDog.Watchdog][{infrastructureType.Name}] Initialization has been triggered.", cancellationToken);
             }
 
             private static async Task WaitUntilStdoutContains(StringBuilder stdoutBuilder, string expected, CancellationToken cancellationToken, int timeoutMs = 5000)

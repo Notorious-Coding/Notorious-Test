@@ -12,14 +12,14 @@
       <DoggyDogArtifactsDir>$(MSBuildThisFileDirectory)artifacts\doggydog\$(DoggyDogRuntime)\</DoggyDogArtifactsDir>
     </PropertyGroup>
 
-    <Warning Text="DoggyDog artifacts not found at '$(DoggyDogArtifactsDir)'. Build the DoggyDog project first."
+    <Warning Text="DoggyDog.Watchdog artifacts not found at '$(DoggyDogArtifactsDir)'. Build the DoggyDog.Watchdog project first."
              Condition="!Exists('$(DoggyDogArtifactsDir)')" />
 
     <ItemGroup>
       <DoggyDogFiles Include="$(DoggyDogArtifactsDir)*" Condition="Exists('$(DoggyDogArtifactsDir)')" />
     </ItemGroup>
 
-    <Message Text="Copying DoggyDog from $(DoggyDogArtifactsDir) to $(OutDir)" Importance="high" />
+    <Message Text="Copying DoggyDog.Watchdog from $(DoggyDogArtifactsDir) to $(OutDir)" Importance="high" />
     <Copy SourceFiles="@(DoggyDogFiles)" DestinationFolder="$(OutDir)" Condition="'@(DoggyDogFiles)' != ''" />
   </Target>
 </Project>

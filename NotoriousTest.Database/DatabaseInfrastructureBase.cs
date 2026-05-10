@@ -4,6 +4,7 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 using Respawn;
 using Respawn.Graph;
 
@@ -22,7 +23,7 @@ namespace NotoriousTest.Database
         private Respawner? _respawner;
 
 
-        public DatabaseInfrastructureBase(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public DatabaseInfrastructureBase(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
         }
 

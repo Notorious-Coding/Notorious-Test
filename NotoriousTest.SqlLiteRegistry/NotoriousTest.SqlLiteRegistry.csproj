@@ -16,6 +16,7 @@
 		<InternalsVisibleTo Include="NotoriousTest.UnitTests" />
 		<InternalsVisibleTo Include="NotoriousTest.IntegrationTests" />
 		<InternalsVisibleTo Include="NotoriousTest" />
-		<InternalsVisibleTo Include="DoggyDog" />
+		<InternalsVisibleTo Include="DoggyDog.Watchdog" />
+		<InternalsVisibleTo Include="DoggyDog.UI.Infrastructures" />
 	</ItemGroup>
 </Project>

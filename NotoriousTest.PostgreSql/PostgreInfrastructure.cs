@@ -9,12 +9,13 @@ using NotoriousTest.Database.Settings;
 using Npgsql;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.PostgreSql
 {
     public class PostgreInfrastructure : PostgreInfrastructure<string, DatabaseSettings>
     {
-        public PostgreInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
+        public PostgreInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, settingsProvider, logger, registry, settings)
         {
         }
 
@@ -35,7 +36,7 @@ namespace NotoriousTest.PostgreSql
     [Cleaner(typeof(PostgreInfrastructureCleaner))]
     public class PostgreInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
-        public PostgreInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry) {}
+        public PostgreInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, settingsProvider, logger, registry, settings) {}
 
         public override DbConnection GetConnection(string connectionString) => new NpgsqlConnection(connectionString);
 

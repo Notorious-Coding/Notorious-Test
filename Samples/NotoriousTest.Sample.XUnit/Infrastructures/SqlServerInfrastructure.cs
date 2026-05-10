@@ -4,12 +4,13 @@ using NotoriousTest.Core.Registry;
 using NotoriousTest.SqlServer;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.Sample.XUnit.Infrastructures
 {
     public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
-        public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
         }
 
@@ -17,7 +18,7 @@ namespace NotoriousTest.Sample.XUnit.Infrastructures
         public override async Task Initialize()
         {
             await base.Initialize();
-            // We can add the connection string to the configuration, it will provide a SqlConnection. 
+            // We can add the connection string to the configuration, it will provide a SqlConnection.
 
             using var connection = GetDatabaseConnection();
             await connection.OpenAsync();

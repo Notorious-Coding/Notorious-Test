@@ -1,5 +1,6 @@
 ﻿using NotoriousTest.Core;
 using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
@@ -11,8 +12,8 @@ namespace NotoriousTest.Web.Infrastructures
         public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
         public HttpClient? HttpClient;
         public override int? Order => 999;
-        public override bool DisableRegistry => true;
-        protected WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        protected override bool DisableRegistry => true;
+        protected WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
 
         }
@@ -23,7 +24,7 @@ namespace NotoriousTest.Web.Infrastructures
         private TWebApp _webApplicationFactory;
         public override int? Order => 999;
 
-        public WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
             _webApplicationFactory = new TWebApp();
         }

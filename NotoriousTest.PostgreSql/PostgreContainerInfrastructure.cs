@@ -9,7 +9,7 @@ using Respawn;
 using Respawn.Graph;
 
 using System.Data.Common;
-
+using NotoriousTest.Core.Environments;
 using Testcontainers.PostgreSql;
 
 
@@ -17,7 +17,7 @@ namespace NotoriousTest.PostgreSql;
 
 public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
-    public PostgreContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+    public PostgreContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
     {
     }
 
@@ -37,7 +37,7 @@ public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<str
 
 public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<PostgreSqlContainer, TOutputConfiguration>
 {
-    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
     }

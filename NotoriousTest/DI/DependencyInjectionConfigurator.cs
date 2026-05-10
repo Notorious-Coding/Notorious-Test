@@ -8,7 +8,6 @@ using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
-using NotoriousTest.Environments;
 using NotoriousTest.Runtime;
 using NotoriousTest.SqlLiteRegistry;
 using NotoriousTest.Watchdog;
@@ -24,7 +23,7 @@ public class DependencyInjectionConfigurator : IDependencyInjectionConfigurator
             DataSource = SettingsDefaults.DefaultRegistryConnectionString
         };
 
-        var registryConfig = new SqliteRegistryProviderConfiguration()
+        var registryConfig = new SqliteRegistryRepositoryConfiguration()
         {
             ConnectionString = builder.ConnectionString
         };
@@ -33,7 +32,7 @@ public class DependencyInjectionConfigurator : IDependencyInjectionConfigurator
         services
             .AddSingleton<ITestSettingsProvider>(settingsProvider)
             .AddSingleton(settingsProvider.Get<EnvironmentSettings>(EnvironmentSettings.SECTION_NAME) ?? new EnvironmentSettings())
-            .AddSingleton<IRegistry>((_) => new SqliteRegistryProvider(registryConfig))
+            .AddSingleton<IRegistry>((_) => new SqliteRegistryRepository(registryConfig))
             .AddSingleton<IWatchDog>((services) => new DoggyDogWatchDog(registryConfig, services.GetRequiredService<ITestLogger>(), settingsProvider.Get<DoggyDogWatchdogConfiguration>("Watchdog") ?? new DoggyDogWatchdogConfiguration()))
             .AddSingleton<IRuntime, RuntimeConfigurationProvider>();
 

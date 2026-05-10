@@ -16,7 +16,7 @@ public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironm
     {
         EnvironmentId environmentId = Guid.NewGuid();
         NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra = CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
-        var registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration
+        var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration
         {
             ConnectionString = notoriousTestRegistryInfra.GetDatabaseConnectionString()
         });
@@ -32,7 +32,7 @@ public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironm
     {
         EnvironmentId environmentId = Guid.NewGuid();
         NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra = CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
-        var registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration
+        var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration
         {
             ConnectionString = notoriousTestRegistryInfra.GetDatabaseConnectionString()
         });
@@ -49,7 +49,7 @@ public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironm
     {
         EnvironmentId environmentId = Guid.NewGuid();
         NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra = CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
-        var registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration
+        var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration
         {
             ConnectionString = notoriousTestRegistryInfra.GetDatabaseConnectionString()
         });

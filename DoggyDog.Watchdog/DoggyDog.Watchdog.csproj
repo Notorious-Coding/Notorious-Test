@@ -6,6 +6,7 @@
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <IsPackable>false</IsPackable>
+    <RootNamespace>DoggyDog</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

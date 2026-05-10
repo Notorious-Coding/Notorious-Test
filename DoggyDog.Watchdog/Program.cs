@@ -10,7 +10,7 @@ using NotoriousTest.SqlLiteRegistry;
 Logger logger = Logger.Instance;
 try
 {
-    using (logger.CreateScope("DoggyDog"))
+    using (logger.CreateScope("DoggyDog.Watchdog"))
     {
         if (args.Contains("--from-env"))
             logger.Debug("Parsing parameters from environment variables");
@@ -23,7 +23,7 @@ try
             Logger.MinLogLevel = parameters.LogLevel.Value;
 
         DoggyDogRecoveryWatchdog.Banner(parameters.Pid, parameters.EnvironmentId);
-        SqliteRegistryProvider registry = GetRegistry(parameters);
+        SqliteRegistryRepository registry = GetRegistry(parameters);
 
         var assemblyLoader = new TestAssemblyLoader(parameters.AssemblyPath, parameters.RuntimesPath);
         var watchdog = new DoggyDogRecoveryWatchdog(assemblyLoader, registry, logger);
@@ -41,7 +41,7 @@ catch (Exception ex)
     Environment.Exit(1);
 }
 
-static SqliteRegistryProvider GetRegistry(WatchDogParameters parameters)
+static SqliteRegistryRepository GetRegistry(WatchDogParameters parameters)
 {
     var cs = new SqliteConnectionStringBuilder(parameters.ConnectionString); // Validate connection string format early
 
@@ -55,7 +55,7 @@ static SqliteRegistryProvider GetRegistry(WatchDogParameters parameters)
         Logger.Instance.Info($"Using registry file at {cs.DataSource}");
     }
 
-    var registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration()
+    var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration()
     {
         ConnectionString = parameters.ConnectionString
     });

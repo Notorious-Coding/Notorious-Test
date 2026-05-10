@@ -1,6 +1,7 @@
 ﻿using System.Data.Common;
 using Dapper;
 using NotoriousTest.Core;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
@@ -12,8 +13,9 @@ public class NotoriousTestRegistryInfrastructure(
     EnvironmentId contextId,
     ITestSettingsProvider settingsProvider,
     ITestLogger logger,
-    IRegistry registry)
-    : SqliteInfrastructure(contextId, settingsProvider, logger, registry)
+    IRegistry registry,
+    EnvironmentSettings settings)
+    : SqliteInfrastructure(contextId, settingsProvider, logger, registry, settings)
 {
     public override async Task Initialize()
     {

@@ -11,11 +11,11 @@ namespace NotoriousTest.Watchdog
 {
     public class DoggyDogWatchDog : IWatchDog
     {
-        private readonly SqliteRegistryProviderConfiguration _registyConfiguration;
+        private readonly SqliteRegistryRepositoryConfiguration _registyConfiguration;
         private readonly ITestLogger _logger;
         private readonly DoggyDogWatchdogConfiguration _config;
 
-        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration, ITestLogger logger, DoggyDogWatchdogConfiguration config)
+        public DoggyDogWatchDog(SqliteRegistryRepositoryConfiguration registryConfiguration, ITestLogger logger, DoggyDogWatchdogConfiguration config)
         {
             _registyConfiguration = registryConfiguration;
             _logger = logger;
@@ -34,7 +34,7 @@ namespace NotoriousTest.Watchdog
 
         private Process? LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
         {
-            string watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+            string watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.Watchdog.exe" : "DoggyDog.Watchdog");
 
             string runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\" ";
             var process = Process.Start(new ProcessStartInfo
@@ -66,8 +66,8 @@ namespace NotoriousTest.Watchdog
             Process? doggyDogProcess;
             do
             {
-                _logger.Log("Waiting for DoggyDog to launch...", environmentId);
-                doggyDogProcess = Process.GetProcessesByName("DoggyDog")?.FirstOrDefault();
+                _logger.Log("Waiting for DoggyDog.Watchdog to launch...", environmentId);
+                doggyDogProcess = Process.GetProcessesByName("DoggyDog.Watchdog")?.FirstOrDefault();
                 Thread.Sleep(5000);
 
             } while (doggyDogProcess == null);

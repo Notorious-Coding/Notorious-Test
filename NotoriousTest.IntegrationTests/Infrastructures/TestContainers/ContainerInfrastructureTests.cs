@@ -6,6 +6,7 @@ using DotNet.Testcontainers.Containers;
 using FakeItEasy;
 
 using NotoriousTest.Core;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.TestContainers;
@@ -45,7 +46,7 @@ namespace NotoriousTest.IntegrationTests.TestContainers
 
     class ContainerTestInfrastructure : DockerContainerInfrastructure<IContainer, string>
     {
-        public ContainerTestInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public ContainerTestInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry, new EnvironmentSettings())
         {
             Container = new ContainerBuilder("alpine")
                 .WithCommand("sleep", "infinity")

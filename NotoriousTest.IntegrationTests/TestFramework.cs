@@ -12,6 +12,7 @@ using NotoriousTest.Database;
 using NotoriousTest.Sqlite;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.IntegrationTests
 {
@@ -22,7 +23,7 @@ namespace NotoriousTest.IntegrationTests
             public class FakeInfrastructure : NotoriousTest.Core.Infrastructures.Infrastructure
             {
                 public FakeInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
-                    : base(contextId, logger, registry) { }
+                    : base(contextId, logger, registry, new EnvironmentSettings()) { }
 
                 public override Task Initialize() => Task.CompletedTask;
                 public override Task Destroy() => Task.CompletedTask;

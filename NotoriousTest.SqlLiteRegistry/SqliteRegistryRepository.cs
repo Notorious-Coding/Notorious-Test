@@ -6,21 +6,21 @@ using NotoriousTest.Core;
 using NotoriousTest.Core.Registry;
 namespace NotoriousTest.SqlLiteRegistry
 {
-    internal partial class SqliteRegistryProvider : IRegistry
+    internal partial class SqliteRegistryRepository : IRegistry
     {
-        private readonly SqliteRegistryProviderConfiguration _configuration;
+        private readonly SqliteRegistryRepositoryConfiguration _configuration;
         public event Action<InfrastuctureRegistryEntry> OnInfrastructureReset;
         public event Action<InfrastuctureRegistryEntry> OnInfrastructureDestroyed;
         public event Action<InfrastuctureRegistryEntry> OnInfrastructureCreated;
 
-        public SqliteRegistryProvider(SqliteRegistryProviderConfiguration configuration)
+        public SqliteRegistryRepository(SqliteRegistryRepositoryConfiguration configuration)
         {
             _configuration = configuration;
         }
 
         private SqliteConnectionStringBuilder ConnectionString => new(_configuration.ConnectionString);
 
-        private SqliteConnection Connection
+        protected SqliteConnection Connection
         {
             get
             {

@@ -9,13 +9,14 @@ using NotoriousTest.Core.Registry;
 using NotoriousTest.TestContainers;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.Database
 {
     [Cleaner(typeof(DockerInfrastructureCleaner))]
     public abstract class DockerDatabaseInfrastructure<TContainer, TOutputConfiguration> : DatabaseInfrastructureBase<TOutputConfiguration, DockerMetadata> where TContainer : IDatabaseContainer
     {
-        protected DockerDatabaseInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        protected DockerDatabaseInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
             if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
                 Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");

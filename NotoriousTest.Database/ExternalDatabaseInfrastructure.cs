@@ -1,4 +1,5 @@
 ﻿using NotoriousTest.Core;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
@@ -12,9 +13,9 @@ namespace NotoriousTest.Database
         protected TSettings Settings { get; private set; }
         protected string? SectionName { get; set; } = null;
 
-        public ExternalDatabaseInfrastructure(EnvironmentId contextId, ITestSettingsProvider provider, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public ExternalDatabaseInfrastructure(EnvironmentId contextId, ITestSettingsProvider provider, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
-            Settings = provider.Get<TSettings>(SectionName ?? this.GetType().Name) ?? throw new InfrastructureSettingsNotFound($"Settings in section {SectionName ?? this.GetType().Name} not found.");
+            Settings = provider.Get<TSettings>(SectionName ?? GetType().Name) ?? throw new InfrastructureSettingsNotFound($"Settings in section {SectionName ?? this.GetType().Name} not found.");
         }
 
         public override string GetServerConnectionString() => Settings.ConnectionString;

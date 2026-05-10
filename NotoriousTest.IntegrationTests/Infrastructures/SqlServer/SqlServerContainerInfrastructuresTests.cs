@@ -3,6 +3,7 @@
 using FakeItEasy;
 
 using NotoriousTest.Core;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.SqlServer;
@@ -23,7 +24,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Initialize_Should_CreateContainerAndADatabase);
-            await using var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            await using var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
             {
                 DbPrefix = dbPrefix,
             };
@@ -43,7 +44,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Reset_Should_Empty_Database);
-            await using var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            await using var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
             {
                 DbPrefix = dbPrefix,
             };
@@ -61,7 +62,7 @@ namespace NotoriousTest.IntegrationTests.SqlServer
         {
             EnvironmentId contextId = Guid.NewGuid();
             string dbPrefix = nameof(Destroy_Should_Delete_Container);
-            var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+            var infrastructure = new SqlServerContainerInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
             {
                 DbPrefix = dbPrefix,
             };

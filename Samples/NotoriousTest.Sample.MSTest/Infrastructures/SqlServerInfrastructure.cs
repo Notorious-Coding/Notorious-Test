@@ -4,12 +4,13 @@ using NotoriousTest.Core.Registry;
 using NotoriousTest.SqlServer;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.Sample.MSTest.Infrastructures
 {
     public class SqlServerInfrastructure : SqlServerContainerInfrastructure
     {
-        public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
         }
 

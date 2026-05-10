@@ -12,12 +12,13 @@ using Respawn;
 using Respawn.Graph;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.Sqlite
 {
     public class SqliteInfrastructure : SqliteInfrastructure<string, DatabaseSettings>
     {
-        public SqliteInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
+        public SqliteInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, settingsProvider, logger, registry, settings)
         {
         }
 
@@ -39,7 +40,7 @@ namespace NotoriousTest.Sqlite
     public class SqliteInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
         private string _connectionString;
-        public SqliteInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, settingsProvider, logger, registry)
+        public SqliteInfrastructure(EnvironmentId contextId, ITestSettingsProvider settingsProvider, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, settingsProvider, logger, registry, settings)
         {
         }
 

@@ -3,6 +3,7 @@
 using DotNet.Testcontainers.Containers;
 
 using NotoriousTest.Core;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
@@ -14,7 +15,7 @@ namespace NotoriousTest.TestContainers
     public class DockerContainerInfrastructure<TContainer, TOutputConfiguration> : Infrastructure<TOutputConfiguration, DockerMetadata>
         where TContainer : IContainer
     {
-        public DockerContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+        public DockerContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, logger, registry, settings)
         {
             if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
                 Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");

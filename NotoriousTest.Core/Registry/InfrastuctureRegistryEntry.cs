@@ -6,6 +6,7 @@
         public Type InfrastructureType { get; set; }
         public Guid EnvironmentId { get; set; }
         public int ProcessID { get; set; }
+        public int ProcessName { get; set; }
         public object? Metadata { get; set; }
         public DateTime? LastResetDate { get; set; }
         public DateTime CreationDate { get; set; }

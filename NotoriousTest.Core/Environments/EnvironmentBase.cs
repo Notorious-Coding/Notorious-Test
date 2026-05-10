@@ -81,7 +81,6 @@ namespace NotoriousTest.Core.Environments
         public EnvironmentBase AddInfrastructure(Infrastructure infrastructure)
         {
             infrastructure.EnvironmentId = EnvironmentId;
-            infrastructure.WatchdogDisabled = Settings?.DisableWatchdog ?? false;
             _infrastructures.Add(infrastructure);
             return this;
         }

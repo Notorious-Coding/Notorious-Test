@@ -12,6 +12,7 @@ using Respawn;
 using Respawn.Graph;
 
 using System.Data.Common;
+using NotoriousTest.Core.Environments;
 
 namespace NotoriousTest.SqlServer
 {
@@ -20,7 +21,7 @@ namespace NotoriousTest.SqlServer
         public SqlServerInfrastructure(EnvironmentId contextId,
             ITestSettingsProvider settingsProvider,
             ITestLogger logger,
-            IRegistry registry) : base(contextId, settingsProvider, logger, registry)
+            IRegistry registry, EnvironmentSettings settings) : base(contextId, settingsProvider, logger, registry, settings)
         {
         }
 
@@ -41,7 +42,7 @@ namespace NotoriousTest.SqlServer
     [Cleaner(typeof(SqlServerInfrastructureCleaner))]
     public class SqlServerInfrastructure<TOutputConfiguration, TSettings> : ExternalDatabaseInfrastructure<TOutputConfiguration, TSettings> where TSettings : DatabaseSettings, new()
     {
-        public SqlServerInfrastructure(EnvironmentId contextId, ITestSettingsProvider testSettingsProvider, ITestLogger logger, IRegistry registry) : base(contextId, testSettingsProvider, logger, registry)
+        public SqlServerInfrastructure(EnvironmentId contextId, ITestSettingsProvider testSettingsProvider, ITestLogger logger, IRegistry registry, EnvironmentSettings settings) : base(contextId, testSettingsProvider, logger, registry, settings)
         {
         }
 

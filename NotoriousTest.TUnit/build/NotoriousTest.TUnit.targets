@@ -9,7 +9,7 @@
 			<DoggyDogFiles Include="$(DoggyDogDir)*" />
 		</ItemGroup>
 
-		<Message Text="DoggyDog files: @(DoggyDogFiles)" Importance="high" />
+		<Message Text="DoggyDog.Watchdog files: @(DoggyDogFiles)" Importance="high" />
 		<Copy SourceFiles="@(DoggyDogFiles)" DestinationFolder="$(OutDir)" />
 	</Target>
 </Project>

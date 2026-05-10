@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NotoriousTest.Core;
 using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
@@ -22,12 +23,12 @@ namespace NotoriousTest.UnitTests.Stubs
 
         public override int? Order => _order;
 
-        public override bool DisableRegistry => _disableRegistry;
+        protected override bool DisableRegistry => _disableRegistry;
         public Func<Task>? OnInitialize { get; set; }
         public Func<Task>? OnReset { get; set; }
         public Func<Task>? OnDestroy { get; set; }
 
-        public InfrastructureStub(ITestLogger logger, IRegistry provider, int? order = null, bool disableRegistry = false, bool autoReset = true) : base(Guid.NewGuid(), logger, provider)
+        public InfrastructureStub(ITestLogger logger, IRegistry provider, int? order = null, bool disableRegistry = false, bool autoReset = true) : base(Guid.NewGuid(), logger, provider, new EnvironmentSettings())
         {
             _order = order;
             _disableRegistry = disableRegistry;
@@ -35,7 +36,7 @@ namespace NotoriousTest.UnitTests.Stubs
         }
 
         [ActivatorUtilitiesConstructor]
-        public InfrastructureStub(EnvironmentId id, ITestLogger logger, IRegistry registry): base(id, logger, registry)
+        public InfrastructureStub(EnvironmentId id, ITestLogger logger, IRegistry registry, EnvironmentSettings environmentSettings): base(id, logger, registry, environmentSettings)
         {
             _order = 1;
             _disableRegistry = false;

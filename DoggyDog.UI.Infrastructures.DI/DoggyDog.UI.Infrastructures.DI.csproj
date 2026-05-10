@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DoggyDog.UI.Context\DoggyDog.UI.Context.csproj" />
+      <ProjectReference Include="..\DoggyDog.UI.Infrastructures\DoggyDog.UI.Infrastructures.csproj" />
+    </ItemGroup>
+
+</Project>
