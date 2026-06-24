@@ -11,7 +11,7 @@
     <File Path="Documentation/4-example.md" />
     <File Path="Documentation/5-architecture.md" />
     <File Path="Documentation/Architecture/workspace.dsl" />
-    <File Path="NotoriousTest/LICENSE.txt" />
+    <File Path="LICENSE.txt" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/Docs/Templates/">

@@ -13,6 +13,9 @@
     &lt;Project Location="C:\Repositories\Notorious Test" Presentation="&amp;lt;src&amp;gt;\&amp;lt;5. Samples&amp;gt;" /&gt;&#xD;
   &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9b916838_002D7187_002D42e8_002D89d3_002Dd272d964e16d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;src&amp;gt;\&amp;lt;4. Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	
