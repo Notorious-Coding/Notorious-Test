@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
 
-namespace DoggyDog.AssemblyLoader
+namespace DoggyDog.Watchdog.AssemblyLoader;
+
+public interface ITestAssemblyLoader
 {
-    public interface ITestAssemblyLoader
-    {
-        Assembly Load();
-    }
+    Assembly Load();
 }

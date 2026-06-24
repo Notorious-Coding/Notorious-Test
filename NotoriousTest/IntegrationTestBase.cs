@@ -5,7 +5,4 @@ using DependencyInjectionConfigurator = NotoriousTest.DI.DependencyInjectionConf
 namespace NotoriousTest;
 
 [InjectionConfigurator(typeof(DependencyInjectionConfigurator))]
-public abstract class IntegrationTestBase<T> : NotoriousTest.Core.IntegrationTestBase<T> where T : EnvironmentBase
-{
-
-}
+public abstract class IntegrationTestBase<T> : Core.IntegrationTestBase<T> where T : EnvironmentBase;

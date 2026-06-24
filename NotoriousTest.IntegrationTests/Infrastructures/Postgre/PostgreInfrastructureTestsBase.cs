@@ -1,7 +1,6 @@
-﻿using AwesomeAssertions;
-
+﻿using System.Data.Common;
+using AwesomeAssertions;
 using FakeItEasy;
-
 using NotoriousTest.Core;
 using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
@@ -10,82 +9,78 @@ using NotoriousTest.Core.Settings;
 using NotoriousTest.Database.Settings;
 using NotoriousTest.PostgreSql;
 using NotoriousTest.XUnit;
-namespace NotoriousTest.IntegrationTests.Postgre
+
+namespace NotoriousTest.IntegrationTests.Postgre;
+
+public class PostgreInfrastructureTestsBase : IntegrationTest<PostgreInfrastructureEnvironment>
 {
-    public class PostgreInfrastructureTestsBase : IntegrationTest<PostgreInfrastructureEnvironment>
+    private readonly ITestSettingsProvider _testSettingsProvider = A.Fake<ITestSettingsProvider>();
+
+    public PostgreInfrastructureTestsBase(XUnitFixture<PostgreInfrastructureEnvironment> environment) :
+        base(environment)
     {
-        private ITestSettingsProvider _testSettingsProvider = A.Fake<ITestSettingsProvider>();
-        public PostgreInfrastructureTestsBase(XUnitFixture<PostgreInfrastructureEnvironment> environment) : base(environment)
-        {
-            string serverConnectionString = CurrentEnvironment.GetInfrastructure<PostgreServerInfrastructure>().OutputConfiguration[0].Value;
-            A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(PostgreInfrastructure))).Returns(new DatabaseSettings { ConnectionString = serverConnectionString + ";Pooling=false" });
-        }
+        string serverConnectionString = CurrentEnvironment.GetInfrastructure<PostgreServerInfrastructure>()
+            .OutputConfiguration[0].Value;
+        A.CallTo(() => _testSettingsProvider.Get<DatabaseSettings>(nameof(PostgreInfrastructure)))
+            .Returns(new DatabaseSettings { ConnectionString = serverConnectionString + ";Pooling=false" });
+    }
 
 
-        [Fact]
-        public async Task Initialize_Should_Create_Database()
-        {
-            EnvironmentId contextId = Guid.NewGuid();
-            string dbPrefix = nameof(Initialize_Should_Create_Database);
+    [Fact]
+    public async Task Initialize_Should_Create_Database()
+    {
+        EnvironmentId contextId = Guid.NewGuid();
+        string dbPrefix = nameof(Initialize_Should_Create_Database);
 
-            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
-            {
-                DbPrefix = dbPrefix,
-            };
+        await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider,
+            A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings()) { DbPrefix = dbPrefix };
 
-            await infrastructure.InitializeAsync();
-            var cs = infrastructure.GetDatabaseConnectionString();
+        await infrastructure.InitializeAsync();
+        string cs = infrastructure.GetDatabaseConnectionString();
 
-            string expectedDbName = $"{dbPrefix}_{contextId.Value.ToString()}";
-            infrastructure.FullDbName.Should().Be(expectedDbName);
-            cs.Should().Contain($"Database={expectedDbName}");
+        string expectedDbName = $"{dbPrefix}_{contextId.Value.ToString()}";
+        infrastructure.FullDbName.Should().Be(expectedDbName);
+        cs.Should().Contain($"Database={expectedDbName}");
 
-            using var connection = infrastructure.GetDatabaseConnection();
-            var act = () => connection.OpenAsync(TestContext.Current.CancellationToken);
-            await act.Should().NotThrowAsync();
+        using DbConnection connection = infrastructure.GetDatabaseConnection();
+        Func<Task> act = () => connection.OpenAsync(TestContext.Current.CancellationToken);
+        await act.Should().NotThrowAsync();
 
-            await connection.CloseAsync();
+        await connection.CloseAsync();
+    }
 
-        }
+    [Fact]
+    public async Task Reset_Should_Empty_Database()
+    {
+        EnvironmentId contextId = Guid.NewGuid();
+        string dbPrefix = nameof(Reset_Should_Empty_Database);
+        await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider,
+            A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings()) { DbPrefix = dbPrefix };
 
-        [Fact]
-        public async Task Reset_Should_Empty_Database()
-        {
-            EnvironmentId contextId = Guid.NewGuid();
-            string dbPrefix = nameof(Reset_Should_Empty_Database);
-            await using var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
-            {
-                DbPrefix = dbPrefix,
-            };
+        await infrastructure.InitializeAsync();
+        await TestFramework.Arrange.CreateTableWithData(infrastructure);
 
-            await infrastructure.InitializeAsync();
-            await TestFramework.Arrange.CreateTableWithData(infrastructure);
-
-            await infrastructure.ResetAsync();
-            await TestFramework.Assert.TableShouldBeEmpty(infrastructure);
-        }
+        await infrastructure.ResetAsync();
+        await TestFramework.Assert.TableShouldBeEmpty(infrastructure);
+    }
 
 
-        [Fact]
-        public async Task Destroy_Should_Delete_Database()
-        {
-            EnvironmentId contextId = Guid.NewGuid();
-            string dbPrefix = nameof(Destroy_Should_Delete_Database);
-            var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(), A.Fake<IRegistry>(), new EnvironmentSettings())
-            {
-                DbPrefix = dbPrefix,
-            };
+    [Fact]
+    public async Task Destroy_Should_Delete_Database()
+    {
+        EnvironmentId contextId = Guid.NewGuid();
+        string dbPrefix = nameof(Destroy_Should_Delete_Database);
+        var infrastructure = new PostgreInfrastructure(contextId, _testSettingsProvider, A.Fake<ITestLogger>(),
+            A.Fake<IRegistry>(), new EnvironmentSettings()) { DbPrefix = dbPrefix };
 
-            await infrastructure.InitializeAsync();
-            var connection = infrastructure.GetDatabaseConnection();
+        await infrastructure.InitializeAsync();
+        DbConnection connection = infrastructure.GetDatabaseConnection();
 
-            var act = () => connection.OpenAsync(TestContext.Current.CancellationToken);
-            await act.Should().NotThrowAsync();
-            await connection.CloseAsync();
+        Func<Task> act = () => connection.OpenAsync(TestContext.Current.CancellationToken);
+        await act.Should().NotThrowAsync();
+        await connection.CloseAsync();
 
-            await infrastructure.DestroyAsync();
-            await TestFramework.Assert.DatabaseNoLongerExist(infrastructure);
-
-        }
+        await infrastructure.DestroyAsync();
+        await TestFramework.Assert.DatabaseNoLongerExist(infrastructure);
     }
 }

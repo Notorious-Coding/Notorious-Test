@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NotoriousTest.Core;
-using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.DI;
+using NotoriousTest.Core.Logger;
 using NotoriousTest.XUnit.Logger;
-using Xunit;
 
 namespace NotoriousTest.XUnit.DI;
 

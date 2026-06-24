@@ -1,22 +1,21 @@
-﻿using NotoriousTest.Core.Configuration;
+﻿using System.Diagnostics;
+using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 
-using System.Diagnostics;
-using System.Reflection;
-using NotoriousTest.Core.Environments;
-
 namespace NotoriousTest.Core.Infrastructures;
 
-
-public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastructure<TMetadata>, IConfigurationProducer<TOutputConfiguration>
+public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastructure<TMetadata>,
+    IConfigurationProducer<TOutputConfiguration>
     where TMetadata : class
 {
-    public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration { get; } = new();
-
-    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings) : base(contextId, logger, provider, settings)
+    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider,
+        EnvironmentSettings settings) : base(contextId, logger, provider, settings)
     {
     }
+
+    public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration { get; } = new();
 
     public void AddEntry(string key, TOutputConfiguration value)
         => OutputConfiguration.Add(new ConfigurationEntry<TOutputConfiguration>(value, key));
@@ -27,51 +26,29 @@ public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastr
 
 public abstract class Infrastructure<TMetadata> : Infrastructure where TMetadata : class
 {
-    /// <summary>
-    /// Gets or sets the metadata associated with the current object.
-    /// </summary>
-    public new TMetadata? Metadata { get => (TMetadata?)base.Metadata; protected set => base.Metadata = value; }
-
-    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings) : base(contextId, logger, provider, settings)
+    protected Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider,
+        EnvironmentSettings settings) : base(contextId, logger, provider, settings)
     {
+    }
+
+    /// <summary>
+    ///     Gets or sets the metadata associated with the current object.
+    /// </summary>
+    public new TMetadata? Metadata
+    {
+        get => (TMetadata?)base.Metadata;
+        protected set => base.Metadata = value;
     }
 }
 
 /// <summary>
-/// Infrastructure is a base class to define a test infrastructure.
+///     Infrastructure is a base class to define a test infrastructure.
 /// </summary>
 public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 {
-
-    ///<inheritdoc/>
-    public virtual int? Order { get; }
-
-    ///<inheritdoc/>
-    public bool AutoReset { get; set; } = true;
-
-    ///<inheritdoc/>
-    public EnvironmentId EnvironmentId { get; set; }
+    private readonly EnvironmentSettings _settings;
 
     public Guid Id = Guid.NewGuid();
-
-    /// <summary>
-    /// Gets or sets the metadata associated with the current object.
-    /// </summary>
-    public object? Metadata { get; protected set; }
-
-    /// <summary>
-    /// Gets the logger instance used to record test execution details and diagnostic information.
-    /// </summary>
-    protected ITestLogger Logger { get; }
-
-    /// <summary>
-    /// Gets the registry provider used to track infrastructure and clean them after test crash.
-    /// </summary>
-    protected IRegistry Registry { get; }
-    protected bool Registered { get; private set; }
-    protected virtual bool DisableRegistry => false;
-
-    private readonly EnvironmentSettings _settings;
 
 
     public Infrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider, EnvironmentSettings settings)
@@ -82,14 +59,38 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         Registry = provider;
     }
 
+    /// <summary>
+    ///     Gets or sets the metadata associated with the current object.
+    /// </summary>
+    public object? Metadata { get; protected set; }
+
+    /// <summary>
+    ///     Gets the logger instance used to record test execution details and diagnostic information.
+    /// </summary>
+    protected ITestLogger Logger { get; }
+
+    /// <summary>
+    ///     Gets the registry provider used to track infrastructure and clean them after test crash.
+    /// </summary>
+    protected IRegistry Registry { get; }
+
+    protected bool Registered { get; private set; }
+    protected virtual bool DisableRegistry => false;
+
+    public async ValueTask DisposeAsync() => await DestroyAsync();
+
+    /// <inheritdoc />
+    public virtual int? Order { get; }
+
+    /// <inheritdoc />
+    public bool AutoReset { get; set; } = true;
+
+    /// <inheritdoc />
+    public EnvironmentId EnvironmentId { get; set; }
+
     public abstract Task Initialize();
     public virtual Task Reset() => Task.CompletedTask;
     public abstract Task Destroy();
-
-    public async ValueTask DisposeAsync()
-    {
-        await DestroyAsync();
-    }
 
     internal async Task InitializeAsync()
     {
@@ -102,7 +103,6 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
             if (!_settings.DisableWatchdog && !DisableRegistry && !Registered) await Register();
 
             Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
-
         }
         catch (Exception ec)
         {
@@ -114,15 +114,15 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
 
     protected async Task Register()
     {
-        await Registry.Register(new InfrastuctureRegistryEntry()
+        await Registry.Register(new InfrastuctureRegistryEntry
         {
             InfrastructureId = Id,
             InfrastructureType = GetType(),
             Metadata = Metadata,
             EnvironmentId = EnvironmentId,
             ProcessID = Process.GetCurrentProcess().Id,
+            ProcessName = IntegrationTestContext.Current.CurrentAssembly.GetName().Name
         });
-
         Registered = true;
     }
 
@@ -134,7 +134,6 @@ public abstract class Infrastructure : IAsyncDisposable, IInfrastructure
         await Reset();
         if (!_settings.DisableWatchdog && !DisableRegistry) await Registry.NotifyReset(Id);
         Logger.Log($"[{GetType().Name} ] Reset completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
-
     }
 
     internal async Task DestroyAsync()

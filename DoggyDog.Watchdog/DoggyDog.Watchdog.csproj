@@ -6,13 +6,12 @@
     <PublishSingleFile>true</PublishSingleFile>
     <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     <IsPackable>false</IsPackable>
-    <RootNamespace>DoggyDog</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-    <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" />
-    <ProjectReference Include="..\NotoriousTest.Watchdog\NotoriousTest.Watchdog.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Watchdog\NotoriousTest.Watchdog.csproj"/>
   </ItemGroup>
 
   <Target Name="PublishDoggyDogToArtifacts" AfterTargets="Build" Condition="'$(PublishDoggyDogToArtifactsOnBuild)' != 'false'">
@@ -22,8 +21,8 @@
       <DoggyDogArtifactsDir>$(MSBuildThisFileDirectory)..\artifacts\doggydog\$(DoggyDogRuntime)\</DoggyDogArtifactsDir>
     </PropertyGroup>
 
-    <Message Text="Publishing DoggyDog to $(DoggyDogArtifactsDir)" Importance="high" />
-    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -r $(DoggyDogRuntime) --no-build --self-contained true /p:PublishSingleFile=true /p:PublishDir=&quot;$(DoggyDogArtifactsDir)&quot;" />
+    <Message Text="Publishing DoggyDog to $(DoggyDogArtifactsDir)" Importance="high"/>
+    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -r $(DoggyDogRuntime) --no-build --self-contained true /p:PublishSingleFile=true /p:PublishDir=&quot;$(DoggyDogArtifactsDir)&quot;"/>
   </Target>
 
 </Project>

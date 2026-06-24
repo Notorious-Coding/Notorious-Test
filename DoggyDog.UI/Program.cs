@@ -2,13 +2,9 @@
 using Terminal.Gui.App;
 using Terminal.Gui.ViewBase;
 
-using IApplication app = Application.Create ();
+using IApplication app = Application.Create();
 
-app.Init ();
+app.Init();
 
-var main = new Main()
-{
-    Width = Dim.Fill(),
-    Height = Dim.Fill(),
-};
-app.Run (main);
+var main = new Main { Width = Dim.Fill(), Height = Dim.Fill() };
+app.Run(main);

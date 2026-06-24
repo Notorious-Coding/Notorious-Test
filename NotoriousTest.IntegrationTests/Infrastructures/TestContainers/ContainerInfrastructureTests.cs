@@ -15,7 +15,6 @@ namespace NotoriousTest.IntegrationTests.TestContainers
 {
     public class ContainerInfrastructureTests
     {
-
         [Fact]
         public async Task Initialize_Should_CreateContainer()
         {

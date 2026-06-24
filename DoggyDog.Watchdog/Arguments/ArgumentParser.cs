@@ -1,6 +1,7 @@
-﻿using DoggyDog.Logs;
+﻿using System.Reflection;
+using DoggyDog.Watchdog.Logs;
 
-using System.Reflection;
+namespace DoggyDog.Watchdog.Arguments;
 
 public static class ArgumentsParser
 {
@@ -11,7 +12,7 @@ public static class ArgumentsParser
             .Where(p => p.Length == 2 && p[0].StartsWith("--"))
             .ToDictionary(p => p[0].TrimStart('-'), p => p[1]);
 
-        return ParseInternal<T>(prop => dict.TryGetValue(prop, out var v) ? v : null);
+        return ParseInternal<T>(prop => dict.TryGetValue(prop, out string? v) ? v : null);
     }
 
     public static T ParseFromEnv<T>(string envPrefix) where T : new() =>

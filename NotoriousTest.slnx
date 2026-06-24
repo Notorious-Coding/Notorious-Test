@@ -28,11 +28,17 @@
     <Project Path="NotoriousTest.Watchdog/NotoriousTest.Watchdog.csproj" Id="a925d516-7983-4cbf-a637-e54edecb47b3" />
     <Project Path="NotoriousTest/NotoriousTest.csproj" />
   </Folder>
-  <Folder Name="/src/2. DoggyDog/">
+  <Folder Name="/src/2. DoggyDog/" />
+  <Folder Name="/src/2. DoggyDog/2.1 UI/">
     <Project Path="DoggyDog.UI.Context/DoggyDog.UI.Context.csproj" />
     <Project Path="DoggyDog.UI.Infrastructures.DI/DoggyDog.UI.Infrastructures.DI.csproj" />
     <Project Path="DoggyDog.UI.Infrastructures/DoggyDog.UI.Infrastructures.csproj" />
     <Project Path="DoggyDog.UI/DoggyDog.UI.csproj" />
+  </Folder>
+  <Folder Name="/src/2. DoggyDog/2.1 UI/Seeder/">
+    <File Path="DoggyDogRegistrySeeder.cs" />
+  </Folder>
+  <Folder Name="/src/2. DoggyDog/2.2 Watchdog/">
     <Project Path="DoggyDog.Watchdog/DoggyDog.Watchdog.csproj" Id="8408dd70-9d47-4f50-bab4-bcd86e50bc3d" />
   </Folder>
   <Folder Name="/src/2. TestFramework/">

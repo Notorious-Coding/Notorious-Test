@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Terminal.Gui" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Terminal.Gui"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\DoggyDog.UI.Context\DoggyDog.UI.Context.csproj" />
-      <ProjectReference Include="..\DoggyDog.UI.Infrastructures.DI\DoggyDog.UI.Infrastructures.DI.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DoggyDog.UI.Context\DoggyDog.UI.Context.csproj"/>
+    <ProjectReference Include="..\DoggyDog.UI.Infrastructures.DI\DoggyDog.UI.Infrastructures.DI.csproj"/>
+  </ItemGroup>
 
 </Project>

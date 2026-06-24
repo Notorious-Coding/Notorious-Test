@@ -1,5 +1,4 @@
 using FakeItEasy;
-
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.IntegrationTests.SystemUnderTest;
@@ -15,12 +14,14 @@ public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironm
     public async Task Initialize_Should_RegisterInfrastructureInRegistry()
     {
         EnvironmentId environmentId = Guid.NewGuid();
-        NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra = CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
+        NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra =
+            CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
         var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration
         {
             ConnectionString = notoriousTestRegistryInfra.GetDatabaseConnectionString()
         });
-        await using var infrastructure = new TestFramework.Arrange.FakeInfrastructure(environmentId, A.Fake<ITestLogger>(), registry);
+        await using var infrastructure =
+            new TestFramework.Arrange.FakeInfrastructure(environmentId, A.Fake<ITestLogger>(), registry);
 
         await infrastructure.InitializeAsync();
 
@@ -31,12 +32,14 @@ public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironm
     public async Task Reset_Should_UpdateLastResetDateInRegistry()
     {
         EnvironmentId environmentId = Guid.NewGuid();
-        NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra = CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
+        NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra =
+            CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
         var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration
         {
             ConnectionString = notoriousTestRegistryInfra.GetDatabaseConnectionString()
         });
-        await using var infrastructure = new TestFramework.Arrange.FakeInfrastructure(environmentId, A.Fake<ITestLogger>(), registry);
+        await using var infrastructure =
+            new TestFramework.Arrange.FakeInfrastructure(environmentId, A.Fake<ITestLogger>(), registry);
 
         await infrastructure.InitializeAsync();
         await infrastructure.ResetAsync();
@@ -48,16 +51,19 @@ public class InfrastructureLifecycleTestsBase(XUnitFixture<NotoriousTestEnvironm
     public async Task Destroy_Should_RemoveInfrastructureFromRegistry()
     {
         EnvironmentId environmentId = Guid.NewGuid();
-        NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra = CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
+        NotoriousTestRegistryInfrastructure notoriousTestRegistryInfra =
+            CurrentEnvironment.GetInfrastructure<NotoriousTestRegistryInfrastructure>();
         var registry = new SqliteRegistryRepository(new SqliteRegistryRepositoryConfiguration
         {
             ConnectionString = notoriousTestRegistryInfra.GetDatabaseConnectionString()
         });
-        var infrastructure = new TestFramework.Arrange.FakeInfrastructure(environmentId, A.Fake<ITestLogger>(), registry);
+        var infrastructure =
+            new TestFramework.Arrange.FakeInfrastructure(environmentId, A.Fake<ITestLogger>(), registry);
 
         await infrastructure.InitializeAsync();
         await infrastructure.DestroyAsync();
 
-        await TestFramework.Assert.InfrastructureShouldBeRemovedFromRegistry(notoriousTestRegistryInfra, infrastructure.Id);
+        await TestFramework.Assert.InfrastructureShouldBeRemovedFromRegistry(notoriousTestRegistryInfra,
+            infrastructure.Id);
     }
 }
