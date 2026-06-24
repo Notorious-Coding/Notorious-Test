@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
+  <ItemGroup>
 	<PackageReference Include="Microsoft.NET.Test.Sdk" />
 	<PackageReference Include="NotoriousTest.SqlServer" />
 	<PackageReference Include="NotoriousTest.Web" />
