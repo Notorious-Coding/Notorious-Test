@@ -1,18 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<PackageId>NotoriousTest.Internal.TestSettings</PackageId>
-		<AssemblyName>NotoriousTest.TestSettings</AssemblyName>
-		<RootNamespace>NotoriousTest.Core.Settings</RootNamespace>
-		<Description>[Internal] JSON-based test settings provider for NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
-		<IsPackable>true</IsPackable>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	</PropertyGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>NotoriousTest.Internal.TestSettings</PackageId>
+    <Description>[Internal] JSON-based test settings provider for NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json"/>
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NotoriousTest"/>
+  </ItemGroup>
 </Project>

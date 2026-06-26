@@ -1,15 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<PackageId>NotoriousTest.Internal.Watchdog</PackageId>
-		<AssemblyName>NotoriousTest.Watchdog</AssemblyName>
-		<RootNamespace>NotoriousTest.Watchdog</RootNamespace>
-		<Description>[Internal] Watchdog service for detecting and recovering stale test environments in NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
-		<IsPackable>true</IsPackable>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	</PropertyGroup>
-	<ItemGroup>
-    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-    <ProjectReference Include="..\NotoriousTest.Internal.SqlLiteRegistry\NotoriousTest.Internal.SqlLiteRegistry.csproj" />
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>NotoriousTest.Internal.Watchdog</PackageId>
+    <Description>[Internal] Watchdog service for detecting and recovering stale test environments in NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Internal.SqlLiteRegistry\NotoriousTest.Internal.SqlLiteRegistry.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NotoriousTest"/>
+    <InternalsVisibleTo Include="DoggyDog"/>
   </ItemGroup>
 </Project>

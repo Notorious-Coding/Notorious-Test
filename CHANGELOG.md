@@ -5,6 +5,8 @@
 ### 🐛 Bug Fixes
 
 - Fixed a bug where internal packages were not available at installation. Preventing NotoriousTest from being installed.
+- All internal packages are now available to download from Nuget.org, but every class is internal. Which makes them
+  impossible to use.
 
 ## v5.0.0
 

@@ -1,4 +1,4 @@
-﻿namespace NotoriousTest.Core.Watchdog
+﻿namespace NotoriousTest.Internal.Watchdog
 {
     public class DoggyDogWatchdogConfiguration
     {

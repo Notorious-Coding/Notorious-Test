@@ -4,7 +4,7 @@ using DoggyDog.Logs;
 using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Registry;
-using NotoriousTest.Watchdog;
+using NotoriousTest.Internal.Watchdog;
 
 using System.Diagnostics;
 using System.Reflection;

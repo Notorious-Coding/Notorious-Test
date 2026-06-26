@@ -9,9 +9,10 @@ using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Settings;
 using NotoriousTest.Core.Watchdog;
 using NotoriousTest.Environments;
-using NotoriousTest.Runtime;
-using NotoriousTest.SqlLiteRegistry;
-using NotoriousTest.Watchdog;
+using NotoriousTest.Internal.Runtime;
+using NotoriousTest.Internal.SqlLiteRegistry;
+using NotoriousTest.Internal.TestSettings;
+using NotoriousTest.Internal.Watchdog;
 
 namespace NotoriousTest.DI;
 

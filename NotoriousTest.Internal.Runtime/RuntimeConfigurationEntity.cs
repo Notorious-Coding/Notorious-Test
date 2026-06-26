@@ -1,12 +1,11 @@
-﻿namespace NotoriousTest.Runtime
-{
-    public record RuntimeConfigurationEntity(RuntimeOptions RuntimeOptions);
+﻿namespace NotoriousTest.Internal.Runtime;
 
-    public record RuntimeOptions(
-        string Tfm,
-        FrameworkEntry? Framework,
-        FrameworkEntry[]? Frameworks
-    );
+internal record RuntimeConfigurationEntity(RuntimeOptions RuntimeOptions);
 
-    public record FrameworkEntry(string Name, string Version);
-}
+internal record RuntimeOptions(
+    string Tfm,
+    FrameworkEntry? Framework,
+    FrameworkEntry[]? Frameworks
+);
+
+internal record FrameworkEntry(string Name, string Version);

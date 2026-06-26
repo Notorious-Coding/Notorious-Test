@@ -3,7 +3,7 @@ using FakeItEasy;
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.IntegrationTests.SystemUnderTest;
-using NotoriousTest.SqlLiteRegistry;
+using NotoriousTest.Internal.SqlLiteRegistry;
 using NotoriousTest.XUnit;
 
 namespace NotoriousTest.IntegrationTests.Infrastructure;
