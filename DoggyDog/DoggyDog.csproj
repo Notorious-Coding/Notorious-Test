@@ -10,8 +10,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-    <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" />
-    <ProjectReference Include="..\NotoriousTest.Watchdog\NotoriousTest.Watchdog.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Internal.SqlLiteRegistry\NotoriousTest.Internal.SqlLiteRegistry.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Internal.Watchdog\NotoriousTest.Internal.Watchdog.csproj" />
   </ItemGroup>
 
   <Target Name="PublishDoggyDogToArtifacts" AfterTargets="Build" Condition="'$(PublishDoggyDogToArtifactsOnBuild)' != 'false'">

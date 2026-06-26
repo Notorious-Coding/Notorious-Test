@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<PackageId>NotoriousTest.Internal.Runtime</PackageId>
+		<AssemblyName>NotoriousTest.Runtime</AssemblyName>
+		<RootNamespace>NotoriousTest.Runtime</RootNamespace>
+		<Description>[Internal] Provides the runtime configuration layer for NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
+		<IsPackable>true</IsPackable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="System.Text.Json" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
+	</ItemGroup>
+</Project>
