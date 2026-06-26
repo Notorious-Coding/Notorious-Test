@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## v5.0.1
+
+### 🐛 Bug Fixes
+
+- Fixed a bug where internal packages were not available at installation. Preventing NotoriousTest from being installed.
+
 ## v5.0.0
 
 ### ✨ Features
