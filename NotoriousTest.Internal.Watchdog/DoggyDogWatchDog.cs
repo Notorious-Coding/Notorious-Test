@@ -1,89 +1,95 @@
-﻿using NotoriousTest.Core;
-using NotoriousTest.Core.Logger;
-using NotoriousTest.Core.Watchdog;
-using NotoriousTest.SqlLiteRegistry;
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Watchdog;
+using NotoriousTest.Internal.SqlLiteRegistry;
 
-namespace NotoriousTest.Watchdog
+namespace NotoriousTest.Internal.Watchdog;
+
+internal class DoggyDogWatchDog : IWatchDog
 {
-    public class DoggyDogWatchDog : IWatchDog
+    private readonly DoggyDogWatchdogConfiguration _config;
+    private readonly ITestLogger _logger;
+    private readonly SqliteRegistryProviderConfiguration _registyConfiguration;
+
+    public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration, ITestLogger logger,
+        DoggyDogWatchdogConfiguration config)
     {
-        private readonly SqliteRegistryProviderConfiguration _registyConfiguration;
-        private readonly ITestLogger _logger;
-        private readonly DoggyDogWatchdogConfiguration _config;
+        _registyConfiguration = registryConfiguration;
+        _logger = logger;
+        _config = config;
+    }
 
-        public DoggyDogWatchDog(SqliteRegistryProviderConfiguration registryConfiguration, ITestLogger logger, DoggyDogWatchdogConfiguration config)
+    public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId environmentId,
+        IEnumerable<string>? runtimePaths)
+    {
+        string assemblyPath = currentAssembly.Location;
+        string? runtimesParams = runtimePaths == null ? null : string.Join("|", runtimePaths);
+
+        if (_config.ManualLaunch)
+            return WaitForDoggyDogToLaunch(currentPid, environmentId, assemblyPath, runtimesParams);
+        return LaunchDoggyDog(currentPid, environmentId, assemblyPath, runtimesParams) ??
+               throw new Exception("Could not launch DoggyDog");
+    }
+
+    public void SendSuccessSignal(EnvironmentId contextId) =>
+        File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal"), "OK");
+
+    private Process? LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath,
+        string? runtimesParams)
+    {
+        string watchdogPath = Path.Combine(AppContext.BaseDirectory,
+            RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+
+        string runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\" ";
+        var process = Process.Start(new ProcessStartInfo
         {
-            _registyConfiguration = registryConfiguration;
-            _logger = logger;
-            _config = config;
-        }
+            FileName = watchdogPath,
+            Arguments = $"--pid {currentPid} " +
+                        $"--assembly \"{assemblyPath}\" " +
+                        $"--connectionString \"{_registyConfiguration.ConnectionString}\" " +
+                        $"--environment {contextId.Value} " +
+                        runtimeParameter +
+                        "--loglevel Info",
+            UseShellExecute = true,
+            CreateNoWindow = false
+        });
 
-        public Process Start(Assembly currentAssembly, int currentPid, EnvironmentId environmentId, IEnumerable<string>? runtimePaths)
+
+        return process;
+    }
+
+    private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId environmentId, string assemblyPath,
+        string? runtimesParams)
+    {
+        Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
+        Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
+        Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_CONNECTIONSTRING", _registyConfiguration.ConnectionString,
+            EnvironmentVariableTarget.User);
+        Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ENVIRONMENT", environmentId.Value.ToString(),
+            EnvironmentVariableTarget.User);
+        Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_RUNTIMES", runtimesParams, EnvironmentVariableTarget.User);
+        Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_LOGLEVEL", "Debug", EnvironmentVariableTarget.User);
+
+        Process? doggyDogProcess;
+        do
         {
-            string assemblyPath = currentAssembly.Location;
-            string? runtimesParams = runtimePaths == null ? null : string.Join("|", runtimePaths);
+            _logger.Log("Waiting for DoggyDog to launch...", environmentId);
+            doggyDogProcess = Process.GetProcessesByName("DoggyDog")?.FirstOrDefault();
+            Thread.Sleep(5000);
+        } while (doggyDogProcess == null);
 
-            if (_config.ManualLaunch)
-                return WaitForDoggyDogToLaunch(currentPid, environmentId, assemblyPath, runtimesParams);
-            return LaunchDoggyDog(currentPid, environmentId, assemblyPath, runtimesParams) ?? throw new Exception("Could not launch DoggyDog");
-        }
+        return doggyDogProcess;
+    }
 
-        private Process? LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath, string? runtimesParams)
-        {
-            string watchdogPath = Path.Combine(AppContext.BaseDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "DoggyDog.exe" : "DoggyDog");
+    public static bool ReadSuccessSignal(EnvironmentId contextId)
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal");
+        bool isSuccess = File.Exists(path);
+        if (isSuccess) File.Delete(path);
 
-            string runtimeParameter = runtimesParams == null ? "" : $"--runtimes \"{runtimesParams}\" ";
-            var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = watchdogPath,
-                Arguments = $"--pid {currentPid} " +
-                            $"--assembly \"{assemblyPath}\" " +
-                            $"--connectionString \"{_registyConfiguration.ConnectionString}\" " +
-                            $"--environment {contextId.Value} " +
-                            runtimeParameter +
-                            "--loglevel Info",
-                UseShellExecute = true,
-                CreateNoWindow = false,
-            });
-
-
-            return process;
-        }
-
-        private Process WaitForDoggyDogToLaunch(int currentPid, EnvironmentId environmentId, string assemblyPath, string? runtimesParams)
-        {
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_PID", currentPid.ToString(), EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ASSEMBLY", assemblyPath, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_CONNECTIONSTRING", _registyConfiguration.ConnectionString, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_ENVIRONMENT", environmentId.Value.ToString(), EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_RUNTIMES", runtimesParams, EnvironmentVariableTarget.User);
-            Environment.SetEnvironmentVariable("DOGGYDOG_DEBUG_LOGLEVEL", "Debug", EnvironmentVariableTarget.User);
-
-            Process? doggyDogProcess;
-            do
-            {
-                _logger.Log("Waiting for DoggyDog to launch...", environmentId);
-                doggyDogProcess = Process.GetProcessesByName("DoggyDog")?.FirstOrDefault();
-                Thread.Sleep(5000);
-
-            } while (doggyDogProcess == null);
-
-            return doggyDogProcess;
-        }
-
-        public void SendSuccessSignal(EnvironmentId contextId) => File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal"), "OK");
-
-        public static bool ReadSuccessSignal(EnvironmentId contextId)
-        {
-            string path = Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal");
-            bool isSuccess = File.Exists(path);
-            if (isSuccess) File.Delete(path);
-
-            return isSuccess;
-        }
+        return isSuccess;
     }
 }

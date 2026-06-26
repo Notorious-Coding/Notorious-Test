@@ -4,7 +4,7 @@ using DoggyDog.Logs;
 
 using Microsoft.Data.Sqlite;
 
-using NotoriousTest.SqlLiteRegistry;
+using NotoriousTest.Internal.SqlLiteRegistry;
 
 
 Logger logger = Logger.Instance;

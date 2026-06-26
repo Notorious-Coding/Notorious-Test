@@ -1,7 +1,6 @@
-﻿namespace NotoriousTest.SqlLiteRegistry
+﻿namespace NotoriousTest.Internal.SqlLiteRegistry;
+
+internal class SqliteRegistryProviderConfiguration
 {
-    public class SqliteRegistryProviderConfiguration
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }

@@ -1,7 +1,7 @@
 using AwesomeAssertions;
 
 using NotoriousTest.Core.Registry;
-using NotoriousTest.SqlLiteRegistry;
+using NotoriousTest.Internal.SqlLiteRegistry;
 
 using System.Text.Json;
 

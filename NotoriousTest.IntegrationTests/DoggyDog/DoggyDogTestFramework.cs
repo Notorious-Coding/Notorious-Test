@@ -9,7 +9,7 @@ using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Sqlite;
-using NotoriousTest.SqlLiteRegistry;
+using NotoriousTest.Internal.SqlLiteRegistry;
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;

@@ -1,25 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<PackageId>NotoriousTest.Internal.SqlLiteRegistry</PackageId>
-		<AssemblyName>NotoriousTest.SqlLiteRegistry</AssemblyName>
-		<RootNamespace>NotoriousTest.SqlLiteRegistry</RootNamespace>
-		<Description>[Internal] SQLite-backed infrastructure registry for NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
-		<IsPackable>true</IsPackable>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-	</PropertyGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Dapper" />
-		<PackageReference Include="Microsoft.Data.Sqlite" />
-		<PackageReference Include="System.Text.Json" />
-	</ItemGroup>
-	<ItemGroup>
-		<InternalsVisibleTo Include="NotoriousTest.UnitTests" />
-		<InternalsVisibleTo Include="NotoriousTest.IntegrationTests" />
-		<InternalsVisibleTo Include="NotoriousTest" />
-		<InternalsVisibleTo Include="DoggyDog" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <PackageId>NotoriousTest.Internal.SqlLiteRegistry</PackageId>
+    <Description>[Internal] SQLite-backed infrastructure registry for NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper"/>
+    <PackageReference Include="Microsoft.Data.Sqlite"/>
+    <PackageReference Include="System.Text.Json"/>
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NotoriousTest.UnitTests"/>
+    <InternalsVisibleTo Include="NotoriousTest.IntegrationTests"/>
+    <InternalsVisibleTo Include="NotoriousTest"/>
+    <InternalsVisibleTo Include="NotoriousTest.Core"/>
+    <InternalsVisibleTo Include="NotoriousTest.Internal.Watchdog"/>
+    <InternalsVisibleTo Include="DoggyDog"/>
+  </ItemGroup>
 </Project>
