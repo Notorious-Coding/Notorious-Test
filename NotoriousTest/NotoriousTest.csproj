@@ -18,10 +18,10 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-	  <ProjectReference Include="..\NotoriousTest.Runtime\NotoriousTest.Runtime.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
-	  <ProjectReference Include="..\NotoriousTest.SqlLiteRegistry\NotoriousTest.SqlLiteRegistry.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
-	  <ProjectReference Include="..\NotoriousTest.TestSettings\NotoriousTest.TestSettings.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
-	  <ProjectReference Include="..\NotoriousTest.Watchdog\NotoriousTest.Watchdog.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
+	  <ProjectReference Include="..\NotoriousTest.Internal.Runtime\NotoriousTest.Internal.Runtime.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
+	  <ProjectReference Include="..\NotoriousTest.Internal.SqlLiteRegistry\NotoriousTest.Internal.SqlLiteRegistry.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
+	  <ProjectReference Include="..\NotoriousTest.Internal.TestSettings\NotoriousTest.Internal.TestSettings.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
+	  <ProjectReference Include="..\NotoriousTest.Internal.Watchdog\NotoriousTest.Internal.Watchdog.csproj" PrivateAssets="contentfiles;analyzers;build;native"/>
 	</ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="NotoriousTest.XUnit" />
