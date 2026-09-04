@@ -49,6 +49,7 @@
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
   </Folder>
   <Folder Name="/src/5. Samples/">
+    <File Path="Samples/Directory.Build.props" />
     <Project Path="Samples/NotoriousTest.Sample.MSTest/NotoriousTest.Sample.MSTest.csproj" />
     <Project Path="Samples/NotoriousTest.Sample.NUnit/NotoriousTest.Sample.NUnit.csproj" />
     <Project Path="Samples/NotoriousTest.Sample.TestWebApp/NotoriousTest.Sample.TestWebApp.csproj" />
