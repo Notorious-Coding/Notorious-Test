@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<Description>A Sqlite integration with NotoriousTest.</Description>
-		<PackageId>NotoriousTest.PostgreSql</PackageId>
+		<PackageId>NotoriousTest.Sqlite</PackageId>
 		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
