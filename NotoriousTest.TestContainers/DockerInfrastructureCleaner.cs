@@ -10,7 +10,7 @@ namespace NotoriousTest.TestContainers
     {
         public async Task CleanAfterCrash(EnvironmentId contextId, Guid infrastructureId, DockerMetadata? metadata = null)
         {
-            DockerClient? client = new DockerClientConfiguration().CreateClient();
+            DockerClient? client = new DockerClientBuilder().Build();
             await client.Containers.RemoveContainerAsync(metadata.ContainerID, new ContainerRemoveParameters
             {
                 Force = true

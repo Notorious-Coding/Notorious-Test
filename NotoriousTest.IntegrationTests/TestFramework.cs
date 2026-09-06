@@ -47,7 +47,7 @@ namespace NotoriousTest.IntegrationTests
         {
             public static async Task ContainerDoesNotExist(string id)
             {
-                var client = new DockerClientConfiguration().CreateClient();
+                var client = new DockerClientBuilder().Build();
                 var act = () => client.Containers.InspectContainerAsync(id);
 
                 await act.Should().ThrowAsync<DockerContainerNotFoundException>();
@@ -55,7 +55,7 @@ namespace NotoriousTest.IntegrationTests
 
             public static async Task ContainerExist(string id)
             {
-                var client = new DockerClientConfiguration().CreateClient();
+                var client = new DockerClientBuilder().Build();
                 var act = () => client.Containers.InspectContainerAsync(id);
 
                 await act.Should().NotThrowAsync();
