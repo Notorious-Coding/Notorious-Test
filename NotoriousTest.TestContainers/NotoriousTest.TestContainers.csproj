@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<Description>A TestContainers integration with NotoriousTest.</Description>
-		<PackageId>NotoriousTest.TestContainers</PackageId>
-		<IsPackable>true</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>A TestContainers integration with NotoriousTest.</Description>
+    <PackageId>NotoriousTest.TestContainers</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+  </ItemGroup>
 
-	<ItemGroup>
-	  <PackageReference Include="Testcontainers" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Testcontainers"/>
+  </ItemGroup>
 </Project>
