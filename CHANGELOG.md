@@ -1,5 +1,10 @@
 ﻿# Changelog
+## v5.0.2
 
+### 📦 Dependencies
+
+- Upgraded dependencies, aspecially TestContainers, with a transitive dependency to SSH.NET with a high vulnarability.
+ 
 ## v5.0.1
 
 ### 🐛 Bug Fixes
