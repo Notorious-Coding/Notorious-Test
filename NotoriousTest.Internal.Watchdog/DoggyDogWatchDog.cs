@@ -34,8 +34,8 @@ internal class DoggyDogWatchDog : IWatchDog
                throw new Exception("Could not launch DoggyDog");
     }
 
-    public void SendSuccessSignal(EnvironmentId contextId) =>
-        File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{contextId.Value}.signal"), "OK");
+    public void SendSuccessSignal(EnvironmentId environmentId) =>
+        File.WriteAllText(Path.Combine(Path.GetTempPath(), $"nt-{environmentId.Value}.signal"), "OK");
 
     private Process? LaunchDoggyDog(int currentPid, EnvironmentId contextId, string assemblyPath,
         string? runtimesParams)
