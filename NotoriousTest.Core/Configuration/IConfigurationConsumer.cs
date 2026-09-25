@@ -1,7 +1,12 @@
-﻿namespace NotoriousTest.Core.Configuration
+﻿namespace NotoriousTest.Core.Configuration;
+
+/// <summary>
+///     Make a class able to consume configuration
+/// </summary>
+public interface IConfigurationConsumer
 {
-    public interface IConfigurationConsumer
-    {
-        List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
-    }
+    /// <summary>
+    ///     Configuration consumed.
+    /// </summary>
+    List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
 }
