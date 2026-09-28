@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "NotoriousTest.IntegrationsTest.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7023",
+      "launchBrowser": false
+    }
+  }
+}

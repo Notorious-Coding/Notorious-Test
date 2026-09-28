@@ -142,6 +142,7 @@ public abstract class EnvironmentBase
 
         await ConfigureEnvironment();
 
+        await VerifyAllInfrastructureRequirements();
         await InstallAllMissingInfrastructureDependencies();
         await InitializeInfrastructureInParralelAndInOrder();
     }
@@ -164,6 +165,19 @@ public abstract class EnvironmentBase
             WatchDog.SendSuccessSignal(EnvironmentId);
     }
 
+    private async Task VerifyAllInfrastructureRequirements()
+    {
+        IEnumerable<IInfrastructureRequirement> requirements =
+            _infrastructures.SelectMany(i => i.Requirements).Distinct().ToList();
+        bool[] exists = await Task.WhenAll(requirements.Select(x => x.Exist()));
+
+        var notMetRequirements = requirements.Zip(exists, (d, e) => (Requirment: d, Exists: e))
+            .Where(x => !x.Exists).Select(x => x.Requirment).ToList();
+
+        if (notMetRequirements.Any())
+            throw new InfrastructureRequirementNotMetException(notMetRequirements);
+    }
+
     private async Task InstallAllMissingInfrastructureDependencies()
     {
         IEnumerable<IInfrastructureDependency> dependencies =
@@ -171,21 +185,17 @@ public abstract class EnvironmentBase
 
         bool[] exists = await Task.WhenAll(dependencies.Select(x => x.Exist()));
 
-        var nonInstalledDependency = dependencies.Zip(exists, (d, e) => (Dependency: d, Exists: e))
+        var installedDependencies = dependencies.Zip(exists, (d, e) => (Dependency: d, Exists: e))
             .Where(x => !x.Exists).Select(x => x.Dependency).ToList();
-        await Task.WhenAll(nonInstalledDependency.Select(x => x.Install()));
+        await Task.WhenAll(installedDependencies.Select(x => x.Install()));
+
+        _installedDependencies = installedDependencies;
     }
 
     private async Task UninstallAllPreviouslyInstalledDependencies()
     {
-        IEnumerable<IInfrastructureDependency> dependencies =
-            _infrastructures.SelectMany(i => i.Dependencies).Distinct().ToList();
-
-        bool[] exists = await Task.WhenAll(dependencies.Select(x => x.Exist()));
-
-        var nonInstalledDependency = dependencies.Zip(exists, (d, e) => (Dependency: d, Exists: e))
-            .Where(x => !x.Exists).Select(x => x.Dependency).ToList();
-        await Task.WhenAll(nonInstalledDependency.Select(x => x.Install()));
+        await Task.WhenAll(_installedDependencies.Select(x => x.Uninstall()));
+        _installedDependencies.Clear();
     }
 
     private async Task InitializeInfrastructureInParralelAndInOrder()

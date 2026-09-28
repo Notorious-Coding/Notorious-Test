@@ -1,9 +1,19 @@
 ﻿using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Infrastructures.Dependencies;
 
-namespace NotoriousTest.Web.Applications
+namespace NotoriousTest.Web.Applications;
+
+/// <summary>
+///     Create a web application accessible via <see cref="HttpClient" />.
+/// </summary>
+public interface IWebApplication : IAsyncDisposable, IConfigurationConsumer
 {
-    public interface IWebApplication : IAsyncDisposable, IConfigurationConsumer
-    {
-        HttpClient CreateDefaultClient();
-    }
+    List<IInfrastructureDependency> Dependencies { get; }
+    List<IInfrastructureRequirement> Requirements { get; }
+
+    /// <summary>
+    ///     Start the application.
+    /// </summary>
+    /// <returns>A HttpClient configured to access the server.</returns>
+    Task<HttpClient> Start();
 }
