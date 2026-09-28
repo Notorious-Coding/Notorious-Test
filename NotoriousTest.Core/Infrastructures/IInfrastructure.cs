@@ -28,6 +28,11 @@ public interface IInfrastructure
     List<IInfrastructureDependency> Dependencies { get; set; }
 
     /// <summary>
+    ///     List of requirements that needs to be met before initialization.
+    /// </summary>
+    List<IInfrastructureRequirement> Requirements { get; set; }
+
+    /// <summary>
     ///     Clean the infrastructure from the software it has been initialized.
     /// </summary>
     Task Destroy();

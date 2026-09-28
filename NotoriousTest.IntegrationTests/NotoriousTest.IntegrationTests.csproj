@@ -6,29 +6,31 @@
     <IsIntegrationTest>true</IsIntegrationTest>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" />
-    <PackageReference Include="Dapper" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="Npgsql" />
-    <PackageReference Include="Testcontainers.PostgreSql" />
-	<PackageReference Include="xunit.v3" />
-	<PackageReference Include="xunit.runner.visualstudio" />
-	<PackageReference Include="AwesomeAssertions" />
-	<PackageReference Include="FakeItEasy" />
+    <PackageReference Include="coverlet.collector"/>
+    <PackageReference Include="Dapper"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+    <PackageReference Include="Npgsql"/>
+    <PackageReference Include="Testcontainers.PostgreSql"/>
+    <PackageReference Include="xunit.v3"/>
+    <PackageReference Include="xunit.runner.visualstudio"/>
+    <PackageReference Include="AwesomeAssertions"/>
+    <PackageReference Include="FakeItEasy"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-    <ProjectReference Include="..\NotoriousTest.IntegrationTests.Web\NotoriousTest.IntegrationTests.Web.csproj" />
-    <ProjectReference Include="..\NotoriousTest.PostgreSql\NotoriousTest.PostgreSql.csproj" />
-    <ProjectReference Include="..\NotoriousTest.Sqlite\NotoriousTest.Sqlite.csproj" />
-    <ProjectReference Include="..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj" />
-    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
-    <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
-    <ProjectReference Include="..\NotoriousTest.XUnit\NotoriousTest.XUnit.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Dependencies.Azure.FunctionCoreTools\NotoriousTest.Dependencies.Azure.FunctionCoreTools.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.IntegrationTests.Web\NotoriousTest.IntegrationTests.Web.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.PostgreSql\NotoriousTest.PostgreSql.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Sqlite\NotoriousTest.Sqlite.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Web.AzureFunctions\NotoriousTest.Web.AzureFunctions.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.XUnit\NotoriousTest.XUnit.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <Using Include="Xunit" />
+    <Using Include="Xunit"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructures\" />
+    <Folder Include="Infrastructures\"/>
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <Description>Azure functions integration tests support for NotoriousTest.</Description>
+    <PackageId>NotoriousTest.Web.AzureFunctions</PackageId>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Dependencies.Azure.FunctionCoreTools\NotoriousTest.Dependencies.Azure.FunctionCoreTools.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj"/>
+  </ItemGroup>
+
+</Project>

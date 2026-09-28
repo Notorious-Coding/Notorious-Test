@@ -4,44 +4,44 @@ using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Web.Applications;
-namespace NotoriousTest.Web.Infrastructures
+
+namespace NotoriousTest.Web.Infrastructures;
+
+public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurationConsumer
 {
-    public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurationConsumer
+    public HttpClient? HttpClient;
+
+    protected WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(
+        contextId, logger, registry)
     {
-        public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
-        public HttpClient? HttpClient;
-        public override int? Order => 999;
-        public override bool DisableRegistry => true;
-        protected WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
-        {
-
-        }
-
     }
-    public class WebApplicationInfrastructure<TWebApp> : WebApplicationInfrastructure where TWebApp : IWebApplication, new()
+
+    public override int? Order => 999;
+    public override bool DisableRegistry => true;
+    public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
+}
+
+public class WebApplicationInfrastructure<TWebApp> : WebApplicationInfrastructure where TWebApp : IWebApplication, new()
+{
+    private TWebApp _webApplicationFactory;
+
+    public WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(
+        contextId, logger, registry)
     {
-        private TWebApp _webApplicationFactory;
-        public override int? Order => 999;
+        _webApplicationFactory = new TWebApp();
+        Dependencies = _webApplicationFactory.Dependencies;
+        Requirements = _webApplicationFactory.Requirements;
+    }
 
-        public WebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
-        {
-            _webApplicationFactory = new TWebApp();
-        }
+    public override int? Order => 999;
 
-        public override async Task Destroy()
-        {
-            await _webApplicationFactory.DisposeAsync();
-        }
+    public override async Task Destroy() => await _webApplicationFactory.DisposeAsync();
 
-        public override Task Initialize()
-        {
-            if (_webApplicationFactory is IConfigurationConsumer configurableApplication)
-            {
-                configurableApplication.ConsumedConfiguration = ConsumedConfiguration;
-            }
+    public override async Task Initialize()
+    {
+        if (_webApplicationFactory is IConfigurationConsumer configurableApplication)
+            configurableApplication.ConsumedConfiguration = ConsumedConfiguration;
 
-            HttpClient = _webApplicationFactory.CreateDefaultClient();
-            return Task.CompletedTask;
-        }
+        HttpClient = await _webApplicationFactory.Start();
     }
 }

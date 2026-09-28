@@ -17,7 +17,6 @@ public abstract class Infrastructure<TOutputConfiguration, TMetadata> : Infrastr
     {
     }
 
-    public List<IInfrastructureDependency> Dependencies { get; }
     public List<ConfigurationEntry<TOutputConfiguration>> OutputConfiguration { get; } = new();
 
     public void AddEntry(string key, TOutputConfiguration value)
@@ -92,6 +91,8 @@ public abstract class Infrastructure(EnvironmentId contextId, ITestLogger logger
 
     /// <inheritdoc />
     public List<IInfrastructureDependency> Dependencies { get; set; } = new();
+
+    public List<IInfrastructureRequirement> Requirements { get; set; } = new();
 
     /// <inheritdoc />
     public virtual int? Order { get; }

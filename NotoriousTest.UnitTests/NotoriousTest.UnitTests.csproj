@@ -26,6 +26,7 @@
     <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
     <ProjectReference Include="..\NotoriousTest.Internal.Watchdog\NotoriousTest.Internal.Watchdog.csproj" />
     <ProjectReference Include="..\NotoriousTest.Internal.SqlLiteRegistry\NotoriousTest.Internal.SqlLiteRegistry.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
   </ItemGroup>
 
 </Project>

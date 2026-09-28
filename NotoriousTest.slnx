@@ -37,13 +37,17 @@
   </Folder>
   <Folder Name="/src/3. Infrastructures/">
     <Project Path="NotoriousTest.Database/NotoriousTest.Database.csproj" Id="61a1bf4a-e96c-464e-a985-8ac40019acd1" />
+    <Project Path="NotoriousTest.Dependencies.Azure.FunctionCoreTools/NotoriousTest.Dependencies.Azure.FunctionCoreTools.csproj" />
     <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj" />
+    <Project Path="NotoriousTest.Requirements.Docker/NotoriousTest.Requirements.Docker.csproj" />
     <Project Path="NotoriousTest.Sqlite/NotoriousTest.Sqlite.csproj" Id="1d72cc23-09fd-4b37-9738-1a7a4a95b69d" />
     <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj" />
     <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
+    <Project Path="NotoriousTest.Web.AzureFunctions/NotoriousTest.Web.AzureFunctions.csproj" />
     <Project Path="NotoriousTest.Web/NotoriousTest.Web.csproj" Id="5a2ebcfc-d429-4f2a-be6c-c7680a4ee8b7" />
   </Folder>
   <Folder Name="/src/4. Tests/">
+    <Project Path="NotoriousTest.IntegrationsTest.Functions/NotoriousTest.IntegrationsTest.Functions.csproj" />
     <Project Path="NotoriousTest.IntegrationTests.Web/NotoriousTest.IntegrationTests.Web.csproj" Id="a18ad5d8-bda4-4161-bd11-224e6e78000a" />
     <Project Path="NotoriousTest.IntegrationTests/NotoriousTest.IntegrationTests.csproj" Id="16bc60da-65d0-42a3-8e12-d8903045cf5b" />
     <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />

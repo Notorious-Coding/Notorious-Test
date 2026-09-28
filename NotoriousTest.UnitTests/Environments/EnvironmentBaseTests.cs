@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NotoriousTest.Core;
 using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Exceptions;
+using NotoriousTest.Core.Infrastructures.Dependencies;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
@@ -291,6 +292,257 @@ public class EnvironmentBaseTests
 
         await stub.Initialize();
         order.Should().Equal(1, 11, 2, 22, 3, 33);
+    }
+
+    // --- Requirements ---
+
+    [Fact]
+    public async Task Initialize_Should_Succeed_WhenAllRequirementsAreMet()
+    {
+        IInfrastructureRequirement requirement = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => requirement.Exist()).Returns(true);
+        bool initialized = false;
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry)
+            {
+                Requirements = [requirement],
+                OnInitialize = async () => initialized = true
+            });
+        };
+
+        await stub.Initialize();
+
+        initialized.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Initialize_Should_ThrowInfrastructureRequirementNotMetException_WhenRequirementIsNotMet()
+    {
+        IInfrastructureRequirement requirement = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => requirement.Exist()).Returns(false);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Requirements = [requirement] });
+        };
+
+        Func<Task> act = () => stub.Initialize();
+
+        (await act.Should().ThrowAsync<InfrastructureRequirementNotMetException>())
+            .Which.Requirements.Should().ContainSingle().Which.Should().BeSameAs(requirement);
+    }
+
+    [Fact]
+    public async Task Initialize_Should_ReportOnlyNotMetRequirements()
+    {
+        IInfrastructureRequirement met = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => met.Exist()).Returns(true);
+        IInfrastructureRequirement notMet1 = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => notMet1.Exist()).Returns(false);
+        IInfrastructureRequirement notMet2 = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => notMet2.Exist()).Returns(false);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Requirements = [met, notMet1] });
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Requirements = [notMet2] });
+        };
+
+        Func<Task> act = () => stub.Initialize();
+
+        (await act.Should().ThrowAsync<InfrastructureRequirementNotMetException>())
+            .Which.Requirements.Should().Equal(notMet1, notMet2);
+    }
+
+    [Fact]
+    public async Task Initialize_Should_VerifySharedRequirementOnlyOnce()
+    {
+        IInfrastructureRequirement requirement = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => requirement.Exist()).Returns(true);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Requirements = [requirement] });
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Requirements = [requirement] });
+        };
+
+        await stub.Initialize();
+
+        A.CallTo(() => requirement.Exist()).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Initialize_Should_NotInitializeInfrastructures_WhenRequirementIsNotMet()
+    {
+        IInfrastructureRequirement requirement = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => requirement.Exist()).Returns(false);
+        bool initialized = false;
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Requirements = [requirement] });
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { OnInitialize = async () => initialized = true });
+        };
+
+        Func<Task> act = () => stub.Initialize();
+
+        await act.Should().ThrowAsync<InfrastructureRequirementNotMetException>();
+        initialized.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Initialize_Should_NotInstallDependencies_WhenRequirementIsNotMet()
+    {
+        IInfrastructureRequirement requirement = A.Fake<IInfrastructureRequirement>();
+        A.CallTo(() => requirement.Exist()).Returns(false);
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(false);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry)
+            {
+                Requirements = [requirement],
+                Dependencies = [dependency]
+            });
+        };
+
+        Func<Task> act = () => stub.Initialize();
+
+        await act.Should().ThrowAsync<InfrastructureRequirementNotMetException>();
+        A.CallTo(() => dependency.Install()).MustNotHaveHappened();
+    }
+
+    // --- Dependencies ---
+
+    [Fact]
+    public async Task Initialize_Should_InstallMissingDependencies()
+    {
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(false);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Dependencies = [dependency] });
+        };
+
+        await stub.Initialize();
+
+        A.CallTo(() => dependency.Install()).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Initialize_Should_NotInstallDependencies_WhenAlreadyInstalled()
+    {
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(true);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Dependencies = [dependency] });
+        };
+
+        await stub.Initialize();
+
+        A.CallTo(() => dependency.Install()).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Initialize_Should_InstallSharedDependencyOnlyOnce()
+    {
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(false);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Dependencies = [dependency] });
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Dependencies = [dependency] });
+        };
+
+        await stub.Initialize();
+
+        A.CallTo(() => dependency.Install()).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Initialize_Should_InstallDependencies_BeforeInitializingInfrastructures()
+    {
+        List<string> calls = new();
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(false);
+        A.CallTo(() => dependency.Install()).Invokes(() => calls.Add("install"));
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry)
+            {
+                Dependencies = [dependency],
+                OnInitialize = async () => calls.Add("initialize")
+            });
+        };
+
+        await stub.Initialize();
+
+        calls.Should().Equal("install", "initialize");
+    }
+
+    [Fact]
+    public async Task Destroy_Should_UninstallDependenciesInstalledByEnvironment()
+    {
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(false);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Dependencies = [dependency] });
+        };
+
+        await stub.Initialize();
+        await stub.Destroy();
+
+        A.CallTo(() => dependency.Uninstall()).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Destroy_Should_NotUninstallDependencies_WhenInstalledBeforeEnvironment()
+    {
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(true);
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry) { Dependencies = [dependency] });
+        };
+
+        await stub.Initialize();
+        await stub.Destroy();
+
+        A.CallTo(() => dependency.Uninstall()).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Destroy_Should_UninstallDependencies_AfterDestroyingInfrastructures()
+    {
+        List<string> calls = new();
+        IInfrastructureDependency dependency = A.Fake<IInfrastructureDependency>();
+        A.CallTo(() => dependency.Exist()).Returns(false);
+        A.CallTo(() => dependency.Uninstall()).Invokes(() => calls.Add("uninstall"));
+        EnvironmentStub stub = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async () =>
+        {
+            stub.AddInfrastructure(new InfrastructureStub(_testLogger, _registry)
+            {
+                Dependencies = [dependency],
+                OnDestroy = async () => calls.Add("destroy")
+            });
+        };
+
+        await stub.Initialize();
+        await stub.Destroy();
+
+        calls.Should().Equal("destroy", "uninstall");
     }
 
     // --- Watchdog disabled ---
