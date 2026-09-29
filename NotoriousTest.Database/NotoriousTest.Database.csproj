@@ -1,19 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<Description>A Database integration with NotoriousTest.</Description>
-		<PackageId>NotoriousTest.Database</PackageId>
-		<IsPackable>true</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>A Database integration with NotoriousTest.</Description>
+    <PackageId>NotoriousTest.Database</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Respawn" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Respawn"/>
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-		<ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Requirements.Docker\NotoriousTest.Requirements.Docker.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
+  </ItemGroup>
 
 </Project>

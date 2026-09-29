@@ -1,22 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-		<Description>A SqlServer integration with NotoriousTest.</Description>
-		<PackageId>NotoriousTest.SqlServer</PackageId>
-		<IsPackable>true</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>A SqlServer integration with NotoriousTest.</Description>
+    <PackageId>NotoriousTest.SqlServer</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" />
-    <PackageReference Include="Respawn" />
-    <PackageReference Include="Testcontainers.MsSql" />
+    <PackageReference Include="Microsoft.Data.SqlClient"/>
+    <PackageReference Include="Respawn"/>
+    <PackageReference Include="Testcontainers.MsSql"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj" />
-    <ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj" />
-    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Requirements.Docker\NotoriousTest.Requirements.Docker.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
   </ItemGroup>
 
 </Project>

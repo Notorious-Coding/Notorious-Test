@@ -1,4 +1,4 @@
-﻿## ![Logo](./Documentation/Images/NotoriousTest.png)
+## ![Logo](./Documentation/Images/NotoriousTest.png)
 
 __Clean, isolated, and maintainable integration testing for .NET__
 
@@ -16,268 +16,237 @@ Github ! Gaining insight into its usage is very important to me!
 ## Summary
 
 - [Purpose](#purpose)
-- [Hello World](#hello-world)
-    - [Setup](#setup)
-    - [Define a Basic Infrastructure](#define-a-basic-infrastructure)
-    - [Create a Test Environment](#create-a-test-environment)
-    - [Write your first test](#write-your-first-test)
-    - [Running Your First Test](#-running-your-first-test)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [1. The Database](#1-the-database)
+  - [2. The Web Application](#2-the-web-application)
+  - [3. The Environment](#3-the-environment)
+  - [4. The Tests](#4-the-tests)
 - [Multi-Framework Support](#multi-framework-support)
+- [Integrations](#integrations)
 - [Resources & Community](#resources--community)
-    - [Documentation](#documentation)
-    - [Changelog](#changelog)
-    - [Contact](#contact)
+  - [Documentation](#documentation)
+  - [Changelog](#changelog)
+  - [Contact](#contact)
 - [Other packages i'm working on](#other-nugets-im-working-on)
 
 ## Purpose
 
-Notorious Test is a testing framework designed to simplify the setup and management of integration tests in .NET
-applications.
-It provides a structured way to define and manage test environments, allowing developers to focus on writing tests
-rather than dealing with the complexities of infrastructure setup and teardown.
+Integration tests are valuable, but their setup is painful: starting databases, wiring connection strings, cleaning
+data between tests, tearing everything down — and ending up with orphan containers when a run crashes.
 
-The concept is simple:
+**NotoriousTest** handles all of that for you. The concept is simple:
 
-1. Create an **infrastructure** and implement its _initialization_, _reset_, and _destruction_ logic.
-2. Add it to an **environment**.
-3. Access it directly from your **integration tests**.
+1. Describe each external dependency (database, container, web application…) as an **infrastructure**.
+2. Group them in an **environment**.
+3. Write **integration tests** against that environment.
 
-**NotoriousTest** will automatically manage the **lifecycle of your infrastructures.**
-Even after the tests have crashed unexpectedly, thanks to the DoggyDog 🐶.
+NotoriousTest then manages the whole lifecycle:
 
-## Hello World
+- ⚡ **Initialize** infrastructures before the tests — in parallel, in order when needed.
+- 🔗 **Share configuration** between them: your API receives the database connection string automatically.
+- 🧹 **Reset** them after each test, so every test starts from a clean state.
+- 🗑️ **Destroy** them at the end.
+- 🐶 **Clean up after crashes** thanks to DoggyDog, a watchdog process that removes whatever a killed run left behind.
 
-## Setup
+It works with **xUnit**, **NUnit**, **MSTest** and **TUnit**, and ships ready-to-use infrastructures for **SQL Server**,
+**PostgreSQL**, **SQLite**, **Docker containers**, **ASP.NET Core** and **Azure Functions**.
 
-First, [install NuGet](http://docs.nuget.org/docs/start-here/installing-nuget). Then, install the package matching your
-test framework:
+## Installation
 
-| Framework | Package                |
-|-----------|------------------------|
-| xUnit     | `NotoriousTest.XUnit`  |
-| NUnit     | `NotoriousTest.NUnit`  |
-| MSTest    | `NotoriousTest.MSTest` |
-| TUnit     | `NotoriousTest.TUnit`  |
+Install the package matching your test framework:
 
-```
-PM> Install-Package NotoriousTest.XUnit
-```
+| Framework | Package |
+|-----------|---------|
+| xUnit (v3) | `NotoriousTest.XUnit` |
+| NUnit | `NotoriousTest.NUnit` |
+| MSTest | `NotoriousTest.MSTest` |
+| TUnit | `NotoriousTest.TUnit` |
 
-Or from the .NET CLI:
+Then the [integrations](#integrations) you need:
 
-```
+```sh
 dotnet add package NotoriousTest.XUnit
+dotnet add package NotoriousTest.SqlServer
+dotnet add package NotoriousTest.Web
 ```
 
-> **Note:** .NET 8 or higher is required.
+> **Note:** .NET 8 or higher is required. Docker-based infrastructures require Docker to be installed and running.
 
-## Define a Basic Infrastructure
+## Quick Start
 
-An **infrastructure** represents an **external dependency** (database, message bus, etc.).
-
-For now, we'll define an empty infrastructure to illustrate the setup.
-You can replace `MyInfrastructure` with any real infrastructure later.
+Let's test an ASP.NET Core API that saves users into SQL Server, against a real database running in Docker.
 
 ```csharp
-public class MyInfrastructure : Infrastructure
+// The API under test — Program.cs
+app.MapPost("/users", async (CreateUserRequest request, IConfiguration configuration) =>
 {
-    public override Task Initialize()
-    {
-        // Setup logic here (e.g., start a database, configure an API)
-        Console.WriteLine($"Setup of {nameof(MyInfrastructure)}");
-        return Task.CompletedTask;
-    }
+    await using var connection = new SqlConnection(configuration.GetConnectionString("Default"));
+    // INSERT INTO Users ...
+    return Results.Created();
+});
 
-    public override Task Reset()
-    {
-        // Reset logic here (e.g., clear data, reset state)
-        Console.WriteLine($"Reset of {nameof(MyInfrastructure)}");
-        return Task.CompletedTask;
-    }
+public partial class Program { } // makes Program visible to the test project
+```
 
-    public override Task Destroy()
+### 1. The Database
+
+An **infrastructure** that starts SQL Server in a container and creates the schema:
+
+```csharp
+public class DatabaseInfrastructure : SqlServerContainerInfrastructure
+{
+    public DatabaseInfrastructure(EnvironmentId environmentId, ITestLogger logger, IRegistry registry)
+        : base(environmentId, logger, registry) { }
+
+    public override async Task Initialize()
     {
-        // Cleanup logic here (e.g., shut down services)
-        Console.WriteLine($"Shutdown of {nameof(MyInfrastructure)}");
+        await base.Initialize(); // starts the container and creates the database
+
+        await using var connection = GetDatabaseConnection();
+        await connection.OpenAsync();
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "CREATE TABLE Users (Id INT IDENTITY PRIMARY KEY, Name NVARCHAR(100) NOT NULL)";
+        await command.ExecuteNonQueryAsync();
+    }
+}
+```
+
+It publishes its connection string as `ConnectionStrings:Default` and empties every table after each test.
+
+### 2. The Web Application
+
+Your API, running in memory:
+
+```csharp
+public class ApiApplication : WebApplication<Program>
+{
+}
+```
+
+It receives `ConnectionStrings:Default` from the database automatically — no configuration file needed.
+
+### 3. The Environment
+
+The **environment** lists the infrastructures your tests need:
+
+```csharp
+public class ApiEnvironment : EnvironmentBase
+{
+    public ApiEnvironment(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry,
+        IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider)
+        : base(settings, watchDog, registry, runtime, logger, serviceProvider) { }
+
+    protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
+    public override Task ConfigureEnvironment()
+    {
+        AddInfrastructure<DatabaseInfrastructure>();
+        this.AddWebApplication<ApiApplication>(); // always starts after the database
         return Task.CompletedTask;
     }
 }
 ```
 
-**📌 What this does:**
-
-- Defines a basic infrastructure with lifecycle methods.
-- This is where you would add setup logic for databases, APIs, queues, etc.
-
-## Create a Test Environment
-
-A test environment groups infrastructures together. Extend the environment class from your framework-specific package:
+### 4. The Tests
 
 ```csharp
-// xUnit
-using System.Reflection;
-using Xunit.Sdk;
-
-public class MyTestEnvironment : NotoriousTest.XUnit.Environment
+public class UserTests : IntegrationTest<ApiEnvironment>
 {
-    public MyTestEnvironment(IMessageSink sink) : base(sink) { }
-
-    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
-
-    public override async Task ConfigureEnvironment()
-    {
-        AddInfrastructure<MyInfrastructure>();
-    }
-}
-```
-
-📌 **What this does:**
-
-- Registers `MyInfrastructure` inside the test environment.
-- Ensures all tests run in a clean and isolated setup.
-
-> See [Multi-Framework Support](#multi-framework-support) for NUnit, MSTest, and TUnit equivalents.
-
-## Write your first test
-
-Now, let's write a basic integration test using our environment.
-
-```csharp
-// xUnit
-public class MyIntegrationTests : NotoriousTest.XUnit.IntegrationTest<MyTestEnvironment>
-{
-    public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
+    public UserTests(XUnitFixture<ApiEnvironment> fixture) : base(fixture) { }
 
     [Fact]
-    public async Task ExampleTest()
+    public async Task CreateUser_Should_InsertUserInDatabase()
     {
-        // Retrieve the infrastructure
-        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
+        HttpClient client = Environment.GetWebApplication().HttpClient!;
 
-        // Add test logic here (e.g., verify database state, call an API)
+        await client.PostAsJsonAsync("users", new { Name = "Alice" });
 
-        Assert.NotNull(infra); // Basic validation to confirm setup works
+        await using var connection = Environment.GetInfrastructure<DatabaseInfrastructure>().GetDatabaseConnection();
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM Users";
+
+        Assert.Equal(1, (int)(await command.ExecuteScalarAsync())!);
     }
 }
 ```
-
-📌 **What this does:**
-
-- Retrieves the test infrastructure from the environment.
-- You can add real test logic (API calls, database assertions, etc.).
-
-## 🚀 Running Your First Test
-
-Now, let's run the test:
 
 ```sh
 dotnet test
 ```
 
-### Expected Output
+That's it 🎉 The container starts before the first test, the table is emptied after each test, and everything is
+removed at the end — even if the run crashes.
 
-You should see something like:
-
-```sh
-Passed! 1 test successful.
-```
-
-If everything works, congrats! 🎉 You've successfully set up NotoriousTest.
+👉 The full step-by-step walkthrough, with every `using` and an explanation of each step, is in the
+[Example](./Documentation/4-example.md).
 
 ## Multi-Framework Support
 
-NotoriousTest supports **xUnit**, **NUnit**, **MSTest**, and **TUnit**. The environment and test base classes differ per
-framework — everything else is identical.
+Infrastructures and environments are identical for every framework. Only the test base class changes:
 
-### NUnit
+| Framework | Base class | Constructor |
+|-----------|------------|-------------|
+| xUnit (v3) | `NotoriousTest.XUnit.IntegrationTest<TEnvironment>` | `(XUnitFixture<TEnvironment> fixture)` |
+| NUnit | `NotoriousTest.NUnit.IntegrationTestBase<TEnvironment>` | parameterless |
+| MSTest | `NotoriousTest.MSTest.IntegrationTestBase<TEnvironment>` | parameterless |
+| TUnit | `NotoriousTest.TUnit.IntegrationTestBase<TEnvironment>` | `(TUnitFixture<TEnvironment> fixture)` |
 
 ```csharp
-// Environment
-public class MyTestEnvironment : NotoriousTest.NUnit.Environment
-{
-    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
-
-    public override async Task ConfigureEnvironment()
-    {
-        AddInfrastructure<MyInfrastructure>();
-    }
-}
-
-// Tests
-[TestFixture]
-public class MyIntegrationTests : NotoriousTest.NUnit.IntegrationTest<MyTestEnvironment>
+// NUnit
+public class UserTests : NotoriousTest.NUnit.IntegrationTestBase<ApiEnvironment>
 {
     [Test]
-    public async Task ExampleTest()
-    {
-        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
-        Assert.That(infra, Is.Not.Null);
-    }
-}
-```
-
-### MSTest
-
-```csharp
-// Environment
-public class MyTestEnvironment : NotoriousTest.MSTest.Environment
-{
-    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
-
-    public override async Task ConfigureEnvironment()
-    {
-        AddInfrastructure<MyInfrastructure>();
-    }
+    public async Task CreateUser_Should_InsertUserInDatabase() { /* same as above */ }
 }
 
-// Tests
+// MSTest
 [TestClass]
-public class MyIntegrationTests : NotoriousTest.MSTest.IntegrationTest<MyTestEnvironment>
+public class UserTests : NotoriousTest.MSTest.IntegrationTestBase<ApiEnvironment>
 {
     [TestMethod]
-    public async Task ExampleTest()
-    {
-        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
-        Assert.IsNotNull(infra);
-    }
-}
-```
-
-### TUnit
-
-```csharp
-// Environment
-public class MyTestEnvironment : NotoriousTest.TUnit.Environment
-{
-    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
-
-    public override async Task ConfigureEnvironment()
-    {
-        AddInfrastructure<MyInfrastructure>();
-    }
+    public async Task CreateUser_Should_InsertUserInDatabase() { /* same as above */ }
 }
 
-// Tests
-public class MyIntegrationTests : NotoriousTest.TUnit.IntegrationTest<MyTestEnvironment>
+// TUnit
+public class UserTests : NotoriousTest.TUnit.IntegrationTestBase<ApiEnvironment>
 {
-    public MyIntegrationTests(MyTestEnvironment environment) : base(environment) { }
+    public UserTests(TUnitFixture<ApiEnvironment> fixture) : base(fixture) { }
 
     [Test]
-    public async Task ExampleTest()
-    {
-        var infra = CurrentEnvironment.GetInfrastructure<MyInfrastructure>();
-        await Assert.That(infra).IsNotNull();
-    }
+    public async Task CreateUser_Should_InsertUserInDatabase() { /* same as above */ }
 }
 ```
+
+Complete samples for each framework are available in the [`Samples`](./Samples/) folder.
+
+## Integrations
+
+| Package | Provides |
+|---------|----------|
+| `NotoriousTest.Web` | ASP.NET Core application running in memory. |
+| `NotoriousTest.Web.AzureFunctions` | Azure Functions host running locally. |
+| `NotoriousTest.SqlServer` | SQL Server — Docker container or existing server. |
+| `NotoriousTest.PostgreSql` | PostgreSQL — Docker container or existing server. |
+| `NotoriousTest.Sqlite` | SQLite — one database file per environment. |
+| `NotoriousTest.TestContainers` | Any [Testcontainers](https://dotnet.testcontainers.org/) container (Redis, RabbitMQ, Keycloak…). |
+| `NotoriousTest.Requirements.Docker` | Fails fast when Docker is not running. |
+| `NotoriousTest.Dependencies.Azure.FunctionCoreTools` | Installs the Azure Functions Core Tools when missing. |
+
+Need something else? Any class inheriting from `Infrastructure` is an infrastructure — see
+[Core Concepts](./Documentation/2-core-concepts.md).
 
 ## Resources & Community
 
 ### Documentation
 
-- 📖 [Core Concepts](./Documentation/2-core-concepts.md) – Learn how infrastructures and environments work.
-- 🔌 [Integrations](./Documentation/3-integrations.md) – See how to integrate SQL Server, TestContainers, and more.
-- 📚 [Examples](./Documentation/4-example.md) – Hands-on use cases with real-world setups.
+- 🏗️ [Core Concepts](./Documentation/2-core-concepts.md) – Infrastructures, environments, lifecycle, DoggyDog, settings,
+  dependency injection.
+- 🔌 [Integrations](./Documentation/3-integrations.md) – SQL Server, PostgreSQL, SQLite, Docker containers, Web, Azure
+  Functions.
+- 📚 [Example](./Documentation/4-example.md) – A complete Web API + SQL Server setup, step by step.
 - 🏛️ [Architecture Guidelines](./Documentation/5-architecture.md) – Best practices for structuring your test setup.
 
 ### Changelog
