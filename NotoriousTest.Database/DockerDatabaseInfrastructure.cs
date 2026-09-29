@@ -6,6 +6,7 @@ using NotoriousTest.Core;
 using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Requirements.Docker;
 using NotoriousTest.TestContainers;
 
 namespace NotoriousTest.Database;
@@ -18,6 +19,8 @@ public abstract class
     protected DockerDatabaseInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(
         contextId, logger, registry)
     {
+        Requirements.Add(new DockerRequirement());
+
         if (Environment.GetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED") != "true")
             Environment.SetEnvironmentVariable("TESTCONTAINERS_RYUK_DISABLED", "true");
     }

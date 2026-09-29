@@ -1,32 +1,29 @@
-﻿using NotoriousTest.Core;
+﻿using System.Data.Common;
+using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Database;
-
 using Npgsql;
-
-using Respawn;
-using Respawn.Graph;
-
-using System.Data.Common;
-
 using Testcontainers.PostgreSql;
-
 
 namespace NotoriousTest.PostgreSql;
 
 public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<string>
 {
-    public PostgreContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+    public PostgreContainerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(
+        contextId, logger, registry)
     {
     }
 
     /// <summary>
-    /// Gets the configuration key used to retrieve the default connection string.
+    ///     Gets the configuration key used to retrieve the default connection string.
     /// </summary>
-    /// <remarks>Override this property in a derived class to specify a different configuration key if
-    /// needed.</remarks>
+    /// <remarks>
+    ///     Override this property in a derived class to specify a different configuration key if
+    ///     needed.
+    /// </remarks>
     protected virtual string ConnectionStringKey => "ConnectionStrings:Default";
+
     public override async Task Initialize()
     {
         await base.Initialize();
@@ -35,9 +32,12 @@ public class PostgreContainerInfrastructure : PostgreContainerInfrastructure<str
     }
 }
 
-public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<PostgreSqlContainer, TOutputConfiguration>
+public class
+    PostgreContainerInfrastructure<TOutputConfiguration> : DockerDatabaseInfrastructure<PostgreSqlContainer,
+    TOutputConfiguration>
 {
-    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry) : base(contextId, logger, registry)
+    public PostgreContainerInfrastructure(Guid contextId, ITestLogger logger, IRegistry registry) : base(contextId,
+        logger, registry)
     {
         Container = ConfigureSqlContainer(new PostgreSqlBuilder()).Build();
     }
@@ -49,10 +49,7 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
     public override string GetDatabaseConnectionString()
     {
         var connectionString = new NpgsqlConnectionStringBuilder(Container.GetConnectionString());
-        if (!string.IsNullOrEmpty(FullDbName))
-        {
-            connectionString.Database = FullDbName;
-        }
+        if (!string.IsNullOrEmpty(FullDbName)) connectionString.Database = FullDbName;
 
         return connectionString.ToString();
     }
@@ -65,6 +62,4 @@ public class PostgreContainerInfrastructure<TOutputConfiguration> : DockerDataba
             await command.ExecuteNonQueryAsync();
         }
     }
-
-
 }

@@ -1,22 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net8.0;net10.0;net9.0</TargetFrameworks>
-		<Description>A PostgreSql integration with NotoriousTest.</Description>
-		<PackageId>NotoriousTest.PostgreSql</PackageId>
-		<IsPackable>true</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0;net9.0</TargetFrameworks>
+    <Description>A PostgreSql integration with NotoriousTest.</Description>
+    <PackageId>NotoriousTest.PostgreSql</PackageId>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Npgsql" />
-		<PackageReference Include="Respawn" />
-		<PackageReference Include="Testcontainers.PostgreSql" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql"/>
+    <PackageReference Include="Respawn"/>
+    <PackageReference Include="Testcontainers.PostgreSql"/>
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj" />
-		<ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
-		<ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Database\NotoriousTest.Database.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Requirements.Docker\NotoriousTest.Requirements.Docker.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
+    <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj"/>
+  </ItemGroup>
 
 </Project>

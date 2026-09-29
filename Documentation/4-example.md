@@ -1,233 +1,290 @@
 # 📚 Example — Web API + SQL Server
 
-This example walks through a complete, real-world integration test setup: a web API that creates users in a SQL Server database.
+This example is the smallest complete setup: an ASP.NET Core API that saves users into a SQL Server database, tested
+end-to-end with a real database running in Docker.
 
-The full working code is available in the [`Samples/NotoriousTest.Sample.XUnit`](../Samples/NotoriousTest.Sample.XUnit/) folder.
+By the end, you will have:
+
+- a SQL Server container started once per test class, with a fresh database;
+- your API running in memory, automatically connected to that database;
+- the database emptied after each test;
+- everything cleaned up at the end — even if the test run crashes.
+
+## Summary
+
+1. [Prerequisites](#1-prerequisites)
+2. [The Application Under Test](#2-the-application-under-test)
+3. [Setting Up the Test Project](#3-setting-up-the-test-project)
+4. [Step 1 — The Database](#4-step-1--the-database)
+5. [Step 2 — The Web Application](#5-step-2--the-web-application)
+6. [Step 3 — The Environment](#6-step-3--the-environment)
+7. [Step 4 — The Tests](#7-step-4--the-tests)
+8. [Running the Tests](#8-running-the-tests)
+9. [What Just Happened](#9-what-just-happened)
+10. [Going Further](#10-going-further)
 
 ---
 
-## The Application Under Test
+## 1. Prerequisites
 
-The application exposes a single endpoint that inserts a user into a SQL Server database, reading the connection string from `IConfiguration`:
+- .NET 8 or higher
+- Docker, installed and running
 
-```csharp
-// Controllers/UserController.cs
-[ApiController]
-[Route("users")]
-public class UserController : ControllerBase
-{
-    private readonly IConfiguration _configuration;
+---
 
-    public UserController(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+## 2. The Application Under Test
 
-    [HttpPost]
-    public void CreateUser()
-    {
-        using var connection = new SqlConnection(_configuration.GetConnectionString("SqlServer"));
-        connection.Open();
-
-        using var command = connection.CreateCommand();
-        command.Parameters.AddWithValue("@username", $"user_{Random.Shared.Next()}");
-        command.Parameters.AddWithValue("@email", $"user_{Random.Shared.Next()}@example.com");
-        command.Parameters.AddWithValue("@password_hash", "hash");
-        command.Parameters.AddWithValue("@created_at", DateTime.UtcNow);
-        command.CommandText = @"INSERT INTO Users (username, email, password_hash, created_at)
-                                VALUES (@username, @email, @password_hash, @created_at)";
-        command.ExecuteNonQuery();
-    }
-}
-```
+A minimal API with a single endpoint. It reads its connection string from `IConfiguration`, like any real application —
+it knows nothing about the tests.
 
 ```csharp
-// Program.cs
+// MyApi/Program.cs
+using Microsoft.Data.SqlClient;
+
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
 var app = builder.Build();
-app.MapControllers();
+
+app.MapPost("/users", async (CreateUserRequest request, IConfiguration configuration) =>
+{
+    await using var connection = new SqlConnection(configuration.GetConnectionString("Default"));
+    await connection.OpenAsync();
+
+    await using var command = connection.CreateCommand();
+    command.CommandText = "INSERT INTO Users (Name) VALUES (@name)";
+    command.Parameters.AddWithValue("@name", request.Name);
+    await command.ExecuteNonQueryAsync();
+
+    return Results.Created();
+});
+
 app.Run();
 
+public record CreateUserRequest(string Name);
+
+// Makes Program visible to the test project
 public partial class Program { }
 ```
 
 ---
 
-## Setup
+## 3. Setting Up the Test Project
 
-Create an xUnit test project and install the required packages:
+Create an xUnit test project, reference the API, and install the packages:
 
-```
+```sh
+dotnet new install xunit.v3.templates
+dotnet new xunit3 -n MyApi.IntegrationTests
+cd MyApi.IntegrationTests
+dotnet add reference ../MyApi/MyApi.csproj
 dotnet add package NotoriousTest.XUnit
 dotnet add package NotoriousTest.SqlServer
 dotnet add package NotoriousTest.Web
 ```
 
+| Package | Why |
+|---------|-----|
+| `NotoriousTest.XUnit` | Environments and integration tests for xUnit. |
+| `NotoriousTest.SqlServer` | A SQL Server database in a Docker container. |
+| `NotoriousTest.Web` | Runs the API in memory and connects it to the other infrastructures. |
+
 ---
 
-## Step 1 — Define the Infrastructure
+## 4. Step 1 — The Database
 
-Inherit from `SqlServerContainerInfrastructure`. Override `Initialize()` to create the schema after the database is ready.
+Inherit from `SqlServerContainerInfrastructure`, and create the schema once the database is ready:
 
 ```csharp
-public class SqlServerInfrastructure : SqlServerContainerInfrastructure
-{
-    public SqlServerInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
-        : base(contextId, logger, registry) { }
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.SqlServer;
 
-    // Key used to expose the connection string to the web application
-    protected override string ConnectionStringKey => "ConnectionStrings:SqlServer";
+public class DatabaseInfrastructure : SqlServerContainerInfrastructure
+{
+    public DatabaseInfrastructure(EnvironmentId environmentId, ITestLogger logger, IRegistry registry)
+        : base(environmentId, logger, registry) { }
 
     public override async Task Initialize()
     {
-        await base.Initialize(); // starts container, creates database, outputs connection string
+        await base.Initialize(); // starts the container and creates the database
 
-        using var connection = GetDatabaseConnection();
+        await using var connection = GetDatabaseConnection();
         await connection.OpenAsync();
 
-        using var command = connection.CreateCommand();
-        command.CommandText = @"
-            CREATE TABLE Users (
-                user_id       INT IDENTITY(1,1) PRIMARY KEY,
-                username      NVARCHAR(50)  NOT NULL UNIQUE,
-                email         NVARCHAR(100) NOT NULL UNIQUE,
-                password_hash NVARCHAR(255) NOT NULL,
-                created_at    DATETIME DEFAULT GETDATE()
-            )";
+        await using var command = connection.CreateCommand();
+        command.CommandText = "CREATE TABLE Users (Id INT IDENTITY PRIMARY KEY, Name NVARCHAR(100) NOT NULL)";
         await command.ExecuteNonQueryAsync();
     }
 }
 ```
 
-What `base.Initialize()` does automatically:
-- Starts a SQL Server Docker container via Testcontainers.
-- Creates a unique database named `NotoriousDb_{EnvironmentId}`.
-- Registers the database in DoggyDog for crash recovery.
-- Publishes the connection string as a `ConfigurationEntry` under `ConnectionStrings:SqlServer`.
+That is all. The base class also:
 
-What happens on `Reset()` (before each test):
-- Respawn empties all tables, leaving the schema intact.
-
-What happens on `Destroy()` (end of session):
-- The Docker container is stopped and removed.
+- names the database after the environment id, so parallel runs never collide;
+- empties every table after each test;
+- publishes the connection string as `ConnectionStrings:Default` — the key the API reads;
+- removes the container at the end, or after a crash thanks to DoggyDog 🐶.
 
 ---
 
-## Step 2 — Define the Web Application
+## 5. Step 2 — The Web Application
+
+Point `WebApplication<T>` at the API's `Program` class:
 
 ```csharp
-public class TestWebApplication : WebApplication<Program>
+using NotoriousTest.Web.Applications;
+
+public class ApiApplication : WebApplication<Program>
 {
-    // Override WebApplicationFactory methods here if needed
 }
 ```
 
-`WebApplication<Program>` automatically receives all `ConfigurationEntry` objects produced by other infrastructures and injects them into the app's `IConfiguration`. The `ConnectionStrings:SqlServer` entry published by `SqlServerInfrastructure` will be available to the controller without any extra wiring.
+The API runs in memory, and receives `ConnectionStrings:Default` from the database infrastructure automatically. No
+`appsettings.Testing.json`, no hard-coded connection string.
 
 ---
 
-## Step 3 — Create the Environment
+## 6. Step 3 — The Environment
+
+The environment lists the infrastructures the API needs:
 
 ```csharp
-public class TestEnvironment : NotoriousTest.XUnit.Environment
+using System.Reflection;
+using NotoriousTest.Core.Environments;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Runtime;
+using NotoriousTest.Core.Watchdog;
+using NotoriousTest.Web;
+
+public class ApiEnvironment : EnvironmentBase
 {
-    public TestEnvironment(IMessageSink sink) : base(sink) { }
+    public ApiEnvironment(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry,
+        IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider)
+        : base(settings, watchDog, registry, runtime, logger, serviceProvider) { }
 
-    public override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+    protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override async Task ConfigureEnvironment()
+    public override Task ConfigureEnvironment()
     {
-        AddInfrastructure<SqlServerInfrastructure>();
-        this.AddWebApplication<TestWebApplication>();
+        AddInfrastructure<DatabaseInfrastructure>();
+        this.AddWebApplication<ApiApplication>();
+        return Task.CompletedTask;
     }
 }
 ```
 
-The environment:
-1. Resolves `SqlServerInfrastructure` via the internal DI container (all constructor parameters injected automatically).
-2. Initializes infrastructures in order — `SqlServerInfrastructure` first (produces config), `WebApplicationInfrastructure` last (consumes it).
-3. Launches DoggyDog to watch the process and clean up containers on crash.
+The web application always starts **after** the database: it is guaranteed to receive the connection string.
 
 ---
 
-## Step 4 — Write the Tests
+## 7. Step 4 — The Tests
+
+Inherit from `IntegrationTest<ApiEnvironment>`, and use the environment to reach the API and the database:
 
 ```csharp
-public class UserTests : NotoriousTest.XUnit.IntegrationTest<TestEnvironment>
+using System.Net;
+using System.Net.Http.Json;
+using NotoriousTest.Web;
+using NotoriousTest.XUnit;
+
+public class UserTests : IntegrationTest<ApiEnvironment>
 {
-    public UserTests(TestEnvironment environment) : base(environment) { }
+    public UserTests(XUnitFixture<ApiEnvironment> fixture) : base(fixture) { }
 
     [Fact]
-    public async Task CreateUser_ShouldInsertOneRow()
+    public async Task CreateUser_Should_ReturnCreated()
     {
-        // Act — call the API
-        HttpClient client = CurrentEnvironment.GetWebApplication().HttpClient;
-        HttpResponseMessage response = await client.PostAsync("users", null);
+        HttpClient client = Environment.GetWebApplication().HttpClient!;
 
-        // Assert — HTTP response
-        Assert.True(response.IsSuccessStatusCode);
+        HttpResponseMessage response = await client.PostAsJsonAsync("users", new { Name = "Alice" });
 
-        // Assert — database state
-        SqlServerInfrastructure db = CurrentEnvironment.GetInfrastructure<SqlServerInfrastructure>();
-        await using var connection = db.GetDatabaseConnection();
-        await connection.OpenAsync(TestContext.Current.CancellationToken);
-
-        using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM Users";
-        int count = (int)await command.ExecuteScalarAsync(TestContext.Current.CancellationToken);
-
-        Assert.Equal(1, count);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 
     [Fact]
-    public async Task CreateUser_CalledTwice_ShouldStillHaveOneRow()
+    public async Task CreateUser_Should_InsertUserInDatabase()
     {
-        // Each test starts with a clean database — Respawn ran before this test
-        HttpClient client = CurrentEnvironment.GetWebApplication().HttpClient;
-        await client.PostAsync("users", null);
+        HttpClient client = Environment.GetWebApplication().HttpClient!;
 
-        SqlServerInfrastructure db = CurrentEnvironment.GetInfrastructure<SqlServerInfrastructure>();
-        await using var connection = db.GetDatabaseConnection();
-        await connection.OpenAsync(TestContext.Current.CancellationToken);
+        await client.PostAsJsonAsync("users", new { Name = "Bob" });
 
-        using var command = connection.CreateCommand();
+        Assert.Equal(1, await CountUsers());
+    }
+
+    private async Task<int> CountUsers()
+    {
+        await using var connection = Environment.GetInfrastructure<DatabaseInfrastructure>().GetDatabaseConnection();
+        await connection.OpenAsync();
+
+        await using var command = connection.CreateCommand();
         command.CommandText = "SELECT COUNT(*) FROM Users";
-        int count = (int)await command.ExecuteScalarAsync(TestContext.Current.CancellationToken);
-
-        Assert.Equal(1, count);
+        return (int)(await command.ExecuteScalarAsync())!;
     }
 }
 ```
 
-Each test runs against a fresh database — Respawn resets the data between tests without recreating the schema.
+The second test always finds **exactly one** user, whatever the execution order: the database is emptied after each
+test.
 
 ---
 
-## Running the Tests
+## 8. Running the Tests
 
 ```sh
 dotnet test
 ```
 
-NotoriousTest handles the full lifecycle:
-
 ```
-Session starts
-  └─ SQL Server container starts (Testcontainers)
-  └─ Database "NotoriousDb_{id}" is created
-  └─ Users table is created
-  └─ Web application starts, connection string injected
-
-Before each test
-  └─ Respawn empties all tables
-
-Each test runs in isolation
-
-Session ends
-  └─ Container is stopped and removed
+Passed!  - Failed: 0, Passed: 2, Skipped: 0, Total: 2
 ```
+
+> 💡 To see NotoriousTest's logs (initialization, reset and destroy durations), add an `xunit.runner.json` file with
+> `{ "diagnosticMessages": true }` to the test project, copied to the output directory.
 
 ---
 
-💡 Need help or have feedback? Join the community [discussions](https://github.com/Notorious-Coding/Notorious-Test/discussions) or open an [issue](https://github.com/Notorious-Coding/Notorious-Test/issues) on GitHub.
+## 9. What Just Happened
+
+```mermaid
+sequenceDiagram
+    participant X as xUnit
+    participant E as ApiEnvironment
+    participant D as DatabaseInfrastructure
+    participant W as ApiApplication
+
+    X->>E: Initialize (before the first test of UserTests)
+    E->>D: Initialize — start container, create database and table
+    D-->>E: ConnectionStrings:Default
+    E->>W: Initialize — start API with ConnectionStrings:Default
+    loop Each test
+        X->>W: POST /users (from the test)
+        X->>E: Reset
+        E->>D: Empty all tables
+    end
+    X->>E: Destroy (after the last test)
+    E->>W: Stop the API
+    E->>D: Remove the container
+```
+
+1. Before the first test of `UserTests`, the environment starts the SQL Server container, creates a database named
+   after its `EnvironmentId`, and runs your `CREATE TABLE`.
+2. The connection string is published and injected into the API, which starts in memory.
+3. After each test, the `Users` table is emptied.
+4. After the last test, the API is stopped and the container is removed.
+5. If the run is killed in the middle, DoggyDog removes the container for you.
+
+---
+
+## 10. Going Further
+
+- 🏗️ [Core Concepts](./2-core-concepts.md) — lifecycle, ordering, configuration, DoggyDog, settings, dependency
+  injection.
+- 🔌 [Integrations](./3-integrations.md) — PostgreSQL, SQLite, Docker containers, Azure Functions…
+- 🏛️ [Architecture Guidelines](./5-architecture.md) — migrations, test frameworks (Arrange / Act / Assert), project
+  structure.
+- 🧪 Complete samples for every test framework are available in the
+  [`Samples`](../Samples/) folder.
+
+💡 Need help or have feedback? Join the community [discussions](https://github.com/Notorious-Coding/Notorious-Test/discussions)
+or open an [issue](https://github.com/Notorious-Coding/Notorious-Test/issues) on GitHub.
