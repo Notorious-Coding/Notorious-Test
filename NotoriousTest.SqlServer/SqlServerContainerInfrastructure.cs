@@ -42,7 +42,7 @@ namespace NotoriousTest.SqlServer
             Container = ConfigureSqlContainer(new MsSqlBuilder()).Build();
         }
 
-        private MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder) => builder;
+        protected virtual MsSqlBuilder ConfigureSqlContainer(MsSqlBuilder builder) => builder;
 
         public override DbConnection GetConnection(string connectionString) => new SqlConnection(connectionString);
 

@@ -1,4 +1,20 @@
 ﻿# Changelog
+
+## v5.1.0
+
+### Azure Functions 💥NEW💥
+
+- Added support for Azure Functions integration testing.
+- Install the `NotoriousTest.Web.AzureFunctions` package and the `AzureFunctionWebApplication` to start a local azure function server.
+
+### ✨ Features
+- Added dependencies and requirments to infrastructure.
+    - Dependencies will be installed before the test campaign, and uninstall at the end. 
+    - Requirments will be checked before the test campaign, and if not met, the test campaign will be skipped.
+
+### 🛠 Technical
+- IWebApplication `CreateDefaultClient` method is now renamed to `Start` and is now async.
+
 ## v5.0.2
 
 ### 📦 Dependencies
