@@ -8,8 +8,20 @@ namespace NotoriousTest.Web.Applications;
 /// </summary>
 public interface IWebApplication : IAsyncDisposable, IConfigurationConsumer
 {
+    /// <summary>
+    ///     WebApplication dependencies to install.
+    /// </summary>
     List<IInfrastructureDependency> Dependencies { get; }
+
+    /// <summary>
+    ///     WebApplication requirements to meet.
+    /// </summary>
     List<IInfrastructureRequirement> Requirements { get; }
+
+    /// <summary>
+    ///     Additional configuration to be passed to the application.
+    /// </summary>
+    Dictionary<string, string> AdditionalConfiguration { get; set; }
 
     /// <summary>
     ///     Start the application.

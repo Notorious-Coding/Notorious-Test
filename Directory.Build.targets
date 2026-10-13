@@ -1,8 +1,8 @@
 <Project>
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
-    <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="False" />
-    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="False" />
-    <None Include="$(MSBuildThisFileDirectory)LICENSE.txt" Pack="true" PackagePath="" Visible="False" />
+    <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="False"/>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="False"/>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE.txt" Pack="true" PackagePath="" Visible="False"/>
   </ItemGroup>
 
   <Target Name="CopyDoggyDogDev" AfterTargets="Build" Condition="'$(IsIntegrationTest)' == 'true'">
@@ -13,13 +13,14 @@
     </PropertyGroup>
 
     <Warning Text="DoggyDog artifacts not found at '$(DoggyDogArtifactsDir)'. Build the DoggyDog project first."
-             Condition="!Exists('$(DoggyDogArtifactsDir)')" />
+             Condition="!Exists('$(DoggyDogArtifactsDir)')"/>
 
     <ItemGroup>
-      <DoggyDogFiles Include="$(DoggyDogArtifactsDir)*" Condition="Exists('$(DoggyDogArtifactsDir)')" />
+      <DoggyDogFiles Include="$(DoggyDogArtifactsDir)*" Condition="Exists('$(DoggyDogArtifactsDir)')"/>
     </ItemGroup>
 
-    <Message Text="Copying DoggyDog from $(DoggyDogArtifactsDir) to $(OutDir)" Importance="high" />
-    <Copy SourceFiles="@(DoggyDogFiles)" DestinationFolder="$(OutDir)" Condition="'@(DoggyDogFiles)' != ''" />
+    <Message Text="Copying DoggyDog from $(DoggyDogArtifactsDir) to $(OutDir)" Importance="high"/>
+    <Copy SourceFiles="@(DoggyDogFiles)" DestinationFolder="$(OutDir)" Condition="'@(DoggyDogFiles)' != ''"/>
+
   </Target>
 </Project>

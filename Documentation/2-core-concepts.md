@@ -659,6 +659,33 @@ debugger attached — with:
 DoggyDog --from-env
 ```
 
+**Hiding the DoggyDog window:**
+
+```json
+{
+  "Watchdog": {
+    "HideDoggyDog": true
+  }
+}
+```
+
+By default, DoggyDog opens its own console window. With `HideDoggyDog` set to `true`, it is started without any window
+and runs silently in the background.
+
+**Log level:**
+
+```json
+{
+  "Watchdog": {
+    "MinLogLevel": "Debug"
+  }
+}
+```
+
+Sets the minimum level of the logs written by DoggyDog. Available values, from the least to the most verbose:
+`Error`, `Warning`, `Success`, `Info` (default), `Trace`, `Debug`. A level includes every level before it — e.g.
+`Info` writes `Error`, `Warning`, `Success` and `Info` logs.
+
 ---
 
 ## 3. Settings
@@ -672,7 +699,9 @@ project.
     "DisableWatchdog": false
   },
   "Watchdog": {
-    "ManualLaunch": false
+    "ManualLaunch": false,
+    "HideDoggyDog": false,
+    "MinLogLevel": "Info"
   },
   "SqlServerInfrastructure": {
     "ConnectionString": "Server=localhost;User Id=sa;Password=...;TrustServerCertificate=True"
@@ -699,6 +728,8 @@ The file must be copied to the output directory:
 |---------------|-------------------|---------|----------------------------------------------------|
 | `Environment` | `DisableWatchdog` | `false` | Disables [DoggyDog](#2-doggydog) and the registry. |
 | `Watchdog`    | `ManualLaunch`    | `false` | Waits for DoggyDog to be launched manually.        |
+| `Watchdog`    | `HideDoggyDog`    | `false` | Starts DoggyDog without a console window.          |
+| `Watchdog`    | `MinLogLevel`     | `Info`  | Minimum level of the logs written by DoggyDog.     |
 
 External database infrastructures (`SqlServerInfrastructure`, `PostgreInfrastructure`, `SqliteInfrastructure`) read a
 section named after **your infrastructure class** — see [Integrations](./3-integrations.md).
@@ -842,7 +873,8 @@ NotoriousTest logs every lifecycle step automatically, with its duration:
 | TUnit     | `TestContext.Current.Output`                                                                |
 
 `ITestLogger` is registered in the [DI container](#4-dependency-injection): inject it into your environment or your own
-services as well. DoggyDog writes its own logs in its console window.
+services as well. DoggyDog writes its own logs in its console window (hidden when `Watchdog:HideDoggyDog` is `true`),
+filtered by `Watchdog:MinLogLevel` — see [DoggyDog configuration](#configuration).
 
 ---
 

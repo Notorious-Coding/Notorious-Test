@@ -1,11 +1,8 @@
 ﻿using DoggyDog;
 using DoggyDog.AssemblyLoader;
 using DoggyDog.Logs;
-
 using Microsoft.Data.Sqlite;
-
 using NotoriousTest.Internal.SqlLiteRegistry;
-
 
 Logger logger = Logger.Instance;
 try
@@ -29,16 +26,12 @@ try
         var watchdog = new DoggyDogRecoveryWatchdog(assemblyLoader, registry, logger);
 
         await watchdog.Run(parameters.Pid, parameters.EnvironmentId);
-
     }
 }
 catch (Exception ex)
 {
-
-    logger.Error($"Fatal error during execution.", ex);
-    Console.WriteLine("Press any key to exit...");
-    Console.Read();
-    Environment.Exit(1);
+    logger.Error("Fatal error during execution.", ex);
+    ConsoleExit.ExitAfterDelay(1, Logger.Instance);
 }
 
 static SqliteRegistryProvider GetRegistry(WatchDogParameters parameters)
@@ -48,14 +41,14 @@ static SqliteRegistryProvider GetRegistry(WatchDogParameters parameters)
     if (!File.Exists(cs.DataSource))
     {
         Logger.Instance.Error($"Registry file not found at {cs.DataSource}");
-        Environment.Exit(1);
+        ConsoleExit.ExitAfterDelay(0, Logger.Instance);
     }
     else
     {
         Logger.Instance.Info($"Using registry file at {cs.DataSource}");
     }
 
-    var registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration()
+    var registry = new SqliteRegistryProvider(new SqliteRegistryProviderConfiguration
     {
         ConnectionString = parameters.ConnectionString
     });

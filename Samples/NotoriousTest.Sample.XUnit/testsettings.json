@@ -3,6 +3,8 @@
     "DisableWatchdog": false
   },
   "Watchdog": {
-    "ManualLaunch": false  
+    "ManualLaunch": false,
+    "MinLogLevel": "Info",
+    "HideDoggyDog": true
   }
 }

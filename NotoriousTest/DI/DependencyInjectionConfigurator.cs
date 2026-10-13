@@ -1,6 +1,5 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
-using NotoriousTest.Core;
 using NotoriousTest.Core.DI;
 using NotoriousTest.Core.Environments;
 using NotoriousTest.Core.Logger;
@@ -25,17 +24,18 @@ public class DependencyInjectionConfigurator : IDependencyInjectionConfigurator
             DataSource = SettingsDefaults.DefaultRegistryConnectionString
         };
 
-        var registryConfig = new SqliteRegistryProviderConfiguration()
-        {
-            ConnectionString = builder.ConnectionString
-        };
+        var registryConfig = new SqliteRegistryProviderConfiguration { ConnectionString = builder.ConnectionString };
 
         var settingsProvider = new TestSettingsProvider();
         services
             .AddSingleton<ITestSettingsProvider>(settingsProvider)
-            .AddSingleton(settingsProvider.Get<EnvironmentSettings>(EnvironmentSettings.SECTION_NAME) ?? new EnvironmentSettings())
-            .AddSingleton<IRegistry>((_) => new SqliteRegistryProvider(registryConfig))
-            .AddSingleton<IWatchDog>((services) => new DoggyDogWatchDog(registryConfig, services.GetRequiredService<ITestLogger>(), settingsProvider.Get<DoggyDogWatchdogConfiguration>("Watchdog") ?? new DoggyDogWatchdogConfiguration()))
+            .AddSingleton(settingsProvider.Get<EnvironmentSettings>(EnvironmentSettings.SECTION_NAME) ??
+                          new EnvironmentSettings())
+            .AddSingleton<IRegistry>(_ => new SqliteRegistryProvider(registryConfig))
+            .AddSingleton<IWatchDog>(services => new DoggyDogWatchDog(registryConfig,
+                services.GetRequiredService<ITestLogger>(),
+                settingsProvider.Get<DoggyDogWatchdogConfiguration>(DoggyDogWatchdogConfiguration.SECTION_NAME) ??
+                new DoggyDogWatchdogConfiguration()))
             .AddSingleton<IRuntime, RuntimeConfigurationProvider>();
 
         return services;

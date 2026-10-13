@@ -1,5 +1,27 @@
 ﻿# Changelog
 
+## v5.2.0
+
+### ✨ Features
+
+- DoggyDog can now be hidden with the `testsettings.json` file, via the `Watchdog:HideDoggyDog` key. False by default.
+- You can set the minimum log level for DoggyDog via the `Watchdog:MinLogLevel` key. `Info` by default.
+    - Keys supported are:
+        - Error,
+        - Warning,
+        - Success,
+        - Info,
+        - Trace,
+        - Debug
+- `WebApplication` now has a virtual property called `AdditionalConfiguration`. This is a dictionary to enrich the
+  configuration of the web application. It is applied after the consumed configuration, so it wins on duplicate keys.
+  The property is now part of `IWebApplication`.
+
+### 🐛 Bug Fixes
+
+- Fixed a bug where DoggyDog would stay open after the test campaign was finished, keeping a lock on the test DLL,
+  preventing other tests from running.
+
 ## v5.1.0
 
 ### Azure Functions 💥NEW💥

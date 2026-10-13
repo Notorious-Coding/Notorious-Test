@@ -52,9 +52,9 @@ internal class DoggyDogWatchDog : IWatchDog
                         $"--connectionString \"{_registyConfiguration.ConnectionString}\" " +
                         $"--environment {contextId.Value} " +
                         runtimeParameter +
-                        "--loglevel Info",
-            UseShellExecute = true,
-            CreateNoWindow = false
+                        $"--loglevel {_config.MinLogLevel.ToString()}",
+            UseShellExecute = !_config.HideDoggyDog,
+            CreateNoWindow = _config.HideDoggyDog
         });
 
 

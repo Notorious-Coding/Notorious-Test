@@ -16,6 +16,12 @@ public class WebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, I
     public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; } = new();
     public List<IInfrastructureDependency> Dependencies { get; } = [];
     public List<IInfrastructureRequirement> Requirements { get; } = [];
+
+    /// <summary>
+    ///     Additional configuration to be passed;
+    /// </summary>
+    public virtual Dictionary<string, string> AdditionalConfiguration { get; set; } = new();
+
     public virtual Task<HttpClient> Start() => Task.FromResult(CreateDefaultClient());
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -24,9 +30,8 @@ public class WebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, I
 
         builder.ConfigureAppConfiguration(config =>
         {
-            if (ConsumedConfiguration == null || !ConsumedConfiguration.Any()) return;
-
-            config.AddInMemoryCollection(ConsumedConfiguration.ToAppSettings());
+            config.AddInMemoryCollection(ConsumedConfiguration.ToAppSettings()!);
+            config.AddInMemoryCollection(AdditionalConfiguration!);
         });
     }
 }
