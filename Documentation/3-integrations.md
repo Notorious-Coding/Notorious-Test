@@ -112,15 +112,31 @@ in-memory configuration source.
 | `Redis` | `new { Host = "localhost", Port = 6379 }` | `Redis:Host = localhost`, `Redis:Port = 6379` |
 | `Brokers` | `new[] { "a", "b" }` | `Brokers:0 = a`, `Brokers:1 = b` |
 
+**Adding your own configuration** — override `AdditionalConfiguration` (part of `IWebApplication`, also available on
+[Azure Functions](#22-azure-functions)), using `appsettings`-style keys:
+
+```csharp
+public class MyWebApplication : WebApplication<Program>
+{
+    public override Dictionary<string, string> AdditionalConfiguration { get; set; } = new()
+    {
+        ["FeatureFlags:NewCheckout"] = "true"
+    };
+}
+```
+
+It is added as a second in-memory source, **after** the consumed configuration: if both define the same key,
+`AdditionalConfiguration` wins.
+
 **Customizing the application** — override any `WebApplicationFactory` method. Keep the call to
-`base.ConfigureWebHost()`, it is what injects the configuration:
+`base.ConfigureWebHost()`, it is what injects the consumed and additional configuration:
 
 ```csharp
 public class MyWebApplication : WebApplication<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        base.ConfigureWebHost(builder); // injects the consumed configuration
+        base.ConfigureWebHost(builder); // injects the consumed and additional configuration
 
         builder.UseEnvironment("Testing");
         builder.ConfigureTestServices(services =>

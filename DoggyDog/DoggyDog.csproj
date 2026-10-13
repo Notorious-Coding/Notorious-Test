@@ -14,6 +14,10 @@
     <ProjectReference Include="..\NotoriousTest.Internal.Watchdog\NotoriousTest.Internal.Watchdog.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyMetadata Include="BuildTimestamp" Value="$([System.DateTime]::UtcNow.ToString('o'))" />
+  </ItemGroup>
+
   <Target Name="PublishDoggyDogToArtifacts" AfterTargets="Build" Condition="'$(PublishDoggyDogToArtifactsOnBuild)' != 'false'">
     <PropertyGroup>
       <DoggyDogRuntime Condition="$([MSBuild]::IsOSPlatform('Windows'))">win-x64</DoggyDogRuntime>
@@ -22,7 +26,7 @@
     </PropertyGroup>
 
     <Message Text="Publishing DoggyDog to $(DoggyDogArtifactsDir)" Importance="high" />
-    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -r $(DoggyDogRuntime) --no-build --self-contained true /p:PublishSingleFile=true /p:PublishDir=&quot;$(DoggyDogArtifactsDir)&quot;" />
+    <Exec Command="dotnet publish &quot;$(MSBuildProjectFullPath)&quot; -c $(Configuration) -r $(DoggyDogRuntime) --self-contained true /p:PublishDoggyDogToArtifactsOnBuild=false /p:PublishSingleFile=true /p:PublishDir=&quot;$(DoggyDogArtifactsDir)&quot;" />
   </Target>
 
 </Project>
