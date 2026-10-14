@@ -1,6 +1,9 @@
-﻿namespace DoggyDog.Logs;
+namespace DoggyDog.Logs;
 
-public class LogScope(Logger logger, string name) : IDisposable
+public sealed class LogScope(Logger logger, string name, LogScope? parent) : IDisposable
 {
-    public void Dispose() => logger.ExitScope(name);
+    public string Name { get; } = name;
+    public LogScope? Parent { get; } = parent;
+
+    public void Dispose() => logger.RestoreScope(Parent);
 }

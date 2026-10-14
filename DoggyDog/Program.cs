@@ -41,7 +41,7 @@ static SqliteRegistryProvider GetRegistry(WatchDogParameters parameters)
     if (!File.Exists(cs.DataSource))
     {
         Logger.Instance.Error($"Registry file not found at {cs.DataSource}");
-        ConsoleExit.ExitAfterDelay(0, Logger.Instance);
+        ConsoleExit.ExitAfterDelay(1, Logger.Instance);
     }
     else
     {
