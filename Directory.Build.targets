@@ -1,8 +1,13 @@
-<Project>
+﻿<Project>
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="$(MSBuildThisFileDirectory)icon.png" Pack="true" PackagePath="" Visible="False"/>
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" Visible="False"/>
     <None Include="$(MSBuildThisFileDirectory)LICENSE.txt" Pack="true" PackagePath="" Visible="False"/>
+  </ItemGroup>
+
+  <!-- Ensure DoggyDog is rebuilt (and republished to artifacts) before integration tests copy it. -->
+  <ItemGroup Condition="'$(IsIntegrationTest)' == 'true'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)DoggyDog\DoggyDog.csproj" ReferenceOutputAssembly="false" Private="false"/>
   </ItemGroup>
 
   <Target Name="CopyDoggyDogDev" AfterTargets="Build" Condition="'$(IsIntegrationTest)' == 'true'">

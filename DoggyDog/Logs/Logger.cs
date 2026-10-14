@@ -4,21 +4,24 @@ namespace DoggyDog.Logs;
 
 public class Logger
 {
-    private static Logger? _logger;
+    private static readonly Lazy<Logger> _logger = new(() => new Logger());
+    private static readonly Lock _consoleLock = new();
 
-    private readonly Stack<string> _scopeStack = new();
+    // Each execution flow (thread / async flow) has its own scope chain, inherited from its parent flow.
+    private readonly AsyncLocal<LogScope?> _currentScope = new();
 
-    public static Logger Instance => _logger ??= new Logger();
+    public static Logger Instance => _logger.Value;
     public static LogLevel MinLogLevel { get; set; } = LogLevel.Debug;
 
     public LogScope CreateScope(string scopeName, string? message = null)
     {
         if (!string.IsNullOrWhiteSpace(message)) Trace(message);
-        _scopeStack.Push(scopeName);
-        return new LogScope(this, scopeName);
+        var scope = new LogScope(this, scopeName, _currentScope.Value);
+        _currentScope.Value = scope;
+        return scope;
     }
 
-    public void ExitScope(string name) => _scopeStack.TryPop(out _);
+    internal void RestoreScope(LogScope? scope) => _currentScope.Value = scope;
 
     public void Log(LogLevel logType, string message, Exception? exception = null)
     {
@@ -26,9 +29,7 @@ public class Logger
         var stringBuilder = new StringBuilder();
 
         stringBuilder.Append(" > ");
-        string scopeString = string.Join(string.Empty, _scopeStack.Reverse().Select(scope => $"[{scope}]").ToArray());
-
-        stringBuilder.Append(scopeString);
+        stringBuilder.Append(BuildScopeString());
 
         Action<Action> colorScope = logType switch
         {
@@ -41,13 +42,23 @@ public class Logger
             _ => LogColorScope.Gray
         };
 
-        colorScope(() =>
+        stringBuilder.Append(' ');
+        stringBuilder.Append(message);
+        if (exception != null) stringBuilder.Append(exception);
+        string line = stringBuilder.ToString();
+
+        lock (_consoleLock)
         {
-            stringBuilder.Append(' ');
-            stringBuilder.Append(message);
-            if (exception != null) stringBuilder.Append(exception);
-            Console.WriteLine(stringBuilder.ToString());
-        });
+            colorScope(() => Console.WriteLine(line));
+        }
+    }
+
+    private string BuildScopeString()
+    {
+        var names = new Stack<string>();
+        for (LogScope? scope = _currentScope.Value; scope != null; scope = scope.Parent)
+            names.Push($"[{scope.Name}]");
+        return string.Concat(names);
     }
 
     public void Error(string message, Exception? exception = null) => Log(LogLevel.Error, message, exception);
