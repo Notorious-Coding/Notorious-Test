@@ -271,7 +271,7 @@ the same dependency.
 |------------------------------------------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | `NotoriousTest.Dependencies.Azure.FunctionCoreTools` | `AzureFunctionCoreToolsDependency` | Azure Functions Core Tools (`func` CLI) — `winget` on Windows, `apt-get` on Debian/Ubuntu. Requires elevated privileges. |
 
-> 💡 `AzureFunctionWebApplication` (from `NotoriousTest.Web.AzureFunctions`) already declares
+> 💡 `AzureFunctionWebApplicationInfrastructure` (from `NotoriousTest.Web.AzureFunctions`) already declares
 > `AzureFunctionCoreToolsDependency` — you don't need to add it yourself.
 
 ---
@@ -414,7 +414,7 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Watchdog;
-using NotoriousTest.Web;
+using NotoriousTest.Web.AspNetCore;
 
 public class MyEnvironment : EnvironmentBase
 {
@@ -427,7 +427,7 @@ public class MyEnvironment : EnvironmentBase
     public override Task ConfigureEnvironment()
     {
         AddInfrastructure<MyDatabaseInfrastructure>();
-        this.AddWebApplication<MyWebApplication>();
+        this.AddAspNetWebApplication<Program>();
         return Task.CompletedTask;
     }
 }
@@ -448,7 +448,6 @@ public class MyEnvironment : EnvironmentBase
 |-------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 | `AddInfrastructure<T>()`      | Creates `T` through the DI container. Every constructor parameter is resolved, and the `EnvironmentId` is passed automatically. |
 | `AddInfrastructure(instance)` | Registers an instance you created yourself. Its `EnvironmentId` is overwritten with the environment's one.                      |
-| `this.AddWebApplication<T>()` | (`NotoriousTest.Web`) Wraps a web application in a web application infrastructure.                                              |
 
 **Retrieving infrastructures:**
 

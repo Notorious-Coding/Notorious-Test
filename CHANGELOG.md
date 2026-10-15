@@ -1,5 +1,34 @@
 ﻿# Changelog
 
+## v6.0.0
+
+### npm 💥NEW💥
+
+- Added support for npm web applications integration testing.
+- Install the `NotoriousTest.Web.Npm` package and inherit from `NpmWebApplicationInfrastructure` to start a JavaScript application
+  with one of its npm scripts (`npm run <Command>`), from its project directory (`ProjectDir`).
+- Implement `ConfigureApplication` to give the configuration to your application the way it reads it: environment
+  variables, `.env` file, JSON file…
+
+### ASP.NET Core 📦
+
+- ASP.NET Core support moved to its own package: `NotoriousTest.Web.AspNetCore`.
+- Add your application to the environment with `this.AddAspNetWebApplication<Program>()`: no class to write.
+- To customize the `WebApplicationFactory`, inherit from `AspNetCoreWebApplication<Program>` and add it with
+  `AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`.
+
+### 💥 Breaking Changes
+
+- `WebApplication<TEntryPoint>` is removed: install `NotoriousTest.Web.AspNetCore` and inherit from
+  `AspNetCoreWebApplication<TEntryPoint>` instead.
+- `IWebApplication`, `WebApplicationInfrastructure<TWebApp>`, `AddWebApplication<T>()` and `GetWebApplication<T>()` are
+  removed: every web application is now an infrastructure, added with `AddInfrastructure<T>()`. `GetWebApplication()`
+  still returns the first web application of the environment.
+- `NotoriousTest.Web` no longer depends on `Microsoft.AspNetCore.Mvc.Testing`: it moved to `NotoriousTest.Web.AspNetCore`.
+- `AzureFunctionWebApplication` is replaced by `AzureFunctionWebApplicationInfrastructure`: inherit from it and add it
+  with `AddInfrastructure<T>()` instead of `AddWebApplication<T>()`. `FunctionProjectDir` is now `protected`, and
+  `AdditionalConfiguration` is set in the constructor.
+
 ## v5.2.0
 
 ### ✨ Features
