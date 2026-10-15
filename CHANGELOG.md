@@ -21,6 +21,7 @@
 
 - Fixed a bug where DoggyDog would stay open after the test campaign was finished, keeping a lock on the test DLL,
   preventing other tests from running.
+- Updated 'System.Security.Cryptography.Pkcs' to 9.0.21 to resolve a security vulnerability.
 
 ## v5.1.0
 
