@@ -5,7 +5,6 @@ using FakeItEasy;
 using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
-using NotoriousTest.Web.Infrastructures;
 
 namespace NotoriousTest.IntegrationTests.AzureFunction
 {
@@ -16,7 +15,7 @@ namespace NotoriousTest.IntegrationTests.AzureFunction
         public async Task Initialize_Should_Start_Server()
         {
             EnvironmentId contextId = Guid.NewGuid();
-            await using var infrastructure = new WebApplicationInfrastructure<TestAzureFunctionApplication>(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
+            await using var infrastructure = new TestAzureFunctionApplicationInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
 
             await infrastructure.InitializeAsync();
 
@@ -32,7 +31,7 @@ namespace NotoriousTest.IntegrationTests.AzureFunction
         public async Task Destroy_Should_Kill_Server()
         {
             EnvironmentId contextId = Guid.NewGuid();
-            var infrastructure = new WebApplicationInfrastructure<TestAzureFunctionApplication>(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
+            var infrastructure = new TestAzureFunctionApplicationInfrastructure(contextId, A.Fake<ITestLogger>(), A.Fake<IRegistry>());
 
             await infrastructure.InitializeAsync();
 

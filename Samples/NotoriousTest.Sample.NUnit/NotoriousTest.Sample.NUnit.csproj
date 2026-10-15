@@ -23,6 +23,7 @@
 	  <ProjectReference Include="..\..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest.Web\NotoriousTest.Web.csproj" />
+	  <ProjectReference Include="..\..\NotoriousTest.Web.AspNetCore\NotoriousTest.Web.AspNetCore.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest.NUnit\NotoriousTest.NUnit.csproj" />
 	  <ProjectReference Include="..\..\NotoriousTest\NotoriousTest.csproj" />
 	  <ProjectReference Include="..\NotoriousTest.Sample.TestWebApp\NotoriousTest.Sample.TestWebApp.csproj" />

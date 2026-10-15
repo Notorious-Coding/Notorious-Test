@@ -78,14 +78,14 @@ cd MyApi.IntegrationTests
 dotnet add reference ../MyApi/MyApi.csproj
 dotnet add package NotoriousTest.XUnit
 dotnet add package NotoriousTest.SqlServer
-dotnet add package NotoriousTest.Web
+dotnet add package NotoriousTest.Web.AspNetCore
 ```
 
 | Package | Why |
 |---------|-----|
 | `NotoriousTest.XUnit` | Environments and integration tests for xUnit. |
 | `NotoriousTest.SqlServer` | A SQL Server database in a Docker container. |
-| `NotoriousTest.Web` | Runs the API in memory and connects it to the other infrastructures. |
+| `NotoriousTest.Web.AspNetCore` | Runs the API in memory and connects it to the other infrastructures. |
 
 ---
 
@@ -129,15 +129,8 @@ That is all. The base class also:
 
 ## 5. Step 2 — The Web Application
 
-Point `WebApplication<T>` at the API's `Program` class:
-
-```csharp
-using NotoriousTest.Web.Applications;
-
-public class ApiApplication : WebApplication<Program>
-{
-}
-```
+There is nothing to write: the API is added to the environment from its `Program` class, with
+`AddAspNetWebApplication<Program>()` (see the next step).
 
 The API runs in memory, and receives `ConnectionStrings:Default` from the database infrastructure automatically. No
 `appsettings.Testing.json`, no hard-coded connection string.
@@ -155,7 +148,7 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Runtime;
 using NotoriousTest.Core.Watchdog;
-using NotoriousTest.Web;
+using NotoriousTest.Web.AspNetCore;
 
 public class ApiEnvironment : EnvironmentBase
 {
@@ -168,7 +161,7 @@ public class ApiEnvironment : EnvironmentBase
     public override Task ConfigureEnvironment()
     {
         AddInfrastructure<DatabaseInfrastructure>();
-        this.AddWebApplication<ApiApplication>();
+        this.AddAspNetWebApplication<Program>();
         return Task.CompletedTask;
     }
 }
@@ -251,7 +244,7 @@ sequenceDiagram
     participant X as xUnit
     participant E as ApiEnvironment
     participant D as DatabaseInfrastructure
-    participant W as ApiApplication
+    participant W as API
 
     X->>E: Initialize (before the first test of UserTests)
     E->>D: Initialize — start container, create database and table

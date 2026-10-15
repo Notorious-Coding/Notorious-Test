@@ -1,20 +1,15 @@
 ﻿using NotoriousTest.Core.Environments;
-using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Infrastructures;
 
+namespace NotoriousTest.Web;
 
-namespace NotoriousTest.Web
+public static class WebEnvironmentExtensions
 {
-    public static class WebEnvironmentExtensions
-    {
-        public static EnvironmentBase AddWebApplication<TWebApp>(this EnvironmentBase environment)
-            where TWebApp : IWebApplication, new()
-        {
-            environment.AddInfrastructure<WebApplicationInfrastructure<TWebApp>>();
-            return environment;
-        }
-
-        public static WebApplicationInfrastructure GetWebApplication(this EnvironmentBase environment) => environment.GetInfrastructure<WebApplicationInfrastructure>();
-
-    }
+    /// <summary>
+    ///     Get the first web application registered in the environment.
+    /// </summary>
+    /// <param name="environment">Environment.</param>
+    /// <returns>The web application infrastructure.</returns>
+    public static WebApplicationInfrastructure GetWebApplication(this EnvironmentBase environment) =>
+        environment.GetInfrastructure<WebApplicationInfrastructure>();
 }

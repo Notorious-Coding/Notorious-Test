@@ -2,7 +2,7 @@
 
 namespace NotoriousTest.Sample.With
 {
-    public class MyWebApplication : WebApplication<Program>
+    public class MyAspNetCoreWebApplication : WebApplication<Program>
     {
     }
 }

@@ -118,7 +118,7 @@ port), use [configuration entries](./2-core-concepts.md#14-configuration):
 AddEntry("ConnectionStrings:Keycloak", Container.GetConnectionString());
 
 // ✅ The consumer receives it
-public class MyWebApplication : WebApplication<Program> { } // receives every entry automatically
+this.AddAspNetWebApplication<Program>(); // receives every entry automatically
 ```
 
 ```csharp
@@ -215,7 +215,7 @@ public class MyAppEnvironment : EnvironmentBase
     {
         AddInfrastructure<MyDatabaseInfrastructure>();
         AddInfrastructure<KeycloakInfrastructure>();
-        this.AddWebApplication<MyWebApplication>();
+        this.AddAspNetWebApplication<Program>();
         return Task.CompletedTask;
     }
 }
@@ -437,8 +437,7 @@ A suggested layout for a test project:
 MyApp.IntegrationTests/
 ├── Infrastructures/            # One class per running service
 │   ├── MyDatabaseInfrastructure.cs
-│   ├── KeycloakInfrastructure.cs
-│   └── MyWebApplication.cs
+│   └── KeycloakInfrastructure.cs
 ├── Environments/
 │   └── MyAppEnvironment.cs     # Declarative list of infrastructures
 ├── DI/
@@ -483,7 +482,7 @@ flowchart TD
     subgraph Infra["Infrastructures"]
         DB[(MyDatabaseInfrastructure)]
         KC[KeycloakInfrastructure]
-        WEB[MyWebApplication]
+        WEB[ASP.NET Core application]
     end
 
     subgraph DI["Dependency Injection"]
