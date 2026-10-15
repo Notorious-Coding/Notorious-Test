@@ -30,8 +30,8 @@ public class WebApplication<TEntryPoint> : WebApplicationFactory<TEntryPoint>, I
 
         builder.ConfigureAppConfiguration(config =>
         {
-            config.AddInMemoryCollection(ConsumedConfiguration.ToAppSettings()!);
-            config.AddInMemoryCollection(AdditionalConfiguration!);
+            config.AddInMemoryCollection(ConsumedConfiguration.ToAppSettings());
+            config.AddInMemoryCollection(AdditionalConfiguration);
         });
     }
 }

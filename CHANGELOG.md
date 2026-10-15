@@ -21,7 +21,13 @@
 
 - Fixed a bug where DoggyDog would stay open after the test campaign was finished, keeping a lock on the test DLL,
   preventing other tests from running.
-- Updated 'System.Security.Cryptography.Pkcs' to 9.0.21 to resolve a security vulnerability.
+
+### 📦 Dependencies
+
+- Pinned `System.Security.Cryptography.Pkcs` to 9.0.21 to fix a high severity vulnerability
+  ([GHSA-846f-f764-76mx](https://github.com/advisories/GHSA-846f-f764-76mx)), transitively pulled by
+  `NotoriousTest.SqlServer` and `NotoriousTest.PostgreSql`.
+- Upgraded `Microsoft.Extensions.*` and `System.Text.Json` to 10.0.13.
 
 ## v5.1.0
 

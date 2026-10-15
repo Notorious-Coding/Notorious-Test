@@ -18,7 +18,7 @@ public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurat
 
     public override int? Order => 999;
     public override bool DisableRegistry => true;
-    public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; }
+    public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; } = new();
 }
 
 public class WebApplicationInfrastructure<TWebApp> : WebApplicationInfrastructure where TWebApp : IWebApplication, new()
