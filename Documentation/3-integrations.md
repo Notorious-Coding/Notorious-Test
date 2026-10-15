@@ -10,6 +10,7 @@ environment, and NotoriousTest handles its lifecycle.
 2. [Web Applications](#2-web-applications)
    1. [ASP.NET Core](#21-aspnet-core)
    2. [Azure Functions](#22-azure-functions)
+   3. [npm](#23-npm)
 3. [Docker Containers](#3-docker-containers)
 4. [Databases](#4-databases)
    1. [Common Behavior](#41-common-behavior)
@@ -24,8 +25,10 @@ environment, and NotoriousTest handles its lifecycle.
 
 | Package | Provides |
 |---------|----------|
-| `NotoriousTest.Web` | `WebApplication<TEntryPoint>` — an in-memory ASP.NET Core server. |
-| `NotoriousTest.Web.AzureFunctions` | `AzureFunctionWebApplication` — a local Azure Functions host (`func host start`). |
+| `NotoriousTest.Web` | Web application infrastructure (`WebApplicationInfrastructure`, `GetWebApplication`), shared by every web integration. |
+| `NotoriousTest.Web.AspNetCore` | `AddAspNetWebApplication<TProgram>()` — an in-memory ASP.NET Core server. |
+| `NotoriousTest.Web.AzureFunctions` | `AzureFunctionWebApplicationInfrastructure` — a local Azure Functions host (`func host start`). |
+| `NotoriousTest.Web.Npm` | `NpmWebApplicationInfrastructure` — a JavaScript application started with an npm script (`npm run <Command>`). |
 | `NotoriousTest.TestContainers` | `DockerContainerInfrastructure<TContainer, TOutputConfiguration>` — any [Testcontainers](https://dotnet.testcontainers.org/) container. |
 | `NotoriousTest.Database` | Base classes shared by all database integrations (Docker & external). |
 | `NotoriousTest.SqlServer` | SQL Server — in a Docker container or on an existing server. |
@@ -55,15 +58,16 @@ A web application is the system under test: your tests call it over HTTP, and it
 - is **not** tracked by DoggyDog (`DisableRegistry = true`): the application runs in memory or as a child process and
   dies with the test process.
 
-Register a web application with `AddWebApplication<T>()` and retrieve it with `GetWebApplication()`:
+Register a web application in the environment (here with `AddAspNetWebApplication<TProgram>()`, see
+[ASP.NET Core](#21-aspnet-core)) and retrieve it with `GetWebApplication()`:
 
 ```csharp
-using NotoriousTest.Web;
+using NotoriousTest.Web.AspNetCore;
 
 public override Task ConfigureEnvironment()
 {
     AddInfrastructure<MyDatabaseInfrastructure>(); // produces "ConnectionStrings:Default"
-    this.AddWebApplication<MyWebApplication>();     // receives it in its IConfiguration
+    this.AddAspNetWebApplication<Program>();         // receives it in its IConfiguration
     return Task.CompletedTask;
 }
 ```
@@ -81,27 +85,58 @@ public async Task GetUsers_Should_ReturnOk()
 ```
 
 > 💡 `GetWebApplication()` returns the first web application of the environment. If you register several, retrieve a
-> specific one with `Environment.GetInfrastructure<WebApplicationInfrastructure<MyOtherWebApplication>>()`.
+> specific one with `Environment.GetInfrastructure<MyOtherWebApplicationInfrastructure>()`.
 
 ---
 
 ### 2.1 ASP.NET Core
 
-`NotoriousTest.Web`
+`NotoriousTest.Web.AspNetCore`
 
-Create a class inheriting from `WebApplication<TEntryPoint>`, where `TEntryPoint` is the `Program` class of your API.
-It is a `WebApplicationFactory<TEntryPoint>`: the application runs in memory, in the test process.
+Add your API to the environment with `AddAspNetWebApplication<TProgram>()`, where `TProgram` is the `Program` class of
+your API. The application runs in memory, in the test process, with a `WebApplicationFactory<TProgram>`:
 
 ```csharp
-using NotoriousTest.Web.Applications;
+using NotoriousTest.Web.AspNetCore;
 
-public class MyWebApplication : WebApplication<Program>
+public override Task ConfigureEnvironment()
 {
+    AddInfrastructure<MyDatabaseInfrastructure>();
+    this.AddAspNetWebApplication<Program>();
+    return Task.CompletedTask;
 }
 ```
 
 That's all: the configuration produced by the other infrastructures is added to the application's `IConfiguration`
-automatically.
+automatically. No class to write.
+
+This is the way to go whenever the application needs no customization. For everything else, add the infrastructure
+yourself with `AddInfrastructure<T>()`.
+
+**Customizing the application** — when you need to override the `WebApplicationFactory` (services, environment,
+`HttpClient`, `AdditionalConfiguration`…), create a class inheriting from `AspNetCoreWebApplication<TProgram>`, and add
+it with `AspNetCoreWebApplicationInfrastructure<TWebApp, TProgram>`:
+
+```csharp
+public class MyWebApplication : AspNetCoreWebApplication<Program>
+{
+    // Overrides, see below.
+}
+```
+
+```csharp
+AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>();
+```
+
+**Customizing the infrastructure** — inherit from `AspNetCoreWebApplicationInfrastructure<TProgram>` (what
+`AddAspNetWebApplication<TProgram>()` adds) or `AspNetCoreWebApplicationInfrastructure<TWebApp, TProgram>`, e.g. to
+override its `Initialize()`, then add it with `AddInfrastructure<MyWebApplicationInfrastructure>()`.
+
+> ℹ️ **Migrating from v5:** `WebApplication<TEntryPoint>`, `IWebApplication` and `AddWebApplication<T>()` are removed.
+> Install `NotoriousTest.Web.AspNetCore`, inherit from `AspNetCoreWebApplication<TEntryPoint>` instead of
+> `WebApplication<TEntryPoint>`, and replace `this.AddWebApplication<MyWebApplication>()` with
+> `AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`. If `MyWebApplication` was
+> empty, delete it and use `this.AddAspNetWebApplication<Program>()`.
 
 **How the configuration is injected:** each entry is flattened into `appsettings`-style keys, then added as an
 in-memory configuration source.
@@ -112,11 +147,11 @@ in-memory configuration source.
 | `Redis` | `new { Host = "localhost", Port = 6379 }` | `Redis:Host = localhost`, `Redis:Port = 6379` |
 | `Brokers` | `new[] { "a", "b" }` | `Brokers:0 = a`, `Brokers:1 = b` |
 
-**Adding your own configuration** — override `AdditionalConfiguration` (part of `IWebApplication`, also available on
-[Azure Functions](#22-azure-functions)), using `appsettings`-style keys:
+**Adding your own configuration** — override `AdditionalConfiguration` (also available on
+[Azure Functions](#22-azure-functions) and [npm](#23-npm)), using `appsettings`-style keys:
 
 ```csharp
-public class MyWebApplication : WebApplication<Program>
+public class MyWebApplication : AspNetCoreWebApplication<Program>
 {
     public override Dictionary<string, string> AdditionalConfiguration { get; set; } = new()
     {
@@ -132,7 +167,7 @@ It is added as a second in-memory source, **after** the consumed configuration: 
 `base.ConfigureWebHost()`, it is what injects the consumed and additional configuration:
 
 ```csharp
-public class MyWebApplication : WebApplication<Program>
+public class MyWebApplication : AspNetCoreWebApplication<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -150,7 +185,7 @@ public class MyWebApplication : WebApplication<Program>
 **Customizing the `HttpClient`** — override `Start()`:
 
 ```csharp
-public class MyWebApplication : WebApplication<Program>
+public class MyWebApplication : AspNetCoreWebApplication<Program>
 {
     public override Task<HttpClient> Start() =>
         Task.FromResult(CreateClient(new WebApplicationFactoryClientOptions
@@ -169,16 +204,21 @@ public class MyWebApplication : WebApplication<Program>
 
 `NotoriousTest.Web.AzureFunctions`
 
-`AzureFunctionWebApplication` starts your Azure Functions project (isolated worker) with the Azure Functions Core Tools
+`AzureFunctionWebApplicationInfrastructure` starts your Azure Functions project (isolated worker) with the Azure Functions Core Tools
 (`func host start`) and gives you an `HttpClient` pointing to it.
 
 ```csharp
 using NotoriousTest.Web.AzureFunctions;
 
-public class MyFunctionApplication : AzureFunctionWebApplication
+public class MyFunctionApplication : AzureFunctionWebApplicationInfrastructure
 {
+    public MyFunctionApplication(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
+        base(contextId, logger, registry)
+    {
+    }
+
     // Path to the Azure Functions project, from the test output directory (bin/Debug/net10.0)
-    public override string FunctionProjectDir { get; } = Path.GetFullPath(
+    protected override string FunctionProjectDir { get; } = Path.GetFullPath(
         Path.Combine(AppContext.BaseDirectory, "../../../../MyApp.Functions"));
 }
 ```
@@ -187,7 +227,7 @@ public class MyFunctionApplication : AzureFunctionWebApplication
 public override Task ConfigureEnvironment()
 {
     AddInfrastructure<MyDatabaseInfrastructure>();
-    this.AddWebApplication<MyFunctionApplication>();
+    AddInfrastructure<MyFunctionApplication>();
     return Task.CompletedTask;
 }
 ```
@@ -209,19 +249,20 @@ public override Task ConfigureEnvironment()
 | Member | Default | Description |
 |--------|---------|-------------|
 | `FunctionProjectDir` | — (required) | Directory of the Azure Functions project. |
-| `AdditionalConfiguration` | empty | Extra environment variables given to the host (e.g. `AzureWebJobsStorage`). |
+| `AdditionalConfiguration` | empty | Extra environment variables given to the host (e.g. `AzureWebJobsStorage`), set in the constructor. |
 | `StartupTimeout` | 2 minutes | Maximum time to wait for the host to be running, build included. |
 | `Logs` | — | Standard and error output of the host (protected). |
 
 ```csharp
-public class MyFunctionApplication : AzureFunctionWebApplication
+public class MyFunctionApplication : AzureFunctionWebApplicationInfrastructure
 {
-    public override string FunctionProjectDir { get; } = "...";
-
-    public override Dictionary<string, string> AdditionalConfiguration { get; set; } = new()
+    public MyFunctionApplication(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
+        base(contextId, logger, registry)
     {
-        ["AzureWebJobsStorage"] = "UseDevelopmentStorage=true"
-    };
+        AdditionalConfiguration["AzureWebJobsStorage"] = "UseDevelopmentStorage=true";
+    }
+
+    protected override string FunctionProjectDir { get; } = "...";
 
     protected override TimeSpan StartupTimeout => TimeSpan.FromMinutes(5);
 }
@@ -230,6 +271,123 @@ public class MyFunctionApplication : AzureFunctionWebApplication
 > ⚠️ Installing the `func` CLI requires elevated privileges (UAC prompt with `winget` on Windows, root or passwordless
 > `sudo` with `apt-get` on Debian/Ubuntu). On a CI agent, prefer installing it beforehand: an existing installation is
 > detected and left untouched.
+
+---
+
+### 2.3 npm
+
+`NotoriousTest.Web.Npm`
+
+`NpmWebApplicationInfrastructure` starts a JavaScript application (Node.js, Express, Next.js, Vite…) with one of its npm scripts
+(`npm run <Command>`) and gives you an `HttpClient` pointing to it.
+
+```csharp
+using NotoriousTest.Web.Npm;
+
+public class MyFrontApplication : NpmWebApplicationInfrastructure
+{
+    public MyFrontApplication(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
+        base(contextId, logger, registry)
+    {
+    }
+
+    // Path to the npm project (where the package.json is), from the test output directory (bin/Debug/net10.0)
+    protected override string ProjectDir { get; } = Path.GetFullPath(
+        Path.Combine(AppContext.BaseDirectory, "../../../../MyApp.Front"));
+
+    // Name of the script in the "scripts" section of the package.json
+    protected override string Command => "start";
+
+    // Give the configuration to the application the way it reads it: here, environment variables.
+    protected override Task ConfigureApplication(Dictionary<string, string?> configuration,
+        IDictionary<string, string?> environmentVariables)
+    {
+        environmentVariables["DATABASE_URL"] = configuration["ConnectionStrings:Default"];
+        return Task.CompletedTask;
+    }
+}
+```
+
+```csharp
+public override Task ConfigureEnvironment()
+{
+    AddInfrastructure<MyDatabaseInfrastructure>();
+    AddInfrastructure<MyFrontApplication>();
+    return Task.CompletedTask;
+}
+```
+
+📌 **How it works:**
+
+1. A free local port is picked, and `npm run <Command>` is run in `ProjectDir`. The port is given to the application
+   with the `PORT` environment variable.
+2. The configuration produced by the other infrastructures, then `AdditionalConfiguration` (which wins on duplicate
+   keys), is flattened into `appsettings`-style keys (`ConnectionStrings:Default`) and given to `ConfigureApplication`,
+   which **you** implement: NotoriousTest makes no assumption on how a JavaScript application reads its configuration.
+3. NotoriousTest requests `HealthCheckPath` until the application answers (any HTTP status). If the process exits or the
+   timeout is reached, initialization fails with the application logs in the exception message.
+4. On `Destroy()`, npm and the processes it started are killed.
+
+**Customization:**
+
+| Member | Default | Description |
+|--------|---------|-------------|
+| `ProjectDir` | — (required) | Directory of the npm project. |
+| `Command` | — (required) | npm script to run (`start`, `dev`…). |
+| `ConfigureApplication(configuration, environmentVariables)` | — (required) | Gives the configuration to the application, before it starts. |
+| `AdditionalConfiguration` | empty | Extra configuration given to `ConfigureApplication` (set it in the constructor). |
+| `HealthCheckPath` | `/` | Path requested to know if the application is listening. |
+| `StartupTimeout` | 2 minutes | Maximum time to wait for the application to be listening. |
+| `GetScriptArguments(port)` | none | Arguments given to the script after `--`. |
+| `Logs` | — | Standard and error output of the application (protected). |
+
+`ConfigureApplication` lets you handle any configuration source, e.g. a `.env` file:
+
+```csharp
+public class MyFrontApplication : NpmWebApplicationInfrastructure
+{
+    public MyFrontApplication(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
+        base(contextId, logger, registry)
+    {
+    }
+
+    protected override string ProjectDir { get; } = "...";
+    protected override string Command => "start";
+
+    protected override async Task ConfigureApplication(Dictionary<string, string?> configuration,
+        IDictionary<string, string?> environmentVariables)
+    {
+        string[] lines = [$"DATABASE_URL={configuration["ConnectionStrings:Default"]}"];
+        await File.WriteAllLinesAsync(Path.Combine(ProjectDir, ".env.test"), lines);
+    }
+}
+```
+
+If your application does not read the `PORT` environment variable, give it the port with `GetScriptArguments`, e.g.
+with Vite:
+
+```csharp
+public class MyFrontApplication : NpmWebApplicationInfrastructure
+{
+    public MyFrontApplication(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
+        base(contextId, logger, registry)
+    {
+    }
+
+    protected override string ProjectDir { get; } = "...";
+    protected override string Command => "dev";
+
+    protected override Task ConfigureApplication(Dictionary<string, string?> configuration,
+        IDictionary<string, string?> environmentVariables) => Task.CompletedTask;
+
+    // npm run dev -- --port <port> --strictPort
+    protected override IEnumerable<string> GetScriptArguments(int port) =>
+        ["--port", port.ToString(), "--strictPort"];
+}
+```
+
+> ⚠️ Node.js and npm must be installed and available in the `PATH`. `npm install` is not run for you: install the
+> project's packages beforehand.
 
 ---
 
@@ -564,7 +722,7 @@ the end of the campaign if NotoriousTest installed it.
 | Debian / Ubuntu | `apt-get install azure-functions-core-tools-4` from the Microsoft repository (root or passwordless `sudo`). |
 | Other | Not supported: install it manually. |
 
-It is already declared by [`AzureFunctionWebApplication`](#22-azure-functions).
+It is already declared by [`AzureFunctionWebApplicationInfrastructure`](#22-azure-functions).
 
 ---
 

@@ -50,7 +50,7 @@ NotoriousTest then manages the whole lifecycle:
 - 🐶 **Clean up after crashes** thanks to DoggyDog, a watchdog process that removes whatever a killed run left behind.
 
 It works with **xUnit**, **NUnit**, **MSTest** and **TUnit**, and ships ready-to-use infrastructures for **SQL Server**,
-**PostgreSQL**, **SQLite**, **Docker containers**, **ASP.NET Core** and **Azure Functions**.
+**PostgreSQL**, **SQLite**, **Docker containers**, **ASP.NET Core**, **Azure Functions** and **npm** applications.
 
 ## Installation
 
@@ -68,7 +68,7 @@ Then the [integrations](#integrations) you need:
 ```sh
 dotnet add package NotoriousTest.XUnit
 dotnet add package NotoriousTest.SqlServer
-dotnet add package NotoriousTest.Web
+dotnet add package NotoriousTest.Web.AspNetCore
 ```
 
 > **Note:** .NET 8 or higher is required. Docker-based infrastructures require Docker to be installed and running.
@@ -117,13 +117,8 @@ It publishes its connection string as `ConnectionStrings:Default` and empties ev
 
 ### 2. The Web Application
 
-Your API, running in memory:
-
-```csharp
-public class ApiApplication : WebApplication<Program>
-{
-}
-```
+Your API, running in memory from its `Program` class: there is no class to write, it is added to the environment in the
+next step.
 
 It receives `ConnectionStrings:Default` from the database automatically — no configuration file needed.
 
@@ -143,7 +138,7 @@ public class ApiEnvironment : EnvironmentBase
     public override Task ConfigureEnvironment()
     {
         AddInfrastructure<DatabaseInfrastructure>();
-        this.AddWebApplication<ApiApplication>(); // always starts after the database
+        this.AddAspNetWebApplication<Program>(); // always starts after the database
         return Task.CompletedTask;
     }
 }
@@ -226,8 +221,9 @@ Complete samples for each framework are available in the [`Samples`](./Samples/)
 
 | Package | Provides |
 |---------|----------|
-| `NotoriousTest.Web` | ASP.NET Core application running in memory. |
+| `NotoriousTest.Web.AspNetCore` | ASP.NET Core application running in memory. |
 | `NotoriousTest.Web.AzureFunctions` | Azure Functions host running locally. |
+| `NotoriousTest.Web.Npm` | JavaScript application started with an npm script. |
 | `NotoriousTest.SqlServer` | SQL Server — Docker container or existing server. |
 | `NotoriousTest.PostgreSql` | PostgreSQL — Docker container or existing server. |
 | `NotoriousTest.Sqlite` | SQLite — one database file per environment. |

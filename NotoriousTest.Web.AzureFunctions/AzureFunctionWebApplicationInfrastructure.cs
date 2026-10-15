@@ -3,28 +3,40 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using NotoriousTest.Core.Configuration;
-using NotoriousTest.Core.Infrastructures.Dependencies;
+using NotoriousTest.Core;
+using NotoriousTest.Core.Logger;
+using NotoriousTest.Core.Registry;
 using NotoriousTest.Dependencies.Azure.FunctionCoreTools;
-using NotoriousTest.Web.Applications;
 using NotoriousTest.Web.Helpers;
+using NotoriousTest.Web.Infrastructures;
 
 namespace NotoriousTest.Web.AzureFunctions;
 
 /// <summary>
-///     Create an Azure Function application.
+///     Create an Azure Function application infrastructure.
 /// </summary>
-public abstract class AzureFunctionWebApplication : IWebApplication
+public abstract class AzureFunctionWebApplicationInfrastructure : WebApplicationInfrastructure
 {
+    /// <summary>
+    ///     Represents the base class for creating Azure Function web application infrastructures.
+    /// </summary>
+    /// <remarks>
+    ///     This class provides an abstract foundation for managing and initializing Azure Functions as part of a web
+    ///     application infrastructure.
+    ///     It extends the WebApplicationInfrastructure class and includes additional functionality specific to Azure
+    ///     Functions.
+    /// </remarks>
+    public AzureFunctionWebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
+        base(contextId, logger, registry)
+    {
+        Dependencies = [new AzureFunctionCoreToolsDependency()];
+    }
+
+
     /// <summary>
     ///     Directory containing the Azure Function project.
     /// </summary>
-    public abstract string FunctionProjectDir { get; }
-
-    /// <summary>
-    ///     Additional configuration to be passed to the Azure Function.
-    /// </summary>
-    public virtual Dictionary<string, string> AdditionalConfiguration { get; set; } = new();
+    protected abstract string FunctionProjectDir { get; }
 
     /// <summary>
     ///     Logs of the Azure Function.
@@ -48,12 +60,8 @@ public abstract class AzureFunctionWebApplication : IWebApplication
     /// </summary>
     protected virtual TimeSpan StartupTimeout => TimeSpan.FromMinutes(2);
 
-    /// <summary>
-    ///     Configuration consumed by the Azure Function from other infrastructures.
-    /// </summary>
-    public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; } = [];
-
-    public async ValueTask DisposeAsync()
+    /// <inheritdoc />
+    public override async Task Destroy()
     {
         if (AzureFunctionProcess == null) return;
 
@@ -64,10 +72,10 @@ public abstract class AzureFunctionWebApplication : IWebApplication
         AzureFunctionProcess = null;
     }
 
-    public List<IInfrastructureDependency> Dependencies { get; } = [new AzureFunctionCoreToolsDependency()];
-    public List<IInfrastructureRequirement> Requirements { get; } = [];
+    /// <inheritdoc />
+    public override async Task Initialize() => HttpClient = await Start();
 
-    public async Task<HttpClient> Start()
+    private async Task<HttpClient> Start()
     {
         int freePort = GetFreeHttpPortOnMachine();
         AzureFunctionProcess = StartAzureFunctionProcess(freePort);
