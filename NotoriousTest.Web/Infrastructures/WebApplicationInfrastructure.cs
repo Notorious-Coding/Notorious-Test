@@ -6,7 +6,7 @@ using NotoriousTest.Core.Registry;
 
 namespace NotoriousTest.Web.Infrastructures;
 
-public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurationConsumer
+public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurationConsumer, IConfigurationProducer
 {
     /// <summary>
     ///     HttpClient to interact with the application.
@@ -30,4 +30,5 @@ public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurat
     public Dictionary<string, string> AdditionalConfiguration { get; set; } = new();
 
     public List<ConfigurationEntry<object>> ConsumedConfiguration { get; set; } = new();
+    public List<ConfigurationEntry<object>> OutputConfiguration { get; } = new();
 }

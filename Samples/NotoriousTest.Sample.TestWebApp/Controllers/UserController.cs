@@ -1,41 +1,39 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-namespace NotoriousTest.Sample.TestWebApp.Controllers
+namespace NotoriousTest.Sample.TestWebApp.Controllers;
+
+[ApiController]
+[Route("users")]
+public class UserController : ControllerBase
 {
-    [ApiController]
-    [Route("users")]
-    public class UserController : ControllerBase
+    private readonly IConfiguration _configuration;
+
+    public UserController(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+    }
 
-        public UserController(IConfiguration configuration)
-        {
-            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-        }
+    [HttpPost]
+    public void CreateUser()
+    {
+        using var connection = new SqlConnection(_configuration.GetConnectionString("SqlServer"));
+        connection.Open();
+        CreateUser(connection);
+    }
 
-        [HttpPost]
-        public void CreateUser()
+    private void CreateUser(SqlConnection sqlConnection)
+    {
+        using (SqlCommand? command = sqlConnection.CreateCommand())
         {
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("SqlServer")))
-            {
-                connection.Open();
-                CreateUser(connection);
-            }
-        }
-
-        private void CreateUser(SqlConnection sqlConnection)
-        {
-            using (var command = sqlConnection.CreateCommand())
-            {
-                var random = Random.Shared.Next(0, 100);
-                command.Parameters.AddWithValue("@username", $"test{random}");
-                command.Parameters.AddWithValue("@email", $"example{random}@email.com");
-                command.Parameters.AddWithValue("@password_hash", "password");
-                command.Parameters.AddWithValue("@created_at", DateTime.Now);
-                command.CommandText = "INSERT INTO Users(username, email, password_hash, created_at) VALUES(@username, @email, @password_hash, @created_at);";
-                command.ExecuteNonQuery();
-            }
+            int random = Random.Shared.Next(0, 100);
+            command.Parameters.AddWithValue("@username", $"test{random}");
+            command.Parameters.AddWithValue("@email", $"example{random}@email.com");
+            command.Parameters.AddWithValue("@password_hash", "password");
+            command.Parameters.AddWithValue("@created_at", DateTime.Now);
+            command.CommandText =
+                "INSERT INTO Users(username, email, password_hash, created_at) VALUES(@username, @email, @password_hash, @created_at);";
+            command.ExecuteNonQuery();
         }
     }
 }
