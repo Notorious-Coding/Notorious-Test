@@ -1,88 +1,105 @@
 <Solution>
   <Folder Name="/Commands/">
-    <File Path="commands.json" />
-    <File Path="Commands/publish-local-nugets.ps1" />
+    <File Path="commands.json"/>
+    <File Path="Commands/publish-local-nugets.ps1"/>
   </Folder>
   <Folder Name="/Docs/">
-    <File Path=".gitignore" />
-    <File Path="CHANGELOG.md" />
-    <File Path="Documentation/2-core-concepts.md" />
-    <File Path="Documentation/3-integrations.md" />
-    <File Path="Documentation/4-example.md" />
-    <File Path="Documentation/5-architecture.md" />
-    <File Path="Documentation/Architecture/workspace.dsl" />
-    <File Path="LICENSE.txt" />
-    <File Path="README.md" />
+    <File Path=".gitignore"/>
+    <File Path="CHANGELOG.md"/>
+    <File Path="Documentation/2-core-concepts.md"/>
+    <File Path="Documentation/3-integrations.md"/>
+    <File Path="Documentation/4-example.md"/>
+    <File Path="Documentation/5-architecture.md"/>
+    <File Path="Documentation/Architecture/workspace.dsl"/>
+    <File Path="LICENSE.txt"/>
+    <File Path="README.md"/>
   </Folder>
   <Folder Name="/Docs/Templates/">
-    <File Path=".github/ISSUE_TEMPLATE/bug_report.yml" />
-    <File Path=".github/ISSUE_TEMPLATE/feature_request.yml" />
-    <File Path=".github/PULL_REQUEST_TEMPLATE.md" />
+    <File Path=".github/ISSUE_TEMPLATE/bug_report.yml"/>
+    <File Path=".github/ISSUE_TEMPLATE/feature_request.yml"/>
+    <File Path=".github/PULL_REQUEST_TEMPLATE.md"/>
   </Folder>
-  <Folder Name="/src/" />
+  <Folder Name="/src/"/>
   <Folder Name="/src/1. Core/">
-    <Project Path="DoggyDog/DoggyDog.csproj" Id="8408dd70-9d47-4f50-bab4-bcd86e50bc3d" />
-    <Project Path="NotoriousTest.Core/NotoriousTest.Core.csproj" Id="ab05b07d-dc15-407e-9af7-e995a4f7c2d9" />
-    <Project Path="NotoriousTest.Internal.Runtime/NotoriousTest.Internal.Runtime.csproj" Id="f2d11925-d0c9-4b26-8b3b-588dfe6edb82" />
-    <Project Path="NotoriousTest.Internal.SqlLiteRegistry/NotoriousTest.Internal.SqlLiteRegistry.csproj" Id="fe120d83-193d-410c-98c5-baf3fd93af7a" />
-    <Project Path="NotoriousTest.Internal.TestSettings/NotoriousTest.Internal.TestSettings.csproj" Id="0989b9dc-fe24-43ee-b04a-ac791bf12c4f" />
-    <Project Path="NotoriousTest.Internal.Watchdog/NotoriousTest.Internal.Watchdog.csproj" Id="a925d516-7983-4cbf-a637-e54edecb47b3" />
-    <Project Path="NotoriousTest/NotoriousTest.csproj" />
+    <Project Path="DoggyDog/DoggyDog.csproj" Id="8408dd70-9d47-4f50-bab4-bcd86e50bc3d"/>
+    <Project Path="NotoriousTest.Core/NotoriousTest.Core.csproj" Id="ab05b07d-dc15-407e-9af7-e995a4f7c2d9"/>
+    <Project Path="NotoriousTest.Internal.Runtime/NotoriousTest.Internal.Runtime.csproj"
+             Id="f2d11925-d0c9-4b26-8b3b-588dfe6edb82"/>
+    <Project Path="NotoriousTest.Internal.SqlLiteRegistry/NotoriousTest.Internal.SqlLiteRegistry.csproj"
+             Id="fe120d83-193d-410c-98c5-baf3fd93af7a"/>
+    <Project Path="NotoriousTest.Internal.TestSettings/NotoriousTest.Internal.TestSettings.csproj"
+             Id="0989b9dc-fe24-43ee-b04a-ac791bf12c4f"/>
+    <Project Path="NotoriousTest.Internal.Watchdog/NotoriousTest.Internal.Watchdog.csproj"
+             Id="a925d516-7983-4cbf-a637-e54edecb47b3"/>
+    <Project Path="NotoriousTest/NotoriousTest.csproj"/>
   </Folder>
   <Folder Name="/src/2. TestFramework/">
-    <Project Path="NotoriousTest.MSTest/NotoriousTest.MSTest.csproj" />
-    <Project Path="NotoriousTest.NUnit/NotoriousTest.NUnit.csproj" />
-    <Project Path="NotoriousTest.TUnit/NotoriousTest.TUnit.csproj" Id="c69b3f8a-360e-4c1a-8177-1688454760c2" />
-    <Project Path="NotoriousTest.XUnit/NotoriousTest.XUnit.csproj" Id="7936b457-1116-4175-92ee-2dd46d7b6273" />
+    <Project Path="NotoriousTest.MSTest/NotoriousTest.MSTest.csproj"/>
+    <Project Path="NotoriousTest.NUnit/NotoriousTest.NUnit.csproj"/>
+    <Project Path="NotoriousTest.TUnit/NotoriousTest.TUnit.csproj" Id="c69b3f8a-360e-4c1a-8177-1688454760c2"/>
+    <Project Path="NotoriousTest.XUnit/NotoriousTest.XUnit.csproj" Id="7936b457-1116-4175-92ee-2dd46d7b6273"/>
   </Folder>
-  <Folder Name="/src/3. Infrastructures/" />
+  <Folder Name="/src/3. Infrastructures/"/>
   <Folder Name="/src/3. Infrastructures/3.1 Databases/">
-    <Project Path="NotoriousTest.Database/NotoriousTest.Database.csproj" Id="61a1bf4a-e96c-464e-a985-8ac40019acd1" />
-    <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj" />
-    <Project Path="NotoriousTest.Sqlite/NotoriousTest.Sqlite.csproj" Id="1d72cc23-09fd-4b37-9738-1a7a4a95b69d" />
-    <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj" />
+    <Project Path="NotoriousTest.Database/NotoriousTest.Database.csproj" Id="61a1bf4a-e96c-464e-a985-8ac40019acd1"/>
+    <Project Path="NotoriousTest.PostgreSql/NotoriousTest.PostgreSql.csproj"/>
+    <Project Path="NotoriousTest.Sqlite/NotoriousTest.Sqlite.csproj" Id="1d72cc23-09fd-4b37-9738-1a7a4a95b69d"/>
+    <Project Path="NotoriousTest.SqlServer/NotoriousTest.SqlServer.csproj"/>
   </Folder>
   <Folder Name="/src/3. Infrastructures/3.2 Docker/">
-    <Project Path="NotoriousTest.Requirements.Docker/NotoriousTest.Requirements.Docker.csproj" />
-    <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj" />
+    <Project Path="NotoriousTest.Requirements.Docker/NotoriousTest.Requirements.Docker.csproj"/>
+    <Project Path="NotoriousTest.TestContainers/NotoriousTest.TestContainers.csproj"/>
   </Folder>
-  <Folder Name="/src/3. Infrastructures/3.3. Web Applications/">
-    <Project Path="NotoriousTest.Dependencies.Azure.FunctionCoreTools/NotoriousTest.Dependencies.Azure.FunctionCoreTools.csproj" />
-    <Project Path="NotoriousTest.Web.AspNetCore/NotoriousTest.Web.AspNetCore.csproj" />
-    <Project Path="NotoriousTest.Web.AzureFunctions/NotoriousTest.Web.AzureFunctions.csproj" />
-    <Project Path="NotoriousTest.Web.Npm/NotoriousTest.Web.Npm.csproj" />
-    <Project Path="NotoriousTest.Web/NotoriousTest.Web.csproj" Id="5a2ebcfc-d429-4f2a-be6c-c7680a4ee8b7" />
+  <Folder Name="/src/3. Infrastructures/3.3 Web Applications/">
+    <Project
+      Path="NotoriousTest.Dependencies.Azure.FunctionCoreTools/NotoriousTest.Dependencies.Azure.FunctionCoreTools.csproj"/>
+    <Project Path="NotoriousTest.Web.AspNetCore/NotoriousTest.Web.AspNetCore.csproj"/>
+    <Project Path="NotoriousTest.Web.AzureFunctions/NotoriousTest.Web.AzureFunctions.csproj"/>
+    <Project Path="NotoriousTest.Web.Npm/NotoriousTest.Web.Npm.csproj"/>
+    <Project Path="NotoriousTest.Web.Playwright/NotoriousTest.Web.Playwright.csproj"/>
+    <Project Path="NotoriousTest.Web/NotoriousTest.Web.csproj" Id="5a2ebcfc-d429-4f2a-be6c-c7680a4ee8b7"/>
   </Folder>
   <Folder Name="/src/4. Tests/">
-    <Project Path="NotoriousTest.IntegrationsTest.Functions/NotoriousTest.IntegrationsTest.Functions.csproj" />
-    <Project Path="NotoriousTest.IntegrationTests.Web/NotoriousTest.IntegrationTests.Web.csproj" Id="a18ad5d8-bda4-4161-bd11-224e6e78000a" />
-    <Project Path="NotoriousTest.IntegrationTests/NotoriousTest.IntegrationTests.csproj" Id="16bc60da-65d0-42a3-8e12-d8903045cf5b" />
-    <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj" />
+    <Project Path="NotoriousTest.IntegrationsTest.Functions/NotoriousTest.IntegrationsTest.Functions.csproj"/>
+    <Project Path="NotoriousTest.IntegrationTests.Web/NotoriousTest.IntegrationTests.Web.csproj"
+             Id="a18ad5d8-bda4-4161-bd11-224e6e78000a"/>
+    <Project Path="NotoriousTest.IntegrationTests/NotoriousTest.IntegrationTests.csproj"
+             Id="16bc60da-65d0-42a3-8e12-d8903045cf5b"/>
+    <Project Path="NotoriousTest.UnitTests/NotoriousTest.UnitTests.csproj"/>
   </Folder>
   <Folder Name="/src/4. Tests/NotoriousTest.IntegrationsTest.Npm/">
-    <File Path="NotoriousTest.IntegrationsTest.Npm/package.json" />
-    <File Path="NotoriousTest.IntegrationsTest.Npm/server.js" />
+    <File Path="NotoriousTest.IntegrationsTest.Npm/package.json"/>
+    <File Path="NotoriousTest.IntegrationsTest.Npm/server.js"/>
   </Folder>
   <Folder Name="/src/5. Samples/">
-    <File Path="Samples/Directory.Build.props" />
-    <Project Path="Samples/NotoriousTest.Sample.MSTest/NotoriousTest.Sample.MSTest.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.NUnit/NotoriousTest.Sample.NUnit.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.TestWebApp/NotoriousTest.Sample.TestWebApp.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.TUnit/NotoriousTest.Sample.TUnit.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.With/NotoriousTest.Sample.With.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.Without/NotoriousTest.Sample.Without.csproj" />
-    <Project Path="Samples/NotoriousTest.Sample.XUnit/NotoriousTest.Sample.XUnit.csproj" />
+    <File Path="Samples/Directory.Build.props"/>
+    <Project Path="Samples/NotoriousTest.Sample.MSTest/NotoriousTest.Sample.MSTest.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.NUnit/NotoriousTest.Sample.NUnit.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.Playwright/NotoriousTest.Sample.Playwright.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.TestWebApp/NotoriousTest.Sample.TestWebApp.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.TUnit/NotoriousTest.Sample.TUnit.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.With/NotoriousTest.Sample.With.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.Without/NotoriousTest.Sample.Without.csproj"/>
+    <Project Path="Samples/NotoriousTest.Sample.XUnit/NotoriousTest.Sample.XUnit.csproj"/>
+  </Folder>
+  <Folder Name="/src/5. Samples/NotoriousTest.Sample.Front/">
+    <File Path="Samples/NotoriousTest.Sample.Front/index.html"/>
+    <File Path="Samples/NotoriousTest.Sample.Front/package.json"/>
+    <File Path="Samples/NotoriousTest.Sample.Front/src/App.css"/>
+    <File Path="Samples/NotoriousTest.Sample.Front/src/App.jsx"/>
+    <File Path="Samples/NotoriousTest.Sample.Front/src/main.jsx"/>
+    <File Path="Samples/NotoriousTest.Sample.Front/vite.config.js"/>
   </Folder>
   <Folder Name="/src/6. Solution/">
-    <File Path=".editorconfig" />
-    <File Path=".gitignore" />
-    <File Path="Directory.Build.props" />
-    <File Path="Directory.Build.targets" />
-    <File Path="Directory.Packages.props" />
-    <File Path="nuget.config" />
+    <File Path=".editorconfig"/>
+    <File Path=".gitignore"/>
+    <File Path="Directory.Build.props"/>
+    <File Path="Directory.Build.targets"/>
+    <File Path="Directory.Packages.props"/>
+    <File Path="nuget.config"/>
   </Folder>
   <Folder Name="/src/7. CI/">
-    <File Path=".github/workflows/prerelease.yml" />
-    <File Path=".github/workflows/release.yml" />
+    <File Path=".github/workflows/prerelease.yml"/>
+    <File Path=".github/workflows/release.yml"/>
   </Folder>
 </Solution>

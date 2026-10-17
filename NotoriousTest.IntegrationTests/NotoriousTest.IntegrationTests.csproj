@@ -25,6 +25,7 @@
     <ProjectReference Include="..\NotoriousTest.Sqlite\NotoriousTest.Sqlite.csproj"/>
     <ProjectReference Include="..\NotoriousTest.SqlServer\NotoriousTest.SqlServer.csproj"/>
     <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Web.Playwright\NotoriousTest.Web.Playwright.csproj"/>
     <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj"/>
     <ProjectReference Include="..\NotoriousTest.Web.AspNetCore\NotoriousTest.Web.AspNetCore.csproj"/>
     <ProjectReference Include="..\NotoriousTest.Web.AzureFunctions\NotoriousTest.Web.AzureFunctions.csproj"/>

@@ -2,6 +2,8 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AArgumentNullException_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F18d0c58f56d62b50aecfa79cf9bad48aac765bf1311e52798225ab8bc6a2e2_003FArgumentNullException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAssemblyDependencyResolver_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F12d6746738863c25269da2957d716489159921cd21dea4be7f22ccebdb6cd7_003FAssemblyDependencyResolver_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAsyncTaskMethodBuilderT_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F2f2b1d92f1ffcf2dabd664473f8c9dafa6039595ac228ce4b75a0f1619c5991_003FAsyncTaskMethodBuilderT_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ABrowserNewContextOptions_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F4feed708943b84bc21e238c62364539d0baedb5468486ef2b4aa8dad31baec_003FBrowserNewContextOptions_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ABrowserTypeLaunchOptions_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003Fbd3de782520fea6634ad2e383958a8ca88293cfbeecbc474e2753085cdf1fa_003FBrowserTypeLaunchOptions_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AExecutionContext_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F69bc68e9420a6e628e801fd8651369ad2af3593c76dcc11a4270ec68d_003FExecutionContext_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AFirst_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F5d16dd521ecb96a323be5963be4cbf12673a02bff45d747e826354246a9160_003FFirst_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AFixtureMappingManager_005Freflection_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F9450adcf5eb0c185b7c29d6c4e3ed58897512e83ce7f61b6cd2f5322faa42_003FFixtureMappingManager_005Freflection_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
@@ -16,39 +18,11 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ATask_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F4d431e535966d3e8d58aed86698f4938fdfbde11da876f5c3a222aa8c29b1_003FTask_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AThrowHelper_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F29ff4eecbec3445d30cf6be51b75c75bc14f83445c042e746c738e76cd8bb_003FThrowHelper_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ATimeSpan_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003FUsers_003Fbrice_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E1_003Fresharper_002Dhost_003FSourcesCache_003F85937d2be7ea998560ccec1e692cc0e99e681983381ded1f4623b2fc5a89d1b_003FTimeSpan_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
-  &lt;Assembly Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\7.0.2\ref\net8.0\Microsoft.Data.SqlClient.dll" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\respawn\6.2.1" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\respawn\7.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\4.0.5" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\5.2.2" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\6.1.4" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\6.1.6" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\7.0.0" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\7.0.2" Loaded="True" /&gt;&#xD;
-  &lt;PhysicalFolder Path="C:\Users\brice\.nuget\packages\microsoft.data.sqlclient\7.1.1" Loaded="True" /&gt;&#xD;
-&lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=45226e7f_002Df3e2_002D4c6a_002Da77f_002D3f561ed36ffb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;And&gt;&#xD;
-    &lt;ProjectFolder&gt;16BC60DA-65D0-42A3-8E12-D8903045CF5B/d:Infrastructures/d:SqlServer&lt;/ProjectFolder&gt;&#xD;
-    &lt;Project Location="C:\Repositories\Notorious Test\NotoriousTest.IntegrationTests" Presentation="&amp;lt;src&amp;gt;\&amp;lt;4. Tests&amp;gt;\&amp;lt;NotoriousTest.IntegrationTests&amp;gt;" /&gt;&#xD;
-  &lt;/And&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4dcf32ca_002D8678_002D44f1_002D8aaf_002Daaf189b88232/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="BrowserInfrastructureTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::16BC60DA-65D0-42A3-8E12-D8903045CF5B::net10.0::NotoriousTest.IntegrationTests.Playwright.BrowserInfrastructureTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/SpawnedProcessesKnownList/=DoggyDog_002Eexe/@EntryIndexedValue">KillOrphaned</s:String></wpf:ResourceDictionary>
+</wpf:ResourceDictionary>
