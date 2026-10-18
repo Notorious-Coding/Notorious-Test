@@ -15,4 +15,8 @@
     <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
     <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj"/>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Configurations\"/>
+  </ItemGroup>
 </Project>

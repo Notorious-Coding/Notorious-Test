@@ -181,6 +181,16 @@ dotnet_naming_rule.locals_camel_case.style = camel_case
 dotnet_naming_rule.locals_camel_case.severity = suggestion
 
 # ──────────────────────────────────────────────
+# Member order
+# ──────────────────────────────────────────────
+# Not expressible in .editorconfig: defined as Rider/ReSharper File Layout
+# in NotoriousTest.sln.DotSettings (team-shared), applied by Code Cleanup.
+# Order: constants & static fields > properties/indexers/events > fields
+#        > constructors > methods > nested types,
+# each group sorted public > protected internal > internal > protected
+#        > private protected > private.
+
+# ──────────────────────────────────────────────
 # Project & config files
 # ──────────────────────────────────────────────
 [*.{csproj,props,targets,slnx}]

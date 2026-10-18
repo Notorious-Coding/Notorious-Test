@@ -6,5 +6,8 @@
     "ManualLaunch": false,
     "MinLogLevel": "Info",
     "HideDoggyDog": true
+  },
+  "Browser": {
+    "Type": "chromium"
   }
 }

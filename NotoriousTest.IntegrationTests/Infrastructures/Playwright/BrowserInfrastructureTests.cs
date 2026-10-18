@@ -6,23 +6,32 @@ using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Web;
 using NotoriousTest.Web.Playwright;
+using NotoriousTest.Web.Playwright.Browsers;
 using static Microsoft.Playwright.Assertions;
 
-namespace NotoriousTest.IntegrationTests.Playwright;
+namespace NotoriousTest.IntegrationTests.Infrastructures.Playwright;
 
 /// <summary>
 ///     Installs the Playwright browsers for the tests, as the environment would do.
 /// </summary>
 public class PlaywrightFixture : IAsyncLifetime
 {
-    private readonly PlaywrightDependency dependency = new();
+    private readonly ChromiumDependency dependency = new();
+    private bool _installedByFixture;
 
     public async ValueTask InitializeAsync()
     {
-        if (!await dependency.Exist()) await dependency.Install();
+        if (!await dependency.Exist())
+        {
+            await dependency.Install();
+            _installedByFixture = true;
+        }
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public async ValueTask DisposeAsync()
+    {
+        if (_installedByFixture) await dependency.Uninstall();
+    }
 }
 
 public class BrowserInfrastructureTests : IClassFixture<PlaywrightFixture>
@@ -70,7 +79,7 @@ public class BrowserInfrastructureTests : IClassFixture<PlaywrightFixture>
 
     private static BrowserInfrastructure CreateBrowser()
     {
-        var browser = new BrowserInfrastructure(Guid.NewGuid(), A.Fake<ITestLogger>(), A.Fake<IRegistry>())
+        var browser = new ChromiumBrowserInfrastructure(Guid.NewGuid(), A.Fake<ITestLogger>(), A.Fake<IRegistry>())
         {
             ConsumedConfiguration = []
         };

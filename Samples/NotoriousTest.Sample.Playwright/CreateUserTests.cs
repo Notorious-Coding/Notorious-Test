@@ -18,25 +18,23 @@ public class CreateUserTests : IntegrationTest<TestEnvironment>
     public async Task Clicking_CreateUser_Should_Create_A_User()
     {
         // The browser is reset before each test: new context, new page.
-        IPage page = Environment.GetInfrastructure<BrowserInfrastructure>().Page;
 
         // Relative to the front url (BaseURL of the browser context).
-        await page.GotoAsync("/");
-        await page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "CreateUser" }).ClickAsync();
+        await Environment.Page.GotoAsync("/");
+        await Environment.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "CreateUser" })
+            .ClickAsync();
 
         // The front called the API through the Vite proxy.
-        await Expect(page.GetByRole(AriaRole.Status)).ToHaveTextAsync("User created");
+        await Expect(Environment.Page.GetByRole(AriaRole.Status)).ToHaveTextAsync("User created");
 
         // The API wrote the user in the database.
         Assert.Equal(1, await CountUsers());
     }
 
     [Fact]
-    public async Task Database_Should_Be_Reset_Between_Tests()
-    {
+    public async Task Database_Should_Be_Reset_Between_Tests() =>
         // The SqlServerInfrastructure is reset with Respawn before each test.
         Assert.Equal(0, await CountUsers());
-    }
 
     private async Task<int> CountUsers()
     {
