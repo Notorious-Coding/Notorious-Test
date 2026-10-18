@@ -11,6 +11,8 @@ namespace NotoriousTest.Sample.Playwright.Environments;
 
 public class TestEnvironment : EnvironmentBase
 {
+    protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
+
     public TestEnvironment(EnvironmentSettings settings,
         IWatchDog watchDog,
         IRegistry registry,
@@ -25,8 +27,6 @@ public class TestEnvironment : EnvironmentBase
     {
     }
 
-    protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
-
     public override async Task ConfigureEnvironment() =>
         // Infrastructures are started by Order, each one consuming the configuration of the previous ones:
         // 1. Database                 -> ConnectionStrings:SqlServer
@@ -36,5 +36,5 @@ public class TestEnvironment : EnvironmentBase
         AddInfrastructure<SqlServerInfrastructure>()
             .AddInfrastructure<ApiInfrastructure>()
             .AddInfrastructure<FrontInfrastructure>()
-            .AddPlaywright();
+            .AddBrowserFromSettings();
 }

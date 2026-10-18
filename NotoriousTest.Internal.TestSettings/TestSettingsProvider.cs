@@ -13,9 +13,9 @@ internal class TestSettingsProvider : ITestSettingsProvider
         {
             string? settingsPath = FindFile("testsettings.json");
 
-
             var configurationBuilder = new ConfigurationBuilder();
             if (settingsPath != null) configurationBuilder.AddJsonFile(settingsPath);
+            configurationBuilder.AddEnvironmentVariables();
 
             _cache = configurationBuilder.Build();
         }
