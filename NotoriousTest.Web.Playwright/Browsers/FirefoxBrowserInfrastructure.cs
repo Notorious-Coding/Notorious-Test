@@ -1,6 +1,7 @@
 ﻿using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Settings;
 
 namespace NotoriousTest.Web.Playwright.Browsers;
 
@@ -12,8 +13,9 @@ public class FirefoxBrowserInfrastructure : BrowserInfrastructure
     protected override BrowserType BrowserType => BrowserType.Firefox;
 
     /// <inheritdoc />
-    public FirefoxBrowserInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(
-        contextId, logger, provider)
+    public FirefoxBrowserInfrastructure(ITestSettingsProvider settings, EnvironmentId contextId, ITestLogger logger,
+        IRegistry provider) : base(
+        settings, contextId, logger, provider)
     {
         Dependencies.Add(new FirefoxDependency());
     }

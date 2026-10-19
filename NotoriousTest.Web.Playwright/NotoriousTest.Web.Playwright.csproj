@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="NotoriousTest.IntegrationTests"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj"/>
   </ItemGroup>
 

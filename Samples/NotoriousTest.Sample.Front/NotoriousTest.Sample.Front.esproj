@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.6887863">
+  <PropertyGroup>
+    <!-- Started by FrontInfrastructure (NotoriousTest.Sample.Playwright) with the Vite dev server. -->
+    <StartupCommand>npm run dev</StartupCommand>
+    <!-- The production bundle is never used by the sample: only restore npm packages on build. -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+  </PropertyGroup>
+</Project>

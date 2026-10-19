@@ -8,6 +8,15 @@
     "HideDoggyDog": true
   },
   "Browser": {
-    "Type": "chromium"
+    "Type": "chromium",
+    "Device": {
+      "ViewportSize": {
+        "Width": 1280,
+        "Height": 720
+      }
+    },
+    "Localization": {
+      "Locale": "fr-FR"
+    }
   }
 }

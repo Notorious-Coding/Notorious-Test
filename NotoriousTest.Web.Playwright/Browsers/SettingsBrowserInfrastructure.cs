@@ -3,44 +3,28 @@ using NotoriousTest.Core.Infrastructures;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Core.Settings;
+using NotoriousTest.Web.Playwright.Settings;
 
 namespace NotoriousTest.Web.Playwright.Browsers;
 
-public class BrowserSettings
-{
-    public static string SECTION_KEY = "Browser";
-    public string Type { get; set; }
-}
-
 /// <summary>
-///
+///     Create the browser configured in the testsettings.json file for a web application.
 /// </summary>
 public class SettingsBrowserInfrastructure : BrowserInfrastructure
 {
     /// <summary>
-    ///     Browser settings.
-    /// </summary>
-    /// <exception cref="InfrastructureSettingsNotFound"></exception>
-    protected BrowserSettings Settings => _settings.Get<BrowserSettings>(BrowserSettings.SECTION_KEY) ??
-                                          throw new InfrastructureSettingsNotFound(
-                                              $"testsettings.json does not contain a {BrowserSettings.SECTION_KEY} section.");
-
-    /// <summary>
     ///     Browser type found in settings (e.g., Chromium, Firefox, Webkit).
     /// </summary>
     /// <exception cref="InfrastructureSettingsNotFound"></exception>
-    protected override BrowserType BrowserType => Settings.Type ??
+    protected override BrowserType BrowserType => BrowserSettings?.Type ??
                                                   throw new InfrastructureSettingsNotFound(
                                                       $"Browser type not found in section {BrowserSettings.SECTION_KEY}.");
 
-
-    private readonly ITestSettingsProvider _settings;
-
+    /// <inheritdoc />
     public SettingsBrowserInfrastructure(ITestSettingsProvider settings, EnvironmentId contextId, ITestLogger logger,
         IRegistry provider) : base(
-        contextId, logger, provider)
+        settings, contextId, logger, provider)
     {
-        _settings = settings;
         Dependencies.Add(CreateDependency(BrowserType));
     }
 

@@ -14,14 +14,10 @@ namespace NotoriousTest.Web.Npm;
 ///     Create a web application infrastructure started with an npm script (<c>npm run &lt;Command&gt;</c>).
 ///     The port to listen on is given to the application with the <c>PORT</c> environment variable.
 /// </summary>
-public abstract class NpmWebApplicationInfrastructure : WebApplicationInfrastructure
+public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
+    : WebApplicationInfrastructure(contextId, logger, registry)
 {
     private const string PORT_ENVIRONMENT_VARIABLE = "PORT";
-
-    public NpmWebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
-        base(contextId, logger, registry)
-    {
-    }
 
     /// <summary>
     ///     Directory containing the npm project (where the <c>package.json</c> is).
@@ -60,6 +56,9 @@ public abstract class NpmWebApplicationInfrastructure : WebApplicationInfrastruc
     protected Process? NpmProcess { get; private set; }
 
     /// <inheritdoc />
+    public override async Task Initialize() => HttpClient = await Start();
+
+    /// <inheritdoc />
     public override async Task Destroy()
     {
         if (NpmProcess == null) return;
@@ -71,8 +70,6 @@ public abstract class NpmWebApplicationInfrastructure : WebApplicationInfrastruc
         NpmProcess = null;
     }
 
-    /// <inheritdoc />
-    public override async Task Initialize() => HttpClient = await Start();
 
     /// <summary>
     ///     Gives the configuration to the application, before it is started.
@@ -80,7 +77,8 @@ public abstract class NpmWebApplicationInfrastructure : WebApplicationInfrastruc
     ///     write it in a <c>.env</c> or JSON file, etc.
     /// </summary>
     /// <param name="configuration">
-    ///     Configuration consumed from the other infrastructures, then <see cref="WebApplicationInfrastructure.AdditionalConfiguration" />
+    ///     Configuration consumed from the other infrastructures, then
+    ///     <see cref="WebApplicationInfrastructure.AdditionalConfiguration" />
     ///     (which wins on duplicate keys). Keys are flattened in the appsettings format,
     ///     e.g. <c>ConnectionStrings:Default</c>, <c>Brokers:0</c>.
     /// </param>
@@ -105,6 +103,9 @@ public abstract class NpmWebApplicationInfrastructure : WebApplicationInfrastruc
 
         if (State == NpmWebApplicationState.Failed)
             throw new Exception($"npm application failed to start with 'npm run {Command}'. Logs: {Logs}");
+
+        OutputConfiguration.WebAppUrl = client.BaseAddress!.ToString();
+
         return client;
     }
 
