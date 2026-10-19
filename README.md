@@ -224,6 +224,7 @@ Complete samples for each framework are available in the [`Samples`](./Samples/)
 | `NotoriousTest.Web.AspNetCore` | ASP.NET Core application running in memory. |
 | `NotoriousTest.Web.AzureFunctions` | Azure Functions host running locally. |
 | `NotoriousTest.Web.Npm` | JavaScript application started with an npm script. |
+| `NotoriousTest.Web.Playwright` | Chromium, Firefox or WebKit browser opening your web application, for end-to-end tests. |
 | `NotoriousTest.SqlServer` | SQL Server — Docker container or existing server. |
 | `NotoriousTest.PostgreSql` | PostgreSQL — Docker container or existing server. |
 | `NotoriousTest.Sqlite` | SQLite — one database file per environment. |

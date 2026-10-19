@@ -733,6 +733,9 @@ The file must be copied to the output directory:
 External database infrastructures (`SqlServerInfrastructure`, `PostgreInfrastructure`, `SqliteInfrastructure`) read a
 section named after **your infrastructure class** — see [Integrations](./3-integrations.md).
 
+Browser infrastructures (`NotoriousTest.Web.Playwright`) read the `Browser` section: browser type, launch options and
+context options — see [Configuring the browser](./3-integrations.md#configuring-the-browser).
+
 ### Reading settings in your infrastructures
 
 Inject `ITestSettingsProvider` and bind a section to a class:

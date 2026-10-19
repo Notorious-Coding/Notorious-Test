@@ -73,6 +73,7 @@
   </Folder>
   <Folder Name="/src/5. Samples/">
     <File Path="Samples/Directory.Build.props"/>
+    <Project Path="Samples/NotoriousTest.Sample.Front/NotoriousTest.Sample.Front.esproj" Type="JavaScript"/>
     <Project Path="Samples/NotoriousTest.Sample.MSTest/NotoriousTest.Sample.MSTest.csproj"/>
     <Project Path="Samples/NotoriousTest.Sample.NUnit/NotoriousTest.Sample.NUnit.csproj"/>
     <Project Path="Samples/NotoriousTest.Sample.Playwright/NotoriousTest.Sample.Playwright.csproj"/>
@@ -81,14 +82,6 @@
     <Project Path="Samples/NotoriousTest.Sample.With/NotoriousTest.Sample.With.csproj"/>
     <Project Path="Samples/NotoriousTest.Sample.Without/NotoriousTest.Sample.Without.csproj"/>
     <Project Path="Samples/NotoriousTest.Sample.XUnit/NotoriousTest.Sample.XUnit.csproj"/>
-  </Folder>
-  <Folder Name="/src/5. Samples/NotoriousTest.Sample.Front/">
-    <File Path="Samples/NotoriousTest.Sample.Front/index.html"/>
-    <File Path="Samples/NotoriousTest.Sample.Front/package.json"/>
-    <File Path="Samples/NotoriousTest.Sample.Front/src/App.css"/>
-    <File Path="Samples/NotoriousTest.Sample.Front/src/App.jsx"/>
-    <File Path="Samples/NotoriousTest.Sample.Front/src/main.jsx"/>
-    <File Path="Samples/NotoriousTest.Sample.Front/vite.config.js"/>
   </Folder>
   <Folder Name="/src/6. Solution/">
     <File Path=".editorconfig"/>

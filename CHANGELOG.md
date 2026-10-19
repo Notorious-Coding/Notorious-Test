@@ -9,6 +9,27 @@
   with one of its npm scripts (`npm run <Command>`), from its project directory (`ProjectDir`).
 - Implement `ConfigureApplication` to give the configuration to your application the way it reads it: environment
   variables, `.env` file, JSON file…
+- The url of the application is published under the `WebAppUrl` key: a Playwright browser opens it with no code.
+
+### Playwright 💥NEW💥
+
+- Browser context options can be set in the `Browser` section of `testsettings.json`, for every browser
+  infrastructure (`AddBrowserFromSettings`, `AddChromiumBrowser`, `AddFirefoxBrowser`, `AddWebkitBrowser`).
+- Every `BrowserNewContextOptions` value except `BaseURL` is supported, grouped by topic: `Device`, `Localization`,
+  `Appearance`, `Http`, `Security`, `Recording`, `StorageState` and `StrictSelectors`.
+
+- Browser launch options are set in `Browser:Launch`: every `BrowserTypeLaunchOptions` value is supported (`Headless`,
+  `SlowMo`, `Timeout`, `Channel`, `ExecutablePath`, `ChromiumSandbox`, `Env`, `FirefoxUserPrefs`, `Proxy`), with the
+  `Arguments`, `Directories` and `Signals` groups.
+
+```json
+"Browser": {
+  "Type": "chromium",
+  "Launch": { "Headless": false, "SlowMo": 200 },
+  "Device": { "ViewportSize": { "Width": 1280, "Height": 720 } },
+  "Localization": { "Locale": "fr-FR" }
+}
+```
 
 ### ASP.NET Core 📦
 

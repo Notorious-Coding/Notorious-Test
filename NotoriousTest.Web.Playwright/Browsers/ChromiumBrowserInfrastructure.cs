@@ -1,6 +1,7 @@
 ﻿using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Core.Settings;
 
 namespace NotoriousTest.Web.Playwright.Browsers;
 
@@ -13,8 +14,9 @@ public class ChromiumBrowserInfrastructure : BrowserInfrastructure
     protected override BrowserType BrowserType => BrowserType.Chromium;
 
     /// <inheritdoc />
-    public ChromiumBrowserInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry provider) : base(
-        contextId, logger, provider)
+    public ChromiumBrowserInfrastructure(ITestSettingsProvider settings, EnvironmentId contextId, ITestLogger logger,
+        IRegistry provider) : base(
+        settings, contextId, logger, provider)
     {
         Dependencies.Add(new ChromiumDependency());
     }

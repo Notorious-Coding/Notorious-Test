@@ -11,13 +11,14 @@ environment, and NotoriousTest handles its lifecycle.
    1. [ASP.NET Core](#21-aspnet-core)
    2. [Azure Functions](#22-azure-functions)
    3. [npm](#23-npm)
-3. [Docker Containers](#3-docker-containers)
-4. [Databases](#4-databases)
-   1. [Common Behavior](#41-common-behavior)
-   2. [SQL Server](#42-sql-server)
-   3. [PostgreSQL](#43-postgresql)
-   4. [SQLite](#44-sqlite)
-5. [Requirements & Dependencies](#5-requirements--dependencies)
+3. [Browsers — Playwright](#3-browsers--playwright)
+4. [Docker Containers](#4-docker-containers)
+5. [Databases](#5-databases)
+   1. [Common Behavior](#51-common-behavior)
+   2. [SQL Server](#52-sql-server)
+   3. [PostgreSQL](#53-postgresql)
+   4. [SQLite](#54-sqlite)
+6. [Requirements & Dependencies](#6-requirements--dependencies)
 
 ---
 
@@ -29,6 +30,7 @@ environment, and NotoriousTest handles its lifecycle.
 | `NotoriousTest.Web.AspNetCore` | `AddAspNetWebApplication<TProgram>()` — an in-memory ASP.NET Core server. |
 | `NotoriousTest.Web.AzureFunctions` | `AzureFunctionWebApplicationInfrastructure` — a local Azure Functions host (`func host start`). |
 | `NotoriousTest.Web.Npm` | `NpmWebApplicationInfrastructure` — a JavaScript application started with an npm script (`npm run <Command>`). |
+| `NotoriousTest.Web.Playwright` | `AddChromiumBrowser()`, `AddFirefoxBrowser()`, `AddWebkitBrowser()`, `AddBrowserFromSettings()` — a [Playwright](https://playwright.dev/dotnet/) browser opening your web application. |
 | `NotoriousTest.TestContainers` | `DockerContainerInfrastructure<TContainer, TOutputConfiguration>` — any [Testcontainers](https://dotnet.testcontainers.org/) container. |
 | `NotoriousTest.Database` | Base classes shared by all database integrations (Docker & external). |
 | `NotoriousTest.SqlServer` | SQL Server — in a Docker container or on an existing server. |
@@ -326,7 +328,9 @@ public override Task ConfigureEnvironment()
    which **you** implement: NotoriousTest makes no assumption on how a JavaScript application reads its configuration.
 3. NotoriousTest requests `HealthCheckPath` until the application answers (any HTTP status). If the process exits or the
    timeout is reached, initialization fails with the application logs in the exception message.
-4. On `Destroy()`, npm and the processes it started are killed.
+4. Once the application answers, its url is published under the `WebAppUrl` key: a
+   [Playwright browser](#3-browsers--playwright) added to the environment opens it, with no code.
+5. On `Destroy()`, npm and the processes it started are killed.
 
 **Customization:**
 
@@ -391,7 +395,204 @@ public class MyFrontApplication : NpmWebApplicationInfrastructure
 
 ---
 
-## 3. Docker Containers
+## 3. Browsers — Playwright
+
+`NotoriousTest.Web.Playwright`
+
+A browser infrastructure starts a real browser (Chromium, Firefox or WebKit) with [Playwright](https://playwright.dev/dotnet/)
+and opens a page on your web application, for end-to-end tests that go through the UI.
+
+```csharp
+using NotoriousTest.Web.Playwright;
+
+public override Task ConfigureEnvironment()
+{
+    AddInfrastructure<MyDatabaseInfrastructure>();
+    AddInfrastructure<MyFrontApplication>(); // npm application: publishes "WebAppUrl"
+    this.AddChromiumBrowser();               // opens it
+    return Task.CompletedTask;
+}
+```
+
+```csharp
+using static Microsoft.Playwright.Assertions;
+
+[Fact]
+public async Task Clicking_CreateUser_Should_Create_A_User()
+{
+    // Relative to the web application url.
+    await Environment.Page.GotoAsync("/");
+    await Environment.Page.GetByRole(AriaRole.Button, new() { Name = "CreateUser" }).ClickAsync();
+
+    await Expect(Environment.Page.GetByRole(AriaRole.Status)).ToHaveTextAsync("User created");
+}
+```
+
+**Choosing the browser:**
+
+| Method | Browser |
+|--------|---------|
+| `AddChromiumBrowser()` | Chromium. |
+| `AddFirefoxBrowser()` | Firefox. |
+| `AddWebkitBrowser()` | WebKit (Safari engine). |
+| `AddBrowserFromSettings()` | The browser named in `Browser:Type` of `testsettings.json` (`chromium`, `firefox` or `webkit`). Handy to run the same campaign on every browser in CI. |
+
+**Accessing Playwright from the tests:**
+
+| Member | Description |
+|--------|-------------|
+| `Environment.Page` | Page opened on the web application. Use it for navigation and assertions. |
+| `Environment.Context` | Browser context of the page: cookies, routes, permissions, new pages (`Context.NewPageAsync()`)… |
+| `Environment.Browser` | The browser itself, e.g. to create a second isolated context (another user). |
+| `Environment.BrowserInfrastructure` | The first browser infrastructure of the environment. If you register several, retrieve a specific one with `Environment.GetInfrastructure<T>()`. |
+
+> ⚠️ The context and the page are recreated before each test: always read `Environment.Page` / `Environment.Context`,
+> never keep them in a field.
+
+📌 **How it works:**
+
+1. The browser starts **after** the web applications (`Order = 1000`) and is a
+   [configuration consumer](./2-core-concepts.md#14-configuration): the `WebAppUrl` entry becomes the `BaseURL` of the
+   browser context, so tests navigate with relative urls.
+2. The browser is declared as a [dependency](./2-core-concepts.md#13-dependencies): if the Playwright-bundled browser is
+   missing, it is installed before the campaign (`playwright install <browser>`). It is **not** uninstalled at the end:
+   the browser cache is shared by every Playwright installation of the machine.
+3. On `Initialize()`, the browser is launched, then a context and a page are created. A single Playwright instance is
+   shared by every browser infrastructure, and disposed when the last one is destroyed.
+4. On `Reset()`, the context is closed and a new one is created with a new page: cookies, local storage and
+   permissions never leak from one test to the next.
+5. On `Destroy()`, the context is closed (which writes the recorded videos and HAR), then the browser.
+
+**Url of the web application** — the browser opens the url published under the `WebAppUrl` key.
+
+- [npm](#23-npm) applications publish it automatically: nothing to write.
+- [ASP.NET Core](#21-aspnet-core) applications run in memory (`TestServer`) and have no real url: a browser cannot open
+  them. Serve your UI with an npm application, which can call your ASP.NET Core API.
+- For any other web application (e.g. [Azure Functions](#22-azure-functions) or your own infrastructure), publish it
+  yourself once the application is started:
+
+```csharp
+public class MyFunctionApplication : AzureFunctionWebApplicationInfrastructure
+{
+    // ...
+
+    public override async Task Initialize()
+    {
+        await base.Initialize();
+
+        OutputConfiguration.WebAppUrl = HttpClient!.BaseAddress!.ToString();
+    }
+}
+```
+
+If no `WebAppUrl` is found, initialization fails with a `NoWebApplicationConfiguredException`. If several web
+applications publish it, the browser opens the first one found.
+
+### Configuring the browser
+
+Every browser infrastructure reads the `Browser` section of [`testsettings.json`](./2-core-concepts.md#3-settings). Every
+key is optional: a missing key keeps the Playwright default.
+
+```json
+{
+  "Browser": {
+    "Type": "chromium",
+    "Launch": {
+      "Headless": false,
+      "SlowMo": 200
+    },
+    "Device": {
+      "ViewportSize": { "Width": 1280, "Height": 720 }
+    },
+    "Localization": {
+      "Locale": "fr-FR",
+      "TimezoneId": "Europe/Paris"
+    },
+    "Appearance": {
+      "ColorScheme": "Dark"
+    },
+    "Http": {
+      "ExtraHTTPHeaders": { "X-Test": "1" }
+    },
+    "Security": {
+      "Permissions": [ "geolocation" ]
+    },
+    "Recording": {
+      "Video": { "Dir": "videos" }
+    }
+  }
+}
+```
+
+> 💡 To watch a test run, set `Browser:Launch:Headless` to `false` and `Browser:Launch:SlowMo` to a few hundred
+> milliseconds.
+
+**Launch options** (`Browser:Launch`, Playwright's `BrowserTypeLaunchOptions`) — used once, when the browser starts:
+
+| Key | Description |
+|-----|-------------|
+| `Headless` | `false` to show the browser window. `true` by default. |
+| `SlowMo` | Slows down every Playwright operation by this many milliseconds. |
+| `Timeout` | Maximum time to wait for the browser to start, in milliseconds. |
+| `Channel` | Branded browser to use instead of the bundled one: `chrome`, `msedge`, `chrome-beta`… It must be installed on the machine. |
+| `ExecutablePath` | Path to a browser executable to use instead of the bundled one. |
+| `ChromiumSandbox` | Enables the Chromium sandbox. |
+| `Env` | Environment variables of the browser process. |
+| `FirefoxUserPrefs` | Firefox preferences. `true`/`false` and integers are converted to their type. |
+| `Proxy` | `Server`, `Bypass`, `Username`, `Password` of the proxy used by the browser. |
+| `Arguments` | `Args` (extra command line arguments), `IgnoreDefaultArgs`, `IgnoreAllDefaultArgs`. |
+| `Directories` | `Downloads`, `Traces`, `Artifacts` directories. |
+| `Signals` | `HandleSIGINT`, `HandleSIGTERM`, `HandleSIGHUP`: whether these signals close the browser. |
+
+**Context options** (Playwright's `BrowserNewContextOptions`) — applied to every new context, so before each test.
+`BaseURL` is not configurable: it always comes from `WebAppUrl`.
+
+| Key | Keys inside |
+|-----|-------------|
+| `Device` | `ViewportSize` (`Width`, `Height`), `NoViewport`, `ScreenSize`, `DeviceScaleFactor`, `IsMobile`, `HasTouch`, `UserAgent`. |
+| `Localization` | `Locale`, `TimezoneId`, `Geolocation` (`Latitude`, `Longitude`, `Accuracy`). |
+| `Appearance` | `ColorScheme`, `Contrast`, `ForcedColors`, `ReducedMotion`. |
+| `Http` | `ExtraHTTPHeaders`, `Credentials` and `CredentialsList` (`Username`, `Password`, `Origin`, `Send`), `Proxy`, `ClientCertificates` (`Origin`, `CertPath`, `KeyPath`, `PfxPath`, `Cert`, `Key`, `Pfx` as base64, `Passphrase`), `IgnoreHTTPSErrors`, `Offline`. |
+| `Security` | `Permissions`, `BypassCSP`, `JavaScriptEnabled`, `AcceptDownloads`, `ServiceWorkers` (`Allow`, `Block`). |
+| `Recording` | `Har` (`Path`, `Content`, `Mode`, `OmitContent`, `UrlFilter`, `UrlFilterString`, `UrlFilterRegex`), `Video` (`Dir`, `Size`). |
+| `StorageState` | `State` (JSON) or `Path` (file) of a saved storage state, e.g. a logged-in session. |
+| `StrictSelectors` | `true` to fail when a selector matches several elements. |
+
+Enum values (`ColorScheme`, `HarMode`…) are written with their Playwright name: `"Dark"`, `"Minimal"`…
+
+> ⚠️ `Recording:Har:Path` and `StorageState:Path` are the same for every environment. If several environments run in
+> parallel, they write to the same HAR file.
+
+**Customizing the options in code** — inherit from a browser infrastructure and override `GetLaunchOptions()` or
+`GetContextOptions()`. Start from `base` to keep the settings of `testsettings.json`:
+
+```csharp
+public class MyBrowser : ChromiumBrowserInfrastructure
+{
+    public MyBrowser(ITestSettingsProvider settings, EnvironmentId environmentId, ITestLogger logger,
+        IRegistry registry) : base(settings, environmentId, logger, registry)
+    {
+    }
+
+    protected override BrowserNewContextOptions GetContextOptions()
+    {
+        BrowserNewContextOptions options = base.GetContextOptions();
+        options.ExtraHTTPHeaders = new Dictionary<string, string> { ["Authorization"] = "Bearer test-token" };
+        return options;
+    }
+}
+```
+
+```csharp
+AddInfrastructure<MyBrowser>();
+```
+
+> ⚠️ On Linux, browsers need system libraries that `playwright install` does not install. On a CI agent, run
+> `pwsh bin/Debug/net10.0/playwright.ps1 install-deps` once, or use a Playwright Docker image.
+
+---
+
+## 4. Docker Containers
 
 `NotoriousTest.TestContainers`
 
@@ -441,7 +642,7 @@ public class RedisInfrastructure : DockerContainerInfrastructure<RedisContainer,
 
 ---
 
-## 4. Databases
+## 5. Databases
 
 Every database integration comes in two flavors:
 
@@ -452,7 +653,7 @@ Every database integration comes in two flavors:
 
 ---
 
-### 4.1 Common Behavior
+### 5.1 Common Behavior
 
 All database infrastructures share the same lifecycle, inherited from `NotoriousTest.Database`:
 
@@ -462,7 +663,7 @@ All database infrastructures share the same lifecycle, inherited from `Notorious
 | **Reset** | Empties every table with [Respawn](https://github.com/jbogard/Respawn). | Same. |
 | **Destroy** | Removes the container (and the database with it). | Drops the database. |
 | **Crash recovery** | DoggyDog removes the container. | DoggyDog drops the database. |
-| **Requirements** | [`DockerRequirement`](#5-requirements--dependencies), declared automatically. | None. |
+| **Requirements** | [`DockerRequirement`](#6-requirements--dependencies), declared automatically. | None. |
 
 **One database per environment:** the database is named `{DbPrefix}_{EnvironmentId}` (e.g.
 `NotoriousDb_3f2b9c1e-...`). Parallel test classes or campaigns never share data.
@@ -562,7 +763,7 @@ public class MyDatabaseInfrastructure : SqlServerContainerInfrastructure<MyDbCon
 
 ---
 
-### 4.2 SQL Server
+### 5.2 SQL Server
 
 `NotoriousTest.SqlServer`
 
@@ -614,7 +815,7 @@ public class MyDatabaseInfrastructure : SqlServerInfrastructure
 
 ---
 
-### 4.3 PostgreSQL
+### 5.3 PostgreSQL
 
 `NotoriousTest.PostgreSql`
 
@@ -658,7 +859,7 @@ Connections are `NpgsqlConnection` instances: cast `GetDatabaseConnection()` if 
 
 ---
 
-### 4.4 SQLite
+### 5.4 SQLite
 
 `NotoriousTest.Sqlite`
 
@@ -692,7 +893,7 @@ public class MyDatabaseInfrastructure : SqliteInfrastructure
 
 ---
 
-## 5. Requirements & Dependencies
+## 6. Requirements & Dependencies
 
 These packages provide ready-made [requirements](./2-core-concepts.md#12-requirements) and
 [dependencies](./2-core-concepts.md#13-dependencies) to declare on your infrastructures.

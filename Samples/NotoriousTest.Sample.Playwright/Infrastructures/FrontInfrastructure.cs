@@ -2,7 +2,6 @@ using NotoriousTest.Core;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Sample.Playwright.Dependencies;
-using NotoriousTest.Web;
 using NotoriousTest.Web.Npm;
 
 namespace NotoriousTest.Sample.Playwright.Infrastructures;
@@ -12,22 +11,14 @@ namespace NotoriousTest.Sample.Playwright.Infrastructures;
 /// </summary>
 public class FrontInfrastructure : NpmWebApplicationInfrastructure
 {
-    public FrontInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId,
-        logger, registry)
-    {
-        Dependencies.Add(new NpmInstallDependency(ProjectDir));
-    }
-
     protected override string ProjectDir { get; } = FindFrontDirectory();
 
     protected override string Command => "dev";
 
-    public override async Task Initialize()
+    public FrontInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId,
+        logger, registry)
     {
-        await base.Initialize();
-
-        // Url opened by the BrowserInfrastructure.
-        OutputConfiguration.WebAppUrl = HttpClient!.BaseAddress!.ToString();
+        Dependencies.Add(new NpmInstallDependency(ProjectDir));
     }
 
     protected override Task ConfigureApplication(Dictionary<string, string?> configuration,
