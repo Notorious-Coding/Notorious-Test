@@ -509,6 +509,7 @@ public class UserTests : NotoriousTest.MSTest.IntegrationTestBase<MyEnvironment>
 }
 
 // TUnit
+[ClassDataSource<TUnitFixture<MyEnvironment>>(Shared = SharedType.PerClass)]
 public class UserTests : NotoriousTest.TUnit.IntegrationTestBase<MyEnvironment>
 {
     public UserTests(TUnitFixture<MyEnvironment> fixture) : base(fixture) { }
@@ -526,6 +527,9 @@ public class UserTests : NotoriousTest.TUnit.IntegrationTestBase<MyEnvironment>
 | NUnit     | `[OneTimeSetUp]`                                    | `[TearDown]`              | `[OneTimeTearDown]`           |
 | MSTest    | `[ClassInitialize]`                                 | `[TestCleanup]`           | `[ClassCleanup]`              |
 | TUnit     | `TUnitFixture` (shared per class) `InitializeAsync` | `[After(Test)]`           | `TUnitFixture` `DisposeAsync` |
+
+> ⚠️ With TUnit, add `[ClassDataSource<TUnitFixture<MyEnvironment>>(Shared = SharedType.PerClass)]` on your test class:
+> it is what gives the fixture to the constructor, and shares it between the tests of the class.
 
 > 💡 Tests of a TUnit integration class are marked `[NotInParallel]`, since they share the same infrastructures and
 > are reset between each test.

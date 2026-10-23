@@ -30,7 +30,7 @@ public class TestEnvironment : EnvironmentBase
     public override async Task ConfigureEnvironment() =>
         // Infrastructures are started by Order, each one consuming the configuration of the previous ones:
         // 1. Database                 -> ConnectionStrings:SqlServer
-        // 2. API (Order 998)          -> ApiUrl
+        // 2. API (Order 998)          -> WebApiUrl
         // 3. React front (Order 999)  -> WebAppUrl
         // 4. Browser (Order 1000)     -> opens WebAppUrl
         AddInfrastructure<SqlServerInfrastructure>()

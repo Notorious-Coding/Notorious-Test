@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using NotoriousTest.Core;
+using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Web.Helpers;
@@ -72,19 +73,19 @@ public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, I
 
 
     /// <summary>
-    ///     Gives the configuration to the application, before it is started.
-    ///     The application reads its configuration its own way: add it to the environment variables,
-    ///     write it in a <c>.env</c> or JSON file, etc.
+    ///     Gives the configuration to the application before it is started.
+    ///     The application reads its configuration its own way: return environment variables,
+    ///     write a <c>.env</c> or JSON file into the <see cref="ProjectDir" /> directory, etc.
     /// </summary>
-    /// <param name="configuration">
+    /// <param name="configurationFromOtherInfrastructures">
     ///     Configuration consumed from the other infrastructures, then
-    ///     <see cref="WebApplicationInfrastructure.AdditionalConfiguration" />
-    ///     (which wins on duplicate keys). Keys are flattened in the appsettings format,
-    ///     e.g. <c>ConnectionStrings:Default</c>, <c>Brokers:0</c>.
+    ///     <see cref="WebApplicationInfrastructure.AdditionalConfiguration" /> (which wins on duplicate keys once
+    ///     flattened with <see cref="ConfigurationEntryExtensions.ToAppSettings" />).
     /// </param>
-    /// <param name="environmentVariables">Environment variables of the npm process, which can be modified.</param>
-    protected abstract Task ConfigureApplication(Dictionary<string, string?> configuration,
-        IDictionary<string, string?> environmentVariables);
+    /// <returns>Environment variables to add to the npm process, can be empty if not needed.</returns>
+    protected abstract Task<Dictionary<string, string>> ConfigureApplication(
+        List<ConfigurationEntry<object>> configurationFromOtherInfrastructures);
+
 
     /// <summary>
     ///     Additional arguments given to the npm script (after <c>--</c>).
@@ -168,9 +169,14 @@ public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, I
 
         psi.Environment[PORT_ENVIRONMENT_VARIABLE] = port.ToString();
 
-        Dictionary<string, string?> configuration = (ConsumedConfiguration ?? []).ToAppSettings();
-        foreach ((string key, string value) in AdditionalConfiguration) configuration[key] = value;
-        await ConfigureApplication(configuration, psi.Environment);
+        // AdditionalConfiguration comes last: it wins on duplicate keys once flattened.
+        List<ConfigurationEntry<object>> configuration =
+        [
+            ..ConsumedConfiguration ?? [],
+            ..AdditionalConfiguration.Select(x => new ConfigurationEntry<object>(x.Value, x.Key))
+        ];
+        Dictionary<string, string> envVariables = await ConfigureApplication(configuration);
+        foreach ((string key, string value) in envVariables) psi.Environment[key] = value;
 
         var process = Process.Start(psi)!;
         process.OutputDataReceived += (sender, e) => Logs.AppendLine(e.Data);

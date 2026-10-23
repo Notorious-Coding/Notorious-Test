@@ -130,6 +130,17 @@ public class MyWebApplication : AspNetCoreWebApplication<Program>
 AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>();
 ```
 
+**Listening on a real port (Kestrel)** — the default `TestServer` runs in memory and has no real url: nothing outside
+the test process (a browser, an [npm](#23-npm) front…) can call it. Use `KestrelAspNetCoreWebApplication<TProgram>`
+instead: the application listens on a free local port with Kestrel, and its url is published under the `WebApiUrl` key.
+
+```csharp
+AddInfrastructure<AspNetCoreWebApplicationInfrastructure<KestrelAspNetCoreWebApplication<Program>, Program>>();
+```
+
+Inherit from `KestrelAspNetCoreWebApplication<TProgram>` to customize it, like `AspNetCoreWebApplication<TProgram>`.
+An infrastructure started after it reads the url with `ConsumedConfiguration.WebApiUrl` (see [npm](#23-npm)).
+
 **Customizing the infrastructure** — inherit from `AspNetCoreWebApplicationInfrastructure<TProgram>` (what
 `AddAspNetWebApplication<TProgram>()` adds) or `AspNetCoreWebApplicationInfrastructure<TWebApp, TProgram>`, e.g. to
 override its `Initialize()`, then add it with `AddInfrastructure<MyWebApplicationInfrastructure>()`.
@@ -301,11 +312,14 @@ public class MyFrontApplication : NpmWebApplicationInfrastructure
     protected override string Command => "start";
 
     // Give the configuration to the application the way it reads it: here, environment variables.
-    protected override Task ConfigureApplication(Dictionary<string, string?> configuration,
-        IDictionary<string, string?> environmentVariables)
+    protected override Task<Dictionary<string, string>> ConfigureApplication(
+        List<ConfigurationEntry<object>> configuration)
     {
-        environmentVariables["DATABASE_URL"] = configuration["ConnectionStrings:Default"];
-        return Task.CompletedTask;
+        Dictionary<string, string?> settings = configuration.ToAppSettings();
+        return Task.FromResult(new Dictionary<string, string>
+        {
+            ["DATABASE_URL"] = settings["ConnectionStrings:Default"]!
+        });
     }
 }
 ```
@@ -323,9 +337,11 @@ public override Task ConfigureEnvironment()
 
 1. A free local port is picked, and `npm run <Command>` is run in `ProjectDir`. The port is given to the application
    with the `PORT` environment variable.
-2. The configuration produced by the other infrastructures, then `AdditionalConfiguration` (which wins on duplicate
-   keys), is flattened into `appsettings`-style keys (`ConnectionStrings:Default`) and given to `ConfigureApplication`,
-   which **you** implement: NotoriousTest makes no assumption on how a JavaScript application reads its configuration.
+2. The configuration produced by the other infrastructures, then `AdditionalConfiguration`, is given to
+   `ConfigureApplication`, which **you** implement: NotoriousTest makes no assumption on how a JavaScript application
+   reads its configuration. The environment variables it returns are added to the npm process. Use `ToAppSettings()`
+   (`NotoriousTest.Web.Helpers`) to flatten it into `appsettings`-style keys (`ConnectionStrings:Default`):
+   `AdditionalConfiguration` then wins on duplicate keys.
 3. NotoriousTest requests `HealthCheckPath` until the application answers (any HTTP status). If the process exits or the
    timeout is reached, initialization fails with the application logs in the exception message.
 4. Once the application answers, its url is published under the `WebAppUrl` key: a
@@ -338,7 +354,7 @@ public override Task ConfigureEnvironment()
 |--------|---------|-------------|
 | `ProjectDir` | — (required) | Directory of the npm project. |
 | `Command` | — (required) | npm script to run (`start`, `dev`…). |
-| `ConfigureApplication(configuration, environmentVariables)` | — (required) | Gives the configuration to the application, before it starts. |
+| `ConfigureApplication(configuration)` | — (required) | Gives the configuration to the application, before it starts. Returns the environment variables to add to the npm process (can be empty). |
 | `AdditionalConfiguration` | empty | Extra configuration given to `ConfigureApplication` (set it in the constructor). |
 | `HealthCheckPath` | `/` | Path requested to know if the application is listening. |
 | `StartupTimeout` | 2 minutes | Maximum time to wait for the application to be listening. |
@@ -358,11 +374,12 @@ public class MyFrontApplication : NpmWebApplicationInfrastructure
     protected override string ProjectDir { get; } = "...";
     protected override string Command => "start";
 
-    protected override async Task ConfigureApplication(Dictionary<string, string?> configuration,
-        IDictionary<string, string?> environmentVariables)
+    protected override async Task<Dictionary<string, string>> ConfigureApplication(
+        List<ConfigurationEntry<object>> configuration)
     {
-        string[] lines = [$"DATABASE_URL={configuration["ConnectionStrings:Default"]}"];
+        string[] lines = [$"DATABASE_URL={configuration.ToAppSettings()["ConnectionStrings:Default"]}"];
         await File.WriteAllLinesAsync(Path.Combine(ProjectDir, ".env.test"), lines);
+        return []; // no environment variable
     }
 }
 ```
@@ -381,8 +398,8 @@ public class MyFrontApplication : NpmWebApplicationInfrastructure
     protected override string ProjectDir { get; } = "...";
     protected override string Command => "dev";
 
-    protected override Task ConfigureApplication(Dictionary<string, string?> configuration,
-        IDictionary<string, string?> environmentVariables) => Task.CompletedTask;
+    protected override Task<Dictionary<string, string>> ConfigureApplication(
+        List<ConfigurationEntry<object>> configuration) => Task.FromResult(new Dictionary<string, string>());
 
     // npm run dev -- --port <port> --strictPort
     protected override IEnumerable<string> GetScriptArguments(int port) =>
@@ -467,7 +484,8 @@ public async Task Clicking_CreateUser_Should_Create_A_User()
 
 - [npm](#23-npm) applications publish it automatically: nothing to write.
 - [ASP.NET Core](#21-aspnet-core) applications run in memory (`TestServer`) and have no real url: a browser cannot open
-  them. Serve your UI with an npm application, which can call your ASP.NET Core API.
+  them. Serve your UI with an npm application, which can call your ASP.NET Core API started with
+  `KestrelAspNetCoreWebApplication` (its url is published under `WebApiUrl`).
 - For any other web application (e.g. [Azure Functions](#22-azure-functions) or your own infrastructure), publish it
   yourself once the application is started:
 

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Description>MSTest integration for Notorious Test.</Description>
 		<PackageId>NotoriousTest.MSTest</PackageId>
 		<IsPackable>true</IsPackable>
