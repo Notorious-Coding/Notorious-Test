@@ -33,29 +33,55 @@ public static class EnvironmentExtensions
         /// </summary>
         public IBrowserContext Context => environment.BrowserInfrastructure.Context ??
                                           throw new InvalidOperationException("No browser configured");
+    }
+
+    extension(InfrastructureListBuilder builder)
+    {
+        /// <summary>
+        ///     Add the browser configured in the testsettings.json file to the current group of infrastructures.
+        /// </summary>
+        public InfrastructureListBuilder AddBrowserFromSettings() => builder.Add<SettingsBrowserInfrastructure>();
 
         /// <summary>
-        ///     Add the browser configured in the testsettings.json file to the environment.
+        ///     Add the browser configured in the testsettings.json file in a new group, started after the previous ones.
         /// </summary>
-        public EnvironmentBase AddBrowserFromSettings() =>
-            environment.AddInfrastructure<SettingsBrowserInfrastructure>();
+        public InfrastructureListBuilder ThenAddBrowserFromSettings() =>
+            builder.ThenAdd<SettingsBrowserInfrastructure>();
 
         /// <summary>
-        ///     Add a Chromium browser to the environment.
+        ///     Add a Chromium browser to the current group of infrastructures.
         /// </summary>
-        /// <returns>Environment configured with a Chromium browser.</returns>
-        public EnvironmentBase AddChromiumBrowser() => environment.AddInfrastructure<ChromiumBrowserInfrastructure>();
+        /// <returns>Builder configured with a Chromium browser.</returns>
+        public InfrastructureListBuilder AddChromiumBrowser() => builder.Add<ChromiumBrowserInfrastructure>();
 
         /// <summary>
-        ///     Add a Firefox browser to the environment.
+        ///     Add a Chromium browser in a new group, started after the previous ones.
         /// </summary>
-        /// <returns>Environment configured with a Firefox browser.</returns>
-        public EnvironmentBase AddFirefoxBrowser() => environment.AddInfrastructure<FirefoxBrowserInfrastructure>();
+        /// <returns>Builder configured with a Chromium browser.</returns>
+        public InfrastructureListBuilder ThenAddChromiumBrowser() => builder.ThenAdd<ChromiumBrowserInfrastructure>();
 
         /// <summary>
-        ///     Add a Webkit browser to the environment.
+        ///     Add a Firefox browser to the current group of infrastructures.
         /// </summary>
-        /// <returns>Environment configured with a Webkit browser.</returns>
-        public EnvironmentBase AddWebkitBrowser() => environment.AddInfrastructure<WebkitBrowserInfrastructure>();
+        /// <returns>Builder configured with a Firefox browser.</returns>
+        public InfrastructureListBuilder AddFirefoxBrowser() => builder.Add<FirefoxBrowserInfrastructure>();
+
+        /// <summary>
+        ///     Add a Firefox browser in a new group, started after the previous ones.
+        /// </summary>
+        /// <returns>Builder configured with a Firefox browser.</returns>
+        public InfrastructureListBuilder ThenAddFirefoxBrowser() => builder.ThenAdd<FirefoxBrowserInfrastructure>();
+
+        /// <summary>
+        ///     Add a Webkit browser to the current group of infrastructures.
+        /// </summary>
+        /// <returns>Builder configured with a Webkit browser.</returns>
+        public InfrastructureListBuilder AddWebkitBrowser() => builder.Add<WebkitBrowserInfrastructure>();
+
+        /// <summary>
+        ///     Add a Webkit browser in a new group, started after the previous ones.
+        /// </summary>
+        /// <returns>Builder configured with a Webkit browser.</returns>
+        public InfrastructureListBuilder ThenAddWebkitBrowser() => builder.ThenAdd<WebkitBrowserInfrastructure>();
     }
 }

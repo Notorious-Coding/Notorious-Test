@@ -43,11 +43,11 @@ public class ConfigurationTests
 
         EnvironmentStub environment = new(settings: new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
-        environment.OnConfigureEnvironment += () =>
+        environment.OnConfigureEnvironment += builder =>
         {
-            environment.AddInfrastructure(infrastructure1);
-            environment.AddInfrastructure(infrastructure2);
-            environment.AddInfrastructure(infrastructure3);
+            builder.Add(infrastructure1);
+            builder.Add(infrastructure2);
+            builder.Add(infrastructure3);
             return Task.CompletedTask;
         };
 
@@ -67,10 +67,10 @@ public class ConfigurationTests
 
         EnvironmentStub environment = new(new EnvironmentSettings(), _watchDog, _registry, _runtime, _testLogger, _provider);
 
-        environment.OnConfigureEnvironment += () =>
+        environment.OnConfigureEnvironment += builder =>
         {
-            environment.AddInfrastructure(infrastructure1);
-            environment.AddInfrastructure(infrastructure2);
+            builder.Add(infrastructure1);
+            builder.Add(infrastructure2);
             return Task.CompletedTask;
         };
         await environment.Initialize();
@@ -92,10 +92,10 @@ public class ConfigurationTests
         {
             infrastructure2.ConsumedConfiguration.Should().Contain(entry => entry.Key == "key" && entry.Value.Equals("value"));
         };
-        environment.OnConfigureEnvironment += () =>
+        environment.OnConfigureEnvironment += builder =>
         {
-            environment.AddInfrastructure(infrastructure1);
-            environment.AddInfrastructure(infrastructure2);
+            builder.Add(infrastructure1);
+            builder.Add(infrastructure2);
             return Task.CompletedTask;
         };
 

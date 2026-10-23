@@ -94,15 +94,15 @@ classes.
 ```mermaid
 flowchart TD
     A([Test class starts]) --> B[Registry is ensured & DoggyDog is started]
-    B --> C["ConfigureEnvironment()"]
+    B --> C["ConfigureEnvironment(builder)"]
     C --> D[Requirements are verified]
     D --> E[Missing dependencies are installed]
-    E --> F["Initialize() — by Order group, in parallel"]
+    E --> F["Initialize() — group by group, in parallel"]
     F --> G[A test runs]
-    G --> H["Reset() — by Order group, in parallel"]
+    G --> H["Reset() — group by group, in parallel"]
     H --> I{More tests?}
     I -- Yes --> G
-    I -- No --> J["Destroy() — by Order group, in parallel"]
+    I -- No --> J["Destroy() — group by group, in parallel"]
     J --> K[Installed dependencies are uninstalled]
     K --> L[Success signal is sent to DoggyDog]
     L --> M([Test class ends])
@@ -351,32 +351,33 @@ public class MyConsumerInfrastructure : Infrastructure, IConfigurationConsumer
 
 - Just before initializing a consumer, the environment aggregates the `OutputConfiguration` of **every** producer and
   assigns it to `ConsumedConfiguration`.
-- Within the same [order group](#15-ordering), consumers are always initialized **after** non-consumers, so the
+- Within the same [group](#15-ordering), consumers are always initialized **after** non-consumers, so the
   producers of that group have already filled their entries.
 - The web application infrastructures (`NotoriousTest.Web`) are consumers: every entry is injected into the
   application's `IConfiguration`. See [Integrations](./3-integrations.md).
 
-> ⚠️ A consumer only sees entries produced **before** it was initialized. If a producer runs in a later order group,
+> ⚠️ A consumer only sees entries produced **before** it was initialized. If a producer runs in a later group,
 > its entries will be missing.
 
 ---
 
 ### 1.5 Ordering
 
-By default, all infrastructures start **in parallel**. Override `Order` when an infrastructure needs another one to be
-running first — for example, an identity server (Keycloak) that stores its data in a PostgreSQL database:
+The order is declared in the environment, with the `InfrastructureListBuilder` given to `ConfigureEnvironment()`.
+`Add<T>()` puts an infrastructure in the current group: it starts **in parallel** with the others of that group.
+`ThenAdd<T>()` opens a new group, started once the previous one is running — for example, an identity server (Keycloak)
+that stores its data in a PostgreSQL database:
 
 ```csharp
-public class PostgreSqlInfrastructure : Infrastructure
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 {
-    public override int? Order => 1;
-    // ...
-}
-
-public class KeycloakInfrastructure : Infrastructure
-{
-    public override int? Order => 2; // starts once PostgreSQL is running
-    // ...
+    builder.Add<RedisInfrastructure>()
+        .Add<RabbitMqInfrastructure>()          // same group as Redis: in parallel
+        .ThenAdd<PostgreSqlInfrastructure>()    // starts once Redis and RabbitMQ are running
+        .ThenAdd<KeycloakInfrastructure>()      // starts once PostgreSQL is running
+        .Add<MailServerInfrastructure>()        // same group as Keycloak
+        .ThenAddAspNetWebApplication<Program>(); // starts last
+    return Task.CompletedTask;
 }
 ```
 
@@ -386,18 +387,19 @@ public class KeycloakInfrastructure : Infrastructure
 
 📌 **Rules:**
 
-- Infrastructures are **grouped by `Order`**. Groups run one after another, in ascending order. Infrastructures inside a
-  group run in parallel.
-- Infrastructures without `Order` (`null`, the default) form the **first** group.
+- Groups run one after another, in the order they were declared. Infrastructures inside a group run in parallel.
+- `Add<T>()` on an empty builder opens the **first** group; `ThenAdd<T>()` on an empty builder does the same.
 - Inside a group, non-[consumers](#14-configuration) run first, then consumers.
 - The same ordering applies to `Initialize()`, `Reset()` and `Destroy()`.
-- Web application infrastructures use `Order = 999`, so they start after everything else.
+- The order belongs to the environment, not to the infrastructure: the same infrastructure can start first in one
+  environment and last in another. Add web applications and browsers with `ThenAdd…` so they start after everything
+  they consume.
 
 ```
-Order = null  →  [ Redis , RabbitMQ ]           (parallel)
-Order = 1     →  [ PostgreSql ]
-Order = 2     →  [ Keycloak , MailServer ]      (parallel)
-Order = 999   →  [ WebApplication ]             (consumer)
+Group 0  →  [ Redis , RabbitMQ ]           (parallel)
+Group 1  →  [ PostgreSql ]
+Group 2  →  [ Keycloak , MailServer ]      (parallel)
+Group 3  →  [ WebApplication ]             (consumer)
 ```
 
 ---
@@ -405,7 +407,7 @@ Order = 999   →  [ WebApplication ]             (consumer)
 ### 1.6 Environments
 
 An **environment** groups the infrastructures needed by a set of tests. Inherit from `EnvironmentBase` and register
-infrastructures in `ConfigureEnvironment()`:
+infrastructures on the builder given to `ConfigureEnvironment()`:
 
 ```csharp
 using System.Reflection;
@@ -424,10 +426,10 @@ public class MyEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override Task ConfigureEnvironment()
+    public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
     {
-        AddInfrastructure<MyDatabaseInfrastructure>();
-        this.AddAspNetWebApplication<Program>();
+        builder.Add<MyDatabaseInfrastructure>()
+            .ThenAddAspNetWebApplication<Program>();
         return Task.CompletedTask;
     }
 }
@@ -444,10 +446,13 @@ public class MyEnvironment : EnvironmentBase
 
 **Registering infrastructures:**
 
-| Method                        | Description                                                                                                                     |
-|-------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| `AddInfrastructure<T>()`      | Creates `T` through the DI container. Every constructor parameter is resolved, and the `EnvironmentId` is passed automatically. |
-| `AddInfrastructure(instance)` | Registers an instance you created yourself. Its `EnvironmentId` is overwritten with the environment's one.                      |
+| Method                                    | Description                                                                                                                     |
+|-------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `Add<T>()` / `ThenAdd<T>()`               | Creates `T` through the DI container. Every constructor parameter is resolved, and the `EnvironmentId` is passed automatically. |
+| `Add(instance)` / `ThenAdd(instance)`     | Registers an instance you created yourself. Its `EnvironmentId` is overwritten with the environment's one.                      |
+
+`Add` puts the infrastructure in the current group, `ThenAdd` in a new group started after the previous ones — see
+[Ordering](#15-ordering).
 
 **Retrieving infrastructures:**
 
@@ -840,7 +845,7 @@ public class MyApiInfrastructure : Infrastructure
 - The built-in services come from configurators already applied to the framework base classes — you never need to
   register them.
 - `EnvironmentId` is not registered in the container: it is passed directly to infrastructures by
-  `AddInfrastructure<T>()`. To use it in your own services, give it to them from the infrastructure.
+  `Add<T>()` / `ThenAdd<T>()`. To use it in your own services, give it to them from the infrastructure.
 
 ---
 
@@ -894,7 +899,7 @@ filtered by `Watchdog:MinLogLevel` — see [DoggyDog configuration](#configurati
 | `IInfrastructureDependency`                                      | Software installed before the campaign if missing, and uninstalled afterwards.          |
 | `Infrastructure<TOutputConfiguration, TMetadata>` / `AddEntry()` | Produces configuration entries for other infrastructures.                               |
 | `IConfigurationConsumer`                                         | Receives the entries produced by the other infrastructures.                             |
-| `Order`                                                          | Groups infrastructures; groups run sequentially, members in parallel.                   |
+| `InfrastructureListBuilder` / `Add()` / `ThenAdd()`              | Groups infrastructures; groups run sequentially, members in parallel.                   |
 | `EnvironmentBase`                                                | Groups infrastructures and drives their lifecycle.                                      |
 | `IntegrationTest<T>` / `IntegrationTestBase<T>`                  | Binds a test class to an environment.                                                   |
 | DoggyDog / `[Cleaner]`                                           | Cleans up infrastructures after an unexpected crash.                                    |

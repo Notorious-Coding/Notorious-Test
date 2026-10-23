@@ -95,9 +95,6 @@ public abstract class Infrastructure(EnvironmentId contextId, ITestLogger logger
     public List<IInfrastructureRequirement> Requirements { get; set; } = new();
 
     /// <inheritdoc />
-    public virtual int? Order { get; }
-
-    /// <inheritdoc />
     public bool AutoReset { get; set; } = true;
 
     /// <inheritdoc />

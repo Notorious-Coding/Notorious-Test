@@ -19,9 +19,6 @@ public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurat
     }
 
     ///<inheritdoc />
-    public override int? Order => 999;
-
-    ///<inheritdoc />
     public override bool DisableRegistry => true;
 
     /// <summary>

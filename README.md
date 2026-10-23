@@ -135,10 +135,10 @@ public class ApiEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override Task ConfigureEnvironment()
+    public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
     {
-        AddInfrastructure<DatabaseInfrastructure>();
-        this.AddAspNetWebApplication<Program>(); // always starts after the database
+        builder.Add<DatabaseInfrastructure>()
+            .ThenAddAspNetWebApplication<Program>(); // starts after the database
         return Task.CompletedTask;
     }
 }

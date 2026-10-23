@@ -18,11 +18,6 @@ public interface IInfrastructure
     EnvironmentId EnvironmentId { get; set; }
 
     /// <summary>
-    ///     Execution order of the infrastructre.
-    /// </summary>
-    int? Order { get; }
-
-    /// <summary>
     ///     List of dependencies that needs installation before initialization.
     /// </summary>
     List<IInfrastructureDependency> Dependencies { get; set; }
