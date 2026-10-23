@@ -25,16 +25,16 @@ public class AspNetCoreWebApplicationInfrastructure<TWebApp, TEntryPoint> : WebA
     where TWebApp : AspNetCoreWebApplication<TEntryPoint>, new()
     where TEntryPoint : class
 {
+    /// <summary>
+    ///     Web application started by the infrastructure.
+    /// </summary>
+    protected TWebApp WebApplication { get; } = new();
+
     /// <inheritdoc />
     public AspNetCoreWebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) :
         base(contextId, logger, registry)
     {
     }
-
-    /// <summary>
-    ///     Web application started by the infrastructure.
-    /// </summary>
-    protected TWebApp WebApplication { get; } = new();
 
     /// <inheritdoc />
     public override async Task Destroy() => await WebApplication.DisposeAsync();
@@ -47,5 +47,8 @@ public class AspNetCoreWebApplicationInfrastructure<TWebApp, TEntryPoint> : WebA
             WebApplication.AdditionalConfiguration[key] = value;
 
         HttpClient = await WebApplication.Start();
+
+        if (WebApplication is KestrelAspNetCoreWebApplication<TEntryPoint>)
+            OutputConfiguration.WebApiUrl = HttpClient!.BaseAddress!.ToString();
     }
 }

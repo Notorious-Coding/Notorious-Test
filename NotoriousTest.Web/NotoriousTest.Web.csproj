@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <Description>Web integration tests support for NotoriousTest.</Description>
     <PackageId>NotoriousTest.Web</PackageId>
     <IsPackable>true</IsPackable>
@@ -14,9 +14,5 @@
     <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
     <ProjectReference Include="..\NotoriousTest.TestContainers\NotoriousTest.TestContainers.csproj"/>
     <ProjectReference Include="..\NotoriousTest\NotoriousTest.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Configurations\"/>
   </ItemGroup>
 </Project>

@@ -7,8 +7,9 @@
 - Added support for npm web applications integration testing.
 - Install the `NotoriousTest.Web.Npm` package and inherit from `NpmWebApplicationInfrastructure` to start a JavaScript application
   with one of its npm scripts (`npm run <Command>`), from its project directory (`ProjectDir`).
-- Implement `ConfigureApplication` to give the configuration to your application the way it reads it: environment
-  variables, `.env` file, JSON file…
+- Implement `ConfigureApplication` to give the configuration to your application the way it reads it: return the
+  environment variables to add to the npm process, or write a `.env` or JSON file… It receives the configuration
+  consumed from the other infrastructures, then `AdditionalConfiguration`.
 - The url of the application is published under the `WebAppUrl` key: a Playwright browser opens it with no code.
 
 ### Playwright 💥NEW💥
@@ -37,9 +38,14 @@
 - Add your application to the environment with `this.AddAspNetWebApplication<Program>()`: no class to write.
 - To customize the `WebApplicationFactory`, inherit from `AspNetCoreWebApplication<Program>` and add it with
   `AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`.
+- `KestrelAspNetCoreWebApplication<Program>` listens on a free local port with a real Kestrel server instead of the
+  in-memory `TestServer`: a browser or an npm front can call it. Its url is published under the new `WebApiUrl` key
+  (`ConsumedConfiguration.WebApiUrl`).
 
 ### 💥 Breaking Changes
 
+- .NET 8 and .NET 9 are no longer supported: they are out of support (neither LTS nor STS). Every package now targets
+  .NET 10 only.
 - `WebApplication<TEntryPoint>` is removed: install `NotoriousTest.Web.AspNetCore` and inherit from
   `AspNetCoreWebApplication<TEntryPoint>` instead.
 - `IWebApplication`, `WebApplicationInfrastructure<TWebApp>`, `AddWebApplication<T>()` and `GetWebApplication<T>()` are
@@ -49,6 +55,8 @@
 - `AzureFunctionWebApplication` is replaced by `AzureFunctionWebApplicationInfrastructure`: inherit from it and add it
   with `AddInfrastructure<T>()` instead of `AddWebApplication<T>()`. `FunctionProjectDir` is now `protected`, and
   `AdditionalConfiguration` is set in the constructor.
+- TUnit: `IntegrationTestBase<T>` no longer declares `[ClassDataSource]`. Add
+  `[ClassDataSource<TUnitFixture<MyEnvironment>>(Shared = SharedType.PerClass)]` on your test classes.
 
 ## v5.2.0
 

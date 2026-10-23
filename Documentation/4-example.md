@@ -27,7 +27,7 @@ By the end, you will have:
 
 ## 1. Prerequisites
 
-- .NET 8 or higher
+- .NET 10 or higher
 - Docker, installed and running
 
 ---

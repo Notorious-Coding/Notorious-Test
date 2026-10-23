@@ -1,11 +1,21 @@
 ﻿namespace NotoriousTest.Core.Configuration;
 
 /// <summary>
-///     A reprensentation of a piece of configuration outputed by infrastrucutre and consumed by others.
+///     A reprensentation of a piece of configuration output by infrastructure and consumed by others.
 /// </summary>
 /// <typeparam name="T">Object type of the configuration.</typeparam>
 public record ConfigurationEntry<T>
 {
+    /// <summary>
+    ///     Value of the configuration.
+    /// </summary>
+    public T Value { get; set; }
+
+    /// <summary>
+    ///     Key of the configuration.
+    /// </summary>
+    public string Key { get; set; }
+
     /// <summary>
     ///     Creates a new configuration entry.
     /// </summary>
@@ -17,14 +27,4 @@ public record ConfigurationEntry<T>
         Value = value;
         Key = section ?? value.GetType().Name ?? throw new ArgumentNullException(nameof(value));
     }
-
-    /// <summary>
-    ///     Value of the configuration.
-    /// </summary>
-    public T Value { get; set; }
-
-    /// <summary>
-    ///     Key of the configuration.
-    /// </summary>
-    public string Key { get; set; }
 }

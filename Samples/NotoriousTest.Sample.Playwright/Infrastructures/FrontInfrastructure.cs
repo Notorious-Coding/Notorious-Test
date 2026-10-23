@@ -1,7 +1,9 @@
 using NotoriousTest.Core;
+using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Sample.Playwright.Dependencies;
+using NotoriousTest.Web;
 using NotoriousTest.Web.Npm;
 
 namespace NotoriousTest.Sample.Playwright.Infrastructures;
@@ -15,19 +17,23 @@ public class FrontInfrastructure : NpmWebApplicationInfrastructure
 
     protected override string Command => "dev";
 
+
     public FrontInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId,
         logger, registry)
     {
         Dependencies.Add(new NpmInstallDependency(ProjectDir));
     }
 
-    protected override Task ConfigureApplication(Dictionary<string, string?> configuration,
-        IDictionary<string, string?> environmentVariables)
-    {
-        // Read by vite.config.js to proxy /api/* to the API started by ApiInfrastructure.
-        environmentVariables["API_URL"] = configuration[ApiInfrastructure.API_URL_KEY];
-        return Task.CompletedTask;
-    }
+    protected override Task<Dictionary<string, string>> ConfigureApplication(
+        List<ConfigurationEntry<object>> configurationFromOtherInfrastructures) =>
+        Task.FromResult(new Dictionary<string, string>
+        {
+            {
+                "API_URL", configurationFromOtherInfrastructures.WebApiUrl ??
+                           throw new InvalidOperationException("WebApiUrl not found.")
+            }
+        });
+
 
     private static string FindFrontDirectory()
     {

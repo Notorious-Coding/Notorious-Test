@@ -71,7 +71,7 @@ dotnet add package NotoriousTest.SqlServer
 dotnet add package NotoriousTest.Web.AspNetCore
 ```
 
-> **Note:** .NET 8 or higher is required. Docker-based infrastructures require Docker to be installed and running.
+> **Note:** .NET 10 or higher is required. Docker-based infrastructures require Docker to be installed and running.
 
 ## Quick Start
 
@@ -206,6 +206,7 @@ public class UserTests : NotoriousTest.MSTest.IntegrationTestBase<ApiEnvironment
 }
 
 // TUnit
+[ClassDataSource<TUnitFixture<ApiEnvironment>>(Shared = SharedType.PerClass)]
 public class UserTests : NotoriousTest.TUnit.IntegrationTestBase<ApiEnvironment>
 {
     public UserTests(TUnitFixture<ApiEnvironment> fixture) : base(fixture) { }

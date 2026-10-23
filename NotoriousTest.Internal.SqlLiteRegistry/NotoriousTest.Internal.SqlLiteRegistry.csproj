@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <PackageId>NotoriousTest.Internal.SqlLiteRegistry</PackageId>
     <Description>[Internal] SQLite-backed infrastructure registry for NotoriousTest. Not intended for direct consumption — use the NotoriousTest package instead.</Description>
     <IsPackable>true</IsPackable>
