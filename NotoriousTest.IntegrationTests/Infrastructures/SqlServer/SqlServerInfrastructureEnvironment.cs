@@ -20,7 +20,8 @@ public class SqlServerInfrastructureEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override async Task ConfigureEnvironment() => AddInfrastructure<SqlServerInfrastructure>();
+    public override async Task ConfigureEnvironment(InfrastructureListBuilder builder) =>
+        builder.Add<SqlServerInfrastructure>();
 }
 
 public class SqlServerInfrastructure : DockerContainerInfrastructure<MsSqlContainer, string>

@@ -20,7 +20,8 @@ public class PostgreInfrastructureEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override async Task ConfigureEnvironment() => AddInfrastructure<PostgreServerInfrastructure>();
+    public override async Task ConfigureEnvironment(InfrastructureListBuilder builder) =>
+        builder.Add<PostgreServerInfrastructure>();
 }
 
 public class PostgreServerInfrastructure : DockerContainerInfrastructure<PostgreSqlContainer, string>

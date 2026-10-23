@@ -14,9 +14,6 @@ namespace NotoriousTest.Web.Playwright.Browsers;
 /// </summary>
 public abstract class BrowserInfrastructure : Infrastructure, IConfigurationConsumer
 {
-    /// <inheritdoc />
-    public override int? Order => 1000;
-
     /// <summary>
     ///     Playwright page.
     /// </summary>

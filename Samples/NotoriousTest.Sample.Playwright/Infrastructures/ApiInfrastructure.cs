@@ -13,9 +13,6 @@ namespace NotoriousTest.Sample.Playwright.Infrastructures;
 public class
     ApiInfrastructure : AspNetCoreWebApplicationInfrastructure<KestrelAspNetCoreWebApplication<Program>, Program>
 {
-    // Started before the front, which needs the API url.
-    public override int? Order => 998;
-
     public ApiInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry) : base(contextId,
         logger, registry)
     {

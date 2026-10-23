@@ -2,6 +2,25 @@
 
 ## v6.0.0
 
+### Infrastructure ordering 🔀
+
+- Infrastructures are declared, and their start order with them, on the `InfrastructureListBuilder` given to
+  `ConfigureEnvironment(InfrastructureListBuilder builder)`.
+- `Add<T>()` / `Add(instance)` puts an infrastructure in the current group: it starts in parallel with the others.
+  `ThenAdd<T>()` / `ThenAdd(instance)` opens a new group, started once the previous one is running.
+- The order belongs to the environment, not to the infrastructure: the same infrastructure can start first in one
+  environment and last in another.
+
+```csharp
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
+{
+    builder.Add<SqlServerInfrastructure>()
+        .ThenAddAspNetWebApplication<Program>()
+        .ThenAddBrowserFromSettings();
+    return Task.CompletedTask;
+}
+```
+
 ### npm 💥NEW💥
 
 - Added support for npm web applications integration testing.
@@ -15,7 +34,8 @@
 ### Playwright 💥NEW💥
 
 - Browser context options can be set in the `Browser` section of `testsettings.json`, for every browser
-  infrastructure (`AddBrowserFromSettings`, `AddChromiumBrowser`, `AddFirefoxBrowser`, `AddWebkitBrowser`).
+  infrastructure (`(Then)AddBrowserFromSettings`, `(Then)AddChromiumBrowser`, `(Then)AddFirefoxBrowser`,
+  `(Then)AddWebkitBrowser`).
 - Every `BrowserNewContextOptions` value except `BaseURL` is supported, grouped by topic: `Device`, `Localization`,
   `Appearance`, `Http`, `Security`, `Recording`, `StorageState` and `StrictSelectors`.
 
@@ -35,9 +55,9 @@
 ### ASP.NET Core 📦
 
 - ASP.NET Core support moved to its own package: `NotoriousTest.Web.AspNetCore`.
-- Add your application to the environment with `this.AddAspNetWebApplication<Program>()`: no class to write.
+- Add your application to the environment with `builder.ThenAddAspNetWebApplication<Program>()`: no class to write.
 - To customize the `WebApplicationFactory`, inherit from `AspNetCoreWebApplication<Program>` and add it with
-  `AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`.
+  `builder.ThenAdd<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`.
 - `KestrelAspNetCoreWebApplication<Program>` listens on a free local port with a real Kestrel server instead of the
   in-memory `TestServer`: a browser or an npm front can call it. Its url is published under the new `WebApiUrl` key
   (`ConsumedConfiguration.WebApiUrl`).
@@ -49,14 +69,22 @@
 - `WebApplication<TEntryPoint>` is removed: install `NotoriousTest.Web.AspNetCore` and inherit from
   `AspNetCoreWebApplication<TEntryPoint>` instead.
 - `IWebApplication`, `WebApplicationInfrastructure<TWebApp>`, `AddWebApplication<T>()` and `GetWebApplication<T>()` are
-  removed: every web application is now an infrastructure, added with `AddInfrastructure<T>()`. `GetWebApplication()`
+  removed: every web application is now an infrastructure, added with `builder.ThenAdd<T>()`. `GetWebApplication()`
   still returns the first web application of the environment.
 - `NotoriousTest.Web` no longer depends on `Microsoft.AspNetCore.Mvc.Testing`: it moved to `NotoriousTest.Web.AspNetCore`.
 - `AzureFunctionWebApplication` is replaced by `AzureFunctionWebApplicationInfrastructure`: inherit from it and add it
-  with `AddInfrastructure<T>()` instead of `AddWebApplication<T>()`. `FunctionProjectDir` is now `protected`, and
+  with `builder.ThenAdd<T>()` instead of `AddWebApplication<T>()`. `FunctionProjectDir` is now `protected`, and
   `AdditionalConfiguration` is set in the constructor.
 - TUnit: `IntegrationTestBase<T>` no longer declares `[ClassDataSource]`. Add
   `[ClassDataSource<TUnitFixture<MyEnvironment>>(Shared = SharedType.PerClass)]` on your test classes.
+- The `Order` property is removed from `IInfrastructure` and `Infrastructure`: declare the start order in the
+  environment with `Add` / `ThenAdd` instead. Web applications (previously `Order = 999`) and browsers (previously
+  `Order = 1000`) no longer start last on their own: add them with `ThenAdd…`.
+- `ConfigureEnvironment()` becomes `ConfigureEnvironment(InfrastructureListBuilder builder)`, and
+  `AddInfrastructure<T>()` / `AddInfrastructure(instance)` are removed from `EnvironmentBase`: use `builder.Add<T>()` /
+  `builder.Add(instance)`.
+- `AddAspNetWebApplication<TProgram>()` and the Playwright `Add…Browser()` methods now extend `InfrastructureListBuilder`
+  instead of `EnvironmentBase`.
 
 ## v5.2.0
 

@@ -17,6 +17,6 @@ public class NotoriousTestEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override Task ConfigureEnvironment() =>
-        Task.FromResult(AddInfrastructure<NotoriousTestRegistryInfrastructure>());
+    public override Task ConfigureEnvironment(InfrastructureListBuilder builder) =>
+        Task.FromResult(builder.Add<NotoriousTestRegistryInfrastructure>());
 }

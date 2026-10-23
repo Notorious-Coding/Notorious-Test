@@ -27,10 +27,10 @@ environment, and NotoriousTest handles its lifecycle.
 | Package | Provides |
 |---------|----------|
 | `NotoriousTest.Web` | Web application infrastructure (`WebApplicationInfrastructure`, `GetWebApplication`), shared by every web integration. |
-| `NotoriousTest.Web.AspNetCore` | `AddAspNetWebApplication<TProgram>()` — an in-memory ASP.NET Core server. |
+| `NotoriousTest.Web.AspNetCore` | `AddAspNetWebApplication<TProgram>()` / `ThenAddAspNetWebApplication<TProgram>()` — an in-memory ASP.NET Core server. |
 | `NotoriousTest.Web.AzureFunctions` | `AzureFunctionWebApplicationInfrastructure` — a local Azure Functions host (`func host start`). |
 | `NotoriousTest.Web.Npm` | `NpmWebApplicationInfrastructure` — a JavaScript application started with an npm script (`npm run <Command>`). |
-| `NotoriousTest.Web.Playwright` | `AddChromiumBrowser()`, `AddFirefoxBrowser()`, `AddWebkitBrowser()`, `AddBrowserFromSettings()` — a [Playwright](https://playwright.dev/dotnet/) browser opening your web application. |
+| `NotoriousTest.Web.Playwright` | `(Then)AddChromiumBrowser()`, `(Then)AddFirefoxBrowser()`, `(Then)AddWebkitBrowser()`, `(Then)AddBrowserFromSettings()` — a [Playwright](https://playwright.dev/dotnet/) browser opening your web application. |
 | `NotoriousTest.TestContainers` | `DockerContainerInfrastructure<TContainer, TOutputConfiguration>` — any [Testcontainers](https://dotnet.testcontainers.org/) container. |
 | `NotoriousTest.Database` | Base classes shared by all database integrations (Docker & external). |
 | `NotoriousTest.SqlServer` | SQL Server — in a Docker container or on an existing server. |
@@ -53,23 +53,24 @@ dotnet add package NotoriousTest.SqlServer
 A web application is the system under test: your tests call it over HTTP, and it talks to the other infrastructures
 (databases, containers…). NotoriousTest wraps it in a **web application infrastructure** that:
 
-- starts **last** (`Order = 999`), once every other infrastructure is running;
+- starts once every infrastructure it consumes is running, when added with `ThenAdd…` (see
+  [Ordering](./2-core-concepts.md#15-ordering));
 - is a [configuration consumer](./2-core-concepts.md#14-configuration): every configuration entry produced by the other
   infrastructures (connection strings, URLs…) is injected into the application's configuration;
 - exposes an `HttpClient` pointing to the running application;
 - is **not** tracked by DoggyDog (`DisableRegistry = true`): the application runs in memory or as a child process and
   dies with the test process.
 
-Register a web application in the environment (here with `AddAspNetWebApplication<TProgram>()`, see
+Register a web application in the environment (here with `ThenAddAspNetWebApplication<TProgram>()`, see
 [ASP.NET Core](#21-aspnet-core)) and retrieve it with `GetWebApplication()`:
 
 ```csharp
 using NotoriousTest.Web.AspNetCore;
 
-public override Task ConfigureEnvironment()
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 {
-    AddInfrastructure<MyDatabaseInfrastructure>(); // produces "ConnectionStrings:Default"
-    this.AddAspNetWebApplication<Program>();         // receives it in its IConfiguration
+    builder.Add<MyDatabaseInfrastructure>()       // produces "ConnectionStrings:Default"
+        .ThenAddAspNetWebApplication<Program>(); // receives it in its IConfiguration
     return Task.CompletedTask;
 }
 ```
@@ -95,16 +96,17 @@ public async Task GetUsers_Should_ReturnOk()
 
 `NotoriousTest.Web.AspNetCore`
 
-Add your API to the environment with `AddAspNetWebApplication<TProgram>()`, where `TProgram` is the `Program` class of
+Add your API to the environment with `ThenAddAspNetWebApplication<TProgram>()` (or `AddAspNetWebApplication<TProgram>()`
+to add it to the current group), where `TProgram` is the `Program` class of
 your API. The application runs in memory, in the test process, with a `WebApplicationFactory<TProgram>`:
 
 ```csharp
 using NotoriousTest.Web.AspNetCore;
 
-public override Task ConfigureEnvironment()
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 {
-    AddInfrastructure<MyDatabaseInfrastructure>();
-    this.AddAspNetWebApplication<Program>();
+    builder.Add<MyDatabaseInfrastructure>()
+        .ThenAddAspNetWebApplication<Program>();
     return Task.CompletedTask;
 }
 ```
@@ -113,7 +115,7 @@ That's all: the configuration produced by the other infrastructures is added to 
 automatically. No class to write.
 
 This is the way to go whenever the application needs no customization. For everything else, add the infrastructure
-yourself with `AddInfrastructure<T>()`.
+yourself with `builder.ThenAdd<T>()`.
 
 **Customizing the application** — when you need to override the `WebApplicationFactory` (services, environment,
 `HttpClient`, `AdditionalConfiguration`…), create a class inheriting from `AspNetCoreWebApplication<TProgram>`, and add
@@ -127,7 +129,7 @@ public class MyWebApplication : AspNetCoreWebApplication<Program>
 ```
 
 ```csharp
-AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>();
+builder.ThenAdd<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>();
 ```
 
 **Listening on a real port (Kestrel)** — the default `TestServer` runs in memory and has no real url: nothing outside
@@ -135,7 +137,7 @@ the test process (a browser, an [npm](#23-npm) front…) can call it. Use `Kestr
 instead: the application listens on a free local port with Kestrel, and its url is published under the `WebApiUrl` key.
 
 ```csharp
-AddInfrastructure<AspNetCoreWebApplicationInfrastructure<KestrelAspNetCoreWebApplication<Program>, Program>>();
+builder.ThenAdd<AspNetCoreWebApplicationInfrastructure<KestrelAspNetCoreWebApplication<Program>, Program>>();
 ```
 
 Inherit from `KestrelAspNetCoreWebApplication<TProgram>` to customize it, like `AspNetCoreWebApplication<TProgram>`.
@@ -143,13 +145,13 @@ An infrastructure started after it reads the url with `ConsumedConfiguration.Web
 
 **Customizing the infrastructure** — inherit from `AspNetCoreWebApplicationInfrastructure<TProgram>` (what
 `AddAspNetWebApplication<TProgram>()` adds) or `AspNetCoreWebApplicationInfrastructure<TWebApp, TProgram>`, e.g. to
-override its `Initialize()`, then add it with `AddInfrastructure<MyWebApplicationInfrastructure>()`.
+override its `Initialize()`, then add it with `builder.ThenAdd<MyWebApplicationInfrastructure>()`.
 
 > ℹ️ **Migrating from v5:** `WebApplication<TEntryPoint>`, `IWebApplication` and `AddWebApplication<T>()` are removed.
 > Install `NotoriousTest.Web.AspNetCore`, inherit from `AspNetCoreWebApplication<TEntryPoint>` instead of
 > `WebApplication<TEntryPoint>`, and replace `this.AddWebApplication<MyWebApplication>()` with
-> `AddInfrastructure<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`. If `MyWebApplication` was
-> empty, delete it and use `this.AddAspNetWebApplication<Program>()`.
+> `builder.ThenAdd<AspNetCoreWebApplicationInfrastructure<MyWebApplication, Program>>()`. If `MyWebApplication` was
+> empty, delete it and use `builder.ThenAddAspNetWebApplication<Program>()`.
 
 **How the configuration is injected:** each entry is flattened into `appsettings`-style keys, then added as an
 in-memory configuration source.
@@ -237,10 +239,10 @@ public class MyFunctionApplication : AzureFunctionWebApplicationInfrastructure
 ```
 
 ```csharp
-public override Task ConfigureEnvironment()
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 {
-    AddInfrastructure<MyDatabaseInfrastructure>();
-    AddInfrastructure<MyFunctionApplication>();
+    builder.Add<MyDatabaseInfrastructure>()
+        .ThenAdd<MyFunctionApplication>();
     return Task.CompletedTask;
 }
 ```
@@ -325,10 +327,10 @@ public class MyFrontApplication : NpmWebApplicationInfrastructure
 ```
 
 ```csharp
-public override Task ConfigureEnvironment()
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 {
-    AddInfrastructure<MyDatabaseInfrastructure>();
-    AddInfrastructure<MyFrontApplication>();
+    builder.Add<MyDatabaseInfrastructure>()
+        .ThenAdd<MyFrontApplication>();
     return Task.CompletedTask;
 }
 ```
@@ -422,11 +424,11 @@ and opens a page on your web application, for end-to-end tests that go through t
 ```csharp
 using NotoriousTest.Web.Playwright;
 
-public override Task ConfigureEnvironment()
+public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 {
-    AddInfrastructure<MyDatabaseInfrastructure>();
-    AddInfrastructure<MyFrontApplication>(); // npm application: publishes "WebAppUrl"
-    this.AddChromiumBrowser();               // opens it
+    builder.Add<MyDatabaseInfrastructure>()
+        .ThenAdd<MyFrontApplication>() // npm application: publishes "WebAppUrl"
+        .ThenAddChromiumBrowser();     // opens it
     return Task.CompletedTask;
 }
 ```
@@ -449,10 +451,10 @@ public async Task Clicking_CreateUser_Should_Create_A_User()
 
 | Method | Browser |
 |--------|---------|
-| `AddChromiumBrowser()` | Chromium. |
-| `AddFirefoxBrowser()` | Firefox. |
-| `AddWebkitBrowser()` | WebKit (Safari engine). |
-| `AddBrowserFromSettings()` | The browser named in `Browser:Type` of `testsettings.json` (`chromium`, `firefox` or `webkit`). Handy to run the same campaign on every browser in CI. |
+| `AddChromiumBrowser()` / `ThenAddChromiumBrowser()` | Chromium. |
+| `AddFirefoxBrowser()` / `ThenAddFirefoxBrowser()` | Firefox. |
+| `AddWebkitBrowser()` / `ThenAddWebkitBrowser()` | WebKit (Safari engine). |
+| `AddBrowserFromSettings()` / `ThenAddBrowserFromSettings()` | The browser named in `Browser:Type` of `testsettings.json` (`chromium`, `firefox` or `webkit`). Handy to run the same campaign on every browser in CI. |
 
 **Accessing Playwright from the tests:**
 
@@ -468,7 +470,7 @@ public async Task Clicking_CreateUser_Should_Create_A_User()
 
 📌 **How it works:**
 
-1. The browser starts **after** the web applications (`Order = 1000`) and is a
+1. Added with `ThenAdd…`, the browser starts **after** the web applications. It is a
    [configuration consumer](./2-core-concepts.md#14-configuration): the `WebAppUrl` entry becomes the `BaseURL` of the
    browser context, so tests navigate with relative urls.
 2. The browser is declared as a [dependency](./2-core-concepts.md#13-dependencies): if the Playwright-bundled browser is
@@ -602,7 +604,7 @@ public class MyBrowser : ChromiumBrowserInfrastructure
 ```
 
 ```csharp
-AddInfrastructure<MyBrowser>();
+builder.ThenAdd<MyBrowser>();
 ```
 
 > ⚠️ On Linux, browsers need system libraries that `playwright install` does not install. On a CI agent, run

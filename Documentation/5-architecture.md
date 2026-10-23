@@ -118,7 +118,7 @@ port), use [configuration entries](./2-core-concepts.md#14-configuration):
 AddEntry("ConnectionStrings:Keycloak", Container.GetConnectionString());
 
 // ✅ The consumer receives it
-this.AddAspNetWebApplication<Program>(); // receives every entry automatically
+builder.ThenAddAspNetWebApplication<Program>(); // receives every entry automatically
 ```
 
 ```csharp
@@ -211,11 +211,11 @@ public class MyAppEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override Task ConfigureEnvironment()
+    public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
     {
-        AddInfrastructure<MyDatabaseInfrastructure>();
-        AddInfrastructure<KeycloakInfrastructure>();
-        this.AddAspNetWebApplication<Program>();
+        builder.Add<MyDatabaseInfrastructure>()
+            .ThenAdd<KeycloakInfrastructure>()
+            .ThenAddAspNetWebApplication<Program>();
         return Task.CompletedTask;
     }
 }
@@ -225,8 +225,8 @@ public class MyAppEnvironment : EnvironmentBase
 
 - **One environment per system under test.** An API and its dependencies form one environment. If you test two APIs
   independently, create two environments.
-- **No logic in `ConfigureEnvironment()`.** It lists infrastructures. Setup belongs to the infrastructures, data belongs
-  to the tests.
+- **No logic in `ConfigureEnvironment()`.** It lists infrastructures and their start order. Setup belongs to the
+  infrastructures, data belongs to the tests.
 - **Mind the cost.** An environment is created and initialized **per test class**: every class starts its own
   containers and databases. Group tests of the same feature in the same class rather than splitting them into many small
   classes, and keep heavy infrastructures out of environments that don't need them.
@@ -240,10 +240,10 @@ public class MyAppWithMessagingEnvironment : MyAppEnvironment
         IRuntime runtime, ITestLogger logger, IServiceProvider serviceProvider)
         : base(settings, watchDog, registry, runtime, logger, serviceProvider) { }
 
-    public override async Task ConfigureEnvironment()
+    public override async Task ConfigureEnvironment(InfrastructureListBuilder builder)
     {
-        await base.ConfigureEnvironment();
-        AddInfrastructure<RabbitMqInfrastructure>();
+        builder.Add<RabbitMqInfrastructure>(); // starts with the database, in parallel
+        await base.ConfigureEnvironment(builder);
     }
 }
 ```

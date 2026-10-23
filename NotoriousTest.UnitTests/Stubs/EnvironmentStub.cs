@@ -18,9 +18,10 @@ public class EnvironmentStub : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public Func<Task>? OnConfigureEnvironment { get; set; }
+    public Func<InfrastructureListBuilder, Task>? OnConfigureEnvironment { get; set; }
     public Action<IServiceCollection>? OnConfigureInfrastructureServices { get; set; }
 
     public IServiceProvider PublicServiceProvider => ServiceProvider;
-    public override Task ConfigureEnvironment() => OnConfigureEnvironment?.Invoke() ?? Task.CompletedTask;
+    public override Task ConfigureEnvironment(InfrastructureListBuilder builder) =>
+        OnConfigureEnvironment?.Invoke(builder) ?? Task.CompletedTask;
 }

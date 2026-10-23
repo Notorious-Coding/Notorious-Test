@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 using NotoriousTest.Core.Configuration;
 using NotoriousTest.Core.Exceptions;
 using NotoriousTest.Core.Infrastructures;
@@ -17,36 +16,6 @@ namespace NotoriousTest.Core.Environments;
 /// </summary>
 public abstract class EnvironmentBase
 {
-    /// <summary>
-    ///     List of all infrastructures within the environment.
-    /// </summary>
-    private readonly List<Infrastructure> _infrastructures = [];
-
-    /// <summary>
-    ///     List of all dependencies installed on the current environment.
-    /// </summary>
-    private List<IInfrastructureDependency> _installedDependencies = [];
-
-    /// <summary>
-    ///     Creates a new instance of the <see cref="EnvironmentBase" /> class.
-    /// </summary>
-    /// <param name="settings">Environment settings provider.</param>
-    /// <param name="watchDog">Side recovery process interaction provider.</param>
-    /// <param name="registry">Registry used to communicate with the watchdog provider.</param>
-    /// <param name="runtime">Currently installed runtime provider.</param>
-    /// <param name="logger">Logger.</param>
-    /// <param name="serviceProvider">DI Container.</param>
-    public EnvironmentBase(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime,
-        ITestLogger logger, IServiceProvider serviceProvider)
-    {
-        Settings = settings;
-        WatchDog = watchDog;
-        Registry = registry;
-        Runtime = runtime;
-        Logger = logger;
-        ServiceProvider = serviceProvider;
-    }
-
     /// <summary>
     ///     Gets the unique identifier for the environment instance.
     /// </summary>
@@ -88,11 +57,47 @@ public abstract class EnvironmentBase
     /// </summary>
     protected EnvironmentSettings Settings { get; }
 
+    /// <summary>
+    ///     List of all infrastructures within the environment.
+    /// </summary>
+    private Dictionary<int, List<Infrastructure>> _infrastructures = new(
+    ) { { 0, new List<Infrastructure>() } };
+
+    /// <summary>
+    ///     All infrastructures within the environment, regardless of their group.
+    /// </summary>
+    private IEnumerable<Infrastructure> AllInfrastructures => _infrastructures.Values.SelectMany(i => i);
+
+    /// <summary>
+    ///     List of all dependencies installed on the current environment.
+    /// </summary>
+    private List<IInfrastructureDependency> _installedDependencies = [];
+
+    /// <summary>
+    ///     Creates a new instance of the <see cref="EnvironmentBase" /> class.
+    /// </summary>
+    /// <param name="settings">Environment settings provider.</param>
+    /// <param name="watchDog">Side recovery process interaction provider.</param>
+    /// <param name="registry">Registry used to communicate with the watchdog provider.</param>
+    /// <param name="runtime">Currently installed runtime provider.</param>
+    /// <param name="logger">Logger.</param>
+    /// <param name="serviceProvider">DI Container.</param>
+    public EnvironmentBase(EnvironmentSettings settings, IWatchDog watchDog, IRegistry registry, IRuntime runtime,
+        ITestLogger logger, IServiceProvider serviceProvider)
+    {
+        Settings = settings;
+        WatchDog = watchDog;
+        Registry = registry;
+        Runtime = runtime;
+        Logger = logger;
+        ServiceProvider = serviceProvider;
+    }
+
 
     /// <summary>
     ///     Configure this environment with infrastructures. Called before environment initialization.
     /// </summary>
-    public abstract Task ConfigureEnvironment();
+    public abstract Task ConfigureEnvironment(InfrastructureListBuilder builder);
 
 
     /// <summary>
@@ -103,7 +108,7 @@ public abstract class EnvironmentBase
     /// <exception cref="InfrastructureNotFoundException">Infrastructure has not beed found within environment.</exception>
     public T GetInfrastructure<T>() where T : Infrastructure
     {
-        T? infrastructure = _infrastructures.OfType<T>().FirstOrDefault();
+        T? infrastructure = AllInfrastructures.OfType<T>().FirstOrDefault();
 
         if (infrastructure == null)
             throw new InfrastructureNotFoundException(
@@ -112,22 +117,6 @@ public abstract class EnvironmentBase
         return infrastructure;
     }
 
-    /// <summary>
-    ///     Add an infrastructure within the environment, using dependency injection.
-    /// </summary>
-    public EnvironmentBase AddInfrastructure<T>() where T : Infrastructure
-        => AddInfrastructure(ActivatorUtilities.CreateInstance<T>(ServiceProvider, EnvironmentId));
-
-    /// <summary>
-    ///     Add an infrastructure within the environment.
-    /// </summary>
-    public EnvironmentBase AddInfrastructure(Infrastructure infrastructure)
-    {
-        infrastructure.EnvironmentId = EnvironmentId;
-        infrastructure.WatchdogDisabled = Settings?.DisableWatchdog ?? false;
-        _infrastructures.Add(infrastructure);
-        return this;
-    }
 
     /// <summary>
     ///     Initialize the environment and all infrastructures configured within it.
@@ -140,7 +129,9 @@ public abstract class EnvironmentBase
             await StartDoggyDog();
         }
 
-        await ConfigureEnvironment();
+        var builder = new InfrastructureListBuilder();
+        await ConfigureEnvironment(builder);
+        _infrastructures = builder.Build(ServiceProvider, EnvironmentId, Settings.DisableWatchdog);
 
         await VerifyAllInfrastructureRequirements();
         await InstallAllMissingInfrastructureDependencies();
@@ -168,7 +159,7 @@ public abstract class EnvironmentBase
     private async Task VerifyAllInfrastructureRequirements()
     {
         IEnumerable<IInfrastructureRequirement> requirements =
-            _infrastructures.SelectMany(i => i.Requirements).Distinct().ToList();
+            AllInfrastructures.SelectMany(i => i.Requirements).Distinct().ToList();
         bool[] exists = await Task.WhenAll(requirements.Select(x => x.Exist()));
 
         var notMetRequirements = requirements.Zip(exists, (d, e) => (Requirment: d, Exists: e))
@@ -181,7 +172,7 @@ public abstract class EnvironmentBase
     private async Task InstallAllMissingInfrastructureDependencies()
     {
         IEnumerable<IInfrastructureDependency> dependencies =
-            _infrastructures.SelectMany(i => i.Dependencies).Distinct().ToList();
+            AllInfrastructures.SelectMany(i => i.Dependencies).Distinct().ToList();
 
         bool[] exists = await Task.WhenAll(dependencies.Select(x => x.Exist()));
 
@@ -200,9 +191,6 @@ public abstract class EnvironmentBase
 
     private async Task InitializeInfrastructureInParralelAndInOrder()
     {
-        IEnumerable<IGrouping<int?, Infrastructure>> infrastructureGroupedByOrder =
-            _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
-
         var action = new Func<Infrastructure, Task>(async i =>
         {
             if (i is IConfigurationConsumer consumer)
@@ -210,7 +198,7 @@ public abstract class EnvironmentBase
             await i.InitializeAsync();
         });
 
-        foreach (IGrouping<int?, Infrastructure> infrastructureGroup in infrastructureGroupedByOrder)
+        foreach (List<Infrastructure> infrastructureGroup in _infrastructures.OrderBy(g => g.Key).Select(g => g.Value))
         {
             IEnumerable<Infrastructure> nonConsumers = infrastructureGroup.Where(i => i is not IConfigurationConsumer);
             IEnumerable<Infrastructure> consumers = infrastructureGroup.Where(i => i is IConfigurationConsumer);
@@ -234,14 +222,12 @@ public abstract class EnvironmentBase
 
     private async Task ExecuteActionOnInfrastructureInParralelAndInOrder(Func<Infrastructure, Task> action)
     {
-        IEnumerable<IGrouping<int?, Infrastructure>> infrastructureGroupedByOrder =
-            _infrastructures.OrderBy(i => i.Order).GroupBy(i => i.Order);
-        foreach (IGrouping<int?, Infrastructure> infrastructure in infrastructureGroupedByOrder)
-            await Task.WhenAll(infrastructure.Select(action));
+        foreach (List<Infrastructure> infrastructureGroup in _infrastructures.OrderBy(g => g.Key).Select(g => g.Value))
+            await Task.WhenAll(infrastructureGroup.Select(action));
     }
 
     private List<ConfigurationEntry<object>> AggregateInfrastructureConfiguration() =>
-        _infrastructures
+        AllInfrastructures
             .Where(i => i is IConfigurationProducer)
             .SelectMany(i => (i as IConfigurationProducer)!.OutputConfiguration)
             .ToList();

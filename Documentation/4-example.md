@@ -130,7 +130,7 @@ That is all. The base class also:
 ## 5. Step 2 — The Web Application
 
 There is nothing to write: the API is added to the environment from its `Program` class, with
-`AddAspNetWebApplication<Program>()` (see the next step).
+`ThenAddAspNetWebApplication<Program>()` (see the next step).
 
 The API runs in memory, and receives `ConnectionStrings:Default` from the database infrastructure automatically. No
 `appsettings.Testing.json`, no hard-coded connection string.
@@ -158,16 +158,16 @@ public class ApiEnvironment : EnvironmentBase
 
     protected override Assembly CurrentAssembly => Assembly.GetExecutingAssembly();
 
-    public override Task ConfigureEnvironment()
+    public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
     {
-        AddInfrastructure<DatabaseInfrastructure>();
-        this.AddAspNetWebApplication<Program>();
+        builder.Add<DatabaseInfrastructure>()
+            .ThenAddAspNetWebApplication<Program>();
         return Task.CompletedTask;
     }
 }
 ```
 
-The web application always starts **after** the database: it is guaranteed to receive the connection string.
+Added with `ThenAdd…`, the web application starts **after** the database: it is guaranteed to receive the connection string.
 
 ---
 

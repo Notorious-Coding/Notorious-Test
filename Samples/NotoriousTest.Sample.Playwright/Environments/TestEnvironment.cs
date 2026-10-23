@@ -27,14 +27,15 @@ public class TestEnvironment : EnvironmentBase
     {
     }
 
-    public override async Task ConfigureEnvironment() =>
-        // Infrastructures are started by Order, each one consuming the configuration of the previous ones:
-        // 1. Database                 -> ConnectionStrings:SqlServer
-        // 2. API (Order 998)          -> WebApiUrl
-        // 3. React front (Order 999)  -> WebAppUrl
-        // 4. Browser (Order 1000)     -> opens WebAppUrl
-        AddInfrastructure<SqlServerInfrastructure>()
-            .AddInfrastructure<ApiInfrastructure>()
-            .AddInfrastructure<FrontInfrastructure>()
-            .AddBrowserFromSettings();
+    public override async Task ConfigureEnvironment(InfrastructureListBuilder builder) =>
+        // Each ThenAdd starts a new group, started once the previous one is running.
+        // Each infrastructure consumes the configuration of the previous ones:
+        // 1. Database     -> ConnectionStrings:SqlServer
+        // 2. API          -> WebApiUrl
+        // 3. React front  -> WebAppUrl
+        // 4. Browser      -> opens WebAppUrl
+        builder.Add<SqlServerInfrastructure>()
+            .ThenAdd<ApiInfrastructure>()
+            .ThenAdd<FrontInfrastructure>()
+            .ThenAddBrowserFromSettings();
 }
