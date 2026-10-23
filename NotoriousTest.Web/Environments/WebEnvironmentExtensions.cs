@@ -22,7 +22,7 @@ public static class WebEnvironmentExtensions
         /// <summary>
         ///     Get first web application registered in the environment.
         /// </summary>
-        private WebApplicationInfrastructure WebApplication =>
+        public WebApplicationInfrastructure WebApplication =>
             environment.GetInfrastructure<WebApplicationInfrastructure>();
 
         /// <summary>
@@ -30,8 +30,8 @@ public static class WebEnvironmentExtensions
         /// </summary>
         /// <exception cref="InvalidOperationException">If no webapplication configured in the environment, throws</exception>
         /// .
-        private HttpClient HttpClient => environment.WebApplication.HttpClient ??
-                                         throw new InvalidOperationException(
-                                             "No web application configured.");
+        public HttpClient HttpClient => environment.WebApplication.HttpClient ??
+                                        throw new InvalidOperationException(
+                                            "No web application configured.");
     }
 }
