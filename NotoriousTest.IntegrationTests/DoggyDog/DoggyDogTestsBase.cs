@@ -11,19 +11,22 @@ namespace NotoriousTest.IntegrationTests.DoggyDog;
 public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environment)
     : IntegrationTest<NotoriousTestEnvironment>(environment)
 {
-    private const int FAKE_PROCESS_WAIT_TIME = 1;
+    private const int FAKE_PROCESS_LIFETIME = 60;
 
     [Fact]
     public async Task DoggyDog_Should_Do_Nothing_When_Process_Exit_Normally()
     {
         var environmentId = Guid.NewGuid();
         Process? process =
-            DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: FAKE_PROCESS_WAIT_TIME);
+            DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: FAKE_PROCESS_LIFETIME);
 
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(process.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, process,
+            TestContext.Current.CancellationToken);
+        process.Kill(true);
 
         await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
         string stdout = stdoutBuilder.ToString();
@@ -39,13 +42,16 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
         var environmentId = Guid.NewGuid();
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
-        Process process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_WAIT_TIME);
+        Process process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_LIFETIME);
 
         InfrastuctureRegistryEntry fakeEntry = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(
             registry, process, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
 
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(process.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, process,
+            TestContext.Current.CancellationToken);
+        process.Kill(true);
 
         await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
@@ -80,7 +86,7 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
     {
         var environmentId = Guid.NewGuid();
 
-        Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_WAIT_TIME);
+        Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_LIFETIME);
 
         const string FAKE_REGISTRY_PATH = "C:\\fake\\path\\registry.db";
         const string FAKE_CONNECTION_STRING = $"DataSource={FAKE_REGISTRY_PATH}";
@@ -92,6 +98,7 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
 
         await DoggyDogTestFramework.Assert.ShouldHaveNotFoundRegistryFile(stdout, FAKE_REGISTRY_PATH);
         doggyDogProcess.ExitCode.Should().Be(1);
+        process.Kill(true);
     }
 
     [Fact]
@@ -101,10 +108,13 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
 
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
-        Process process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_WAIT_TIME);
+        Process process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_LIFETIME);
 
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(process.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, process,
+            TestContext.Current.CancellationToken);
+        process.Kill(true);
 
         await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
@@ -122,7 +132,7 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
         var environmentId = Guid.NewGuid();
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
-        Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_WAIT_TIME);
+        Process? process = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_LIFETIME);
 
         InfrastuctureRegistryEntry fakeEntry = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(
             registry, process, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithoutCleanerAttribute),
@@ -130,6 +140,9 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
 
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(process.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, process,
+            TestContext.Current.CancellationToken);
+        process.Kill(true);
 
         await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
 
@@ -148,7 +161,7 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
         var environmentId = Guid.NewGuid();
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
-        Process fakeProcess = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_WAIT_TIME);
+        Process fakeProcess = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, 1, FAKE_PROCESS_LIFETIME);
 
         InfrastuctureRegistryEntry fakeEntry1 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(
             registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);
@@ -157,6 +170,9 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
 
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(fakeProcess.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, fakeProcess,
+            TestContext.Current.CancellationToken);
+        fakeProcess.Kill(true);
 
         await doggyDogProcess.WaitForExitAsync(TestContext.Current.CancellationToken);
         string stdout = stdoutBuilder.ToString();
@@ -175,9 +191,13 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
         var environmentId = Guid.NewGuid();
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
-        Process fakeProcess = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: 999);
+        Process fakeProcess =
+            DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: FAKE_PROCESS_LIFETIME);
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(fakeProcess.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, fakeProcess,
+            TestContext.Current.CancellationToken);
+        // The registry watcher takes its initial snapshot asynchronously, give it time before inserting.
         await Task.Delay(1000, TestContext.Current.CancellationToken);
 
         InfrastuctureRegistryEntry fakeEntry1 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(
@@ -206,10 +226,12 @@ public class DoggyDogTestsBase(XUnitFixture<NotoriousTestEnvironment> environmen
         var environmentId = Guid.NewGuid();
         SqliteInfrastructure registry = Environment.GetInfrastructure<SqliteInfrastructure>();
 
-        Process fakeProcess = DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: 999);
+        Process fakeProcess =
+            DoggyDogTestFramework.Arrange.StartFakeProcess(environmentId, timeToExit: FAKE_PROCESS_LIFETIME);
         (Process doggyDogProcess, StringBuilder stdoutBuilder) = DoggyDogTestFramework.Act.StartDoggyDog(fakeProcess.Id,
             typeof(DoggyDogTestsBase).Assembly.Location, registry.GetDatabaseConnectionString(), environmentId);
-        await Task.Delay(1000, TestContext.Current.CancellationToken);
+        await DoggyDogTestFramework.Assert.ShouldBeMonitoringProcess(stdoutBuilder, fakeProcess,
+            TestContext.Current.CancellationToken);
 
         InfrastuctureRegistryEntry fakeEntry1 = await DoggyDogTestFramework.Arrange.CreateInfrastructureInRegistry(
             registry, fakeProcess, typeof(DoggyDogTestFramework.Arrange.FakeInfrastructureWithCleaner), environmentId);

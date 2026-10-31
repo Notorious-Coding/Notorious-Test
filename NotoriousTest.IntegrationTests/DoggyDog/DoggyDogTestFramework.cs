@@ -310,6 +310,10 @@ public static class DoggyDogTestFramework
             attachedProcess.HasExited.Should().BeFalse();
         }
 
+        public static async Task ShouldBeMonitoringProcess(StringBuilder stdoutBuilder, Process attachedProcess,
+            CancellationToken cancellationToken = default) => await WaitUntilStdoutContains(stdoutBuilder,
+            $"[DoggyDog] Monitoring PID {attachedProcess.Id} - awaiting termination...", cancellationToken, 30000);
+
         public static async Task ShouldHaveCatchInitEvent(StringBuilder stdoutBuilder, Type infrastructureType,
             CancellationToken cancellationToken = default) => await WaitUntilStdoutContains(stdoutBuilder,
             $"[DoggyDog][{infrastructureType.Name}] Initialization has been triggered.", cancellationToken);
