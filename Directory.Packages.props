@@ -14,13 +14,13 @@
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="11.0.0-preview.5.26302.115"/>
     <PackageVersion Include="Microsoft.Data.Sqlite.Core" Version="11.0.0-preview.5.26302.115"/>
     <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.1"/>
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.13"/>
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13"/>
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.13"/>
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.13"/>
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.13"/>
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13"/>
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.14"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.14"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.14"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.14"/>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14"/>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14"/>
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0"/>
     <PackageVersion Include="Microsoft.Playwright" Version="1.63.0"/>
     <PackageVersion Include="MSTest" Version="4.4.0"/>
@@ -34,7 +34,7 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="10.2.3"/>
     <!-- Pinned transitively to fix GHSA-846f-f764-76mx (pulled by Microsoft.Data.SqlClient / Npgsql) -->
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="9.0.21"/>
-    <PackageVersion Include="System.Text.Json" Version="10.0.13"/>
+    <PackageVersion Include="System.Text.Json" Version="10.0.14"/>
     <PackageVersion Include="Testcontainers" Version="4.14.0"/>
     <PackageVersion Include="Testcontainers.MsSql" Version="4.14.0"/>
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.14.0"/>
