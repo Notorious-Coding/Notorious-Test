@@ -625,13 +625,50 @@ public class MyContainerCleaner : IInfrastructureCleaner<MyContainerMetadata>
 - The cleaner runs in the DoggyDog process, **not** in your test process: it is created with `Activator.CreateInstance`
   and must have a **parameterless constructor**. Everything it needs must be in the metadata.
 - Metadata must be serializable (plain properties).
-- `[Cleaner]` is inherited: a class deriving from a built-in infrastructure keeps its cleaner. The built-in Docker and
-  database infrastructures already provide one.
+- `[Cleaner]` is inherited: a class deriving from a built-in infrastructure keeps its cleaner. The built-in Docker,
+  database, Azure Functions and npm infrastructures already provide one.
 - An infrastructure without `[Cleaner]` is simply skipped during recovery.
 - Registration happens automatically **after** `Initialize()`. If a crash during `Initialize()` could leave resources
   behind, set `Metadata` and call `await Register()` yourself as early as possible — the automatic registration will
-  then be skipped.
-- Override `DisableRegistry => true` to keep a specific infrastructure out of the registry.
+  then be skipped. If `Initialize()` fails afterwards, the infrastructure is removed from the registry.
+- `Register()` does nothing when DoggyDog is disabled (`DisableWatchdog`) or when the infrastructure overrides
+  `DisableRegistry => true`: you can call it unconditionally.
+- Override `DisableRegistry => true` to keep a specific infrastructure out of the registry, typically when it runs
+  inside the test process and dies with it (the built-in ASP.NET Core and Playwright browser infrastructures do).
+
+### Cleaning up a process
+
+An infrastructure starting an external process (a CLI, a server…) can reuse the cleaner of the `NotoriousTest.Process`
+package, used by the Azure Functions and npm infrastructures:
+
+```csharp
+using NotoriousTest.Core.Infrastructures.Cleaner;
+using NotoriousTest.Processes;
+
+[Cleaner(typeof(ProcessInfrastructureCleaner))]
+public class MyServerInfrastructure : Infrastructure
+{
+    private Process? _process;
+
+    public override async Task Initialize()
+    {
+        _process = Process.Start(new ProcessStartInfo("my-server"))!;
+        Metadata = ProcessMetadata.From(_process);
+        await Register(); // right away: a crash during the startup is cleaned up too
+        // ... wait for the server to be ready
+    }
+
+    public override async Task Destroy()
+    {
+        if (_process != null) await ProcessTree.KillAsync(_process);
+    }
+    // ...
+}
+```
+
+- `ProcessMetadata` stores the process id and start time. After a crash, the cleaner kills the process **with its
+  whole process tree**, only if its start time still matches: a PID reused by another process is never killed.
+- `ProcessTree.KillAsync` kills a process tree the same way from your own `Destroy()`.
 
 ### Configuration
 

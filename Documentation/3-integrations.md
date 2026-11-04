@@ -38,6 +38,7 @@ environment, and NotoriousTest handles its lifecycle.
 | `NotoriousTest.Sqlite` | SQLite — one database file per environment. |
 | `NotoriousTest.Requirements.Docker` | `DockerRequirement` — checks Docker is installed and running. |
 | `NotoriousTest.Dependencies.Azure.FunctionCoreTools` | `AzureFunctionCoreToolsDependency` — installs the `func` CLI. |
+| `NotoriousTest.Process` | `ProcessInfrastructureCleaner` — kills, after a crash, a process started by an infrastructure (see [Cleaning up a process](./2-core-concepts.md#cleaning-up-a-process)). |
 
 Each package is installed alongside your test framework package (`NotoriousTest.XUnit`, `NotoriousTest.NUnit`,
 `NotoriousTest.MSTest` or `NotoriousTest.TUnit`):
@@ -58,8 +59,9 @@ A web application is the system under test: your tests call it over HTTP, and it
 - is a [configuration consumer](./2-core-concepts.md#14-configuration): every configuration entry produced by the other
   infrastructures (connection strings, URLs…) is injected into the application's configuration;
 - exposes an `HttpClient` pointing to the running application;
-- is **not** tracked by DoggyDog (`DisableRegistry = true`): the application runs in memory or as a child process and
-  dies with the test process.
+- is cleaned up by DoggyDog after a crash when it runs in its own process: the [Azure Functions](#22-azure-functions)
+  host and the [npm](#23-npm) process are killed. An [ASP.NET Core](#21-aspnet-core) application runs inside the test
+  process and dies with it: it is not tracked (`DisableRegistry => true`).
 
 Register a web application in the environment (here with `ThenAddAspNetWebApplication<TProgram>()`, see
 [ASP.NET Core](#21-aspnet-core)) and retrieve it with `GetWebApplication()`:
@@ -258,6 +260,8 @@ public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 4. NotoriousTest polls `/admin/host/status` until the host is `Running`. If the process exits or the timeout is reached,
    initialization fails with the host logs in the exception message.
 5. On `Destroy()`, the host process and its worker are killed.
+6. The host process is registered in the DoggyDog registry as soon as it starts, build included: if the test process
+   crashes, DoggyDog kills it and its worker.
 
 **Customization:**
 
@@ -349,6 +353,8 @@ public override Task ConfigureEnvironment(InfrastructureListBuilder builder)
 4. Once the application answers, its url is published under the `WebAppUrl` key: a
    [Playwright browser](#3-browsers--playwright) added to the environment opens it, with no code.
 5. On `Destroy()`, npm and the processes it started are killed.
+6. The npm process is registered in the DoggyDog registry as soon as it starts: if the test process crashes, DoggyDog
+   kills it with the processes it started (node, vite…).
 
 **Customization:**
 
@@ -481,6 +487,8 @@ public async Task Clicking_CreateUser_Should_Create_A_User()
 4. On `Reset()`, the context is closed and a new one is created with a new page: cookies, local storage and
    permissions never leak from one test to the next.
 5. On `Destroy()`, the context is closed (which writes the recorded videos and HAR), then the browser.
+6. The browser is not tracked by DoggyDog: if the test process crashes, the Playwright driver closes the browsers it
+   launched.
 
 **Url of the web application** — the browser opens the url published under the `WebAppUrl` key.
 

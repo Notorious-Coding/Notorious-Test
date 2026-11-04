@@ -1,5 +1,34 @@
 ﻿# Changelog
 
+## v6.1.0
+
+### Crash cleaning 🧹
+
+- New package `NotoriousTest.Process`: `ProcessInfrastructureCleaner` lets DoggyDog kill, after a test crash, a process
+  started by an infrastructure, with its whole process tree. The process start time is checked first: a PID reused by
+  another process is never killed.
+- npm (`NpmWebApplicationInfrastructure`) and Azure Functions (`AzureFunctionWebApplicationInfrastructure`) now use it:
+  the `npm` / `func` process no longer stays alive after a crash.
+
+### Fixes 🐛
+
+- `Register()` now respects `DisableWatchdog` and `DisableRegistry`: an infrastructure registering itself early (Docker,
+  external databases) no longer writes to the registry when the watchdog is disabled.
+- Azure Functions Core Tools: the winget "already installed" / "no newer version" exit codes are no longer an
+  installation failure, and `func` is found when it was installed after the test process started (the PATH is refreshed
+  for the test process only, the machine and user PATH are never modified).
+
+### Samples
+
+- New Azure Functions sample: `NotoriousTest.Sample.AzureFunctions`, testing `NotoriousTest.Sample.FunctionApp` with a
+  SQL Server database.
+- The `NotoriousTest.Sample.With` and `NotoriousTest.Sample.Without` samples are removed.
+
+### ⚠️ Behavior change
+
+- `WebApplicationInfrastructure` no longer sets `DisableRegistry => true`: a web application infrastructure inheriting
+  directly from it is now registered. Override `DisableRegistry` if it has nothing to clean after a crash.
+
 ## v6.0.0
 
 ### Infrastructure ordering 🔀
