@@ -17,6 +17,9 @@ jobs:
       CONFIGURATION: 'Release'
       DOTNET_VERSION: '10.0'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for NuGet trusted publishing (OIDC)
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -58,6 +61,12 @@ jobs:
       
     - name: Pack
       run: dotnet pack -c ${{ env.CONFIGURATION }}  -o out --version-suffix "beta.${{ github.run_number }}"
+    - name: NuGet login (trusted publishing)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: ${{ secrets.NUGET_USER }}
     - name: Push
       if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-      run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push out/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
