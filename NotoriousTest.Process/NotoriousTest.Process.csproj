@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Description>Process support for NotoriousTest: cleans up processes left behind after a test crash.</Description>
+    <PackageId>NotoriousTest.Process</PackageId>
+    <RootNamespace>NotoriousTest.Processes</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotoriousTest.Core\NotoriousTest.Core.csproj"/>
+  </ItemGroup>
+
+</Project>

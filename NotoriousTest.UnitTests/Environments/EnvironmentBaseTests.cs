@@ -597,6 +597,21 @@ public class EnvironmentBaseTests
     }
 
     [Fact]
+    public async Task Initialize_Should_NotRegisterEarlyRegisteredInfrastructure_WhenWatchdogIsDisabled()
+    {
+        EnvironmentSettings settings = new() { DisableWatchdog = true };
+        EnvironmentStub stub = new(settings, _watchDog, _registry, _runtime, _testLogger, _provider);
+        stub.OnConfigureEnvironment = async builder =>
+        {
+            builder.Add(new RegisteredInfrastructureStub(_testLogger, _registry));
+        };
+
+        await stub.Initialize();
+
+        A.CallTo(() => _registry.Register(A<InfrastuctureRegistryEntry>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Reset_Should_NotNotifyResetInRegistry_WhenWatchdogIsDisabled()
     {
         EnvironmentSettings settings = new() { DisableWatchdog = true };

@@ -37,6 +37,13 @@ public class AspNetCoreWebApplicationInfrastructure<TWebApp, TEntryPoint> : WebA
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    ///     The application (in-memory TestServer or Kestrel) runs inside the test process and dies with it:
+    ///     there is nothing for the watchdog to clean after a crash.
+    /// </remarks>
+    public override bool DisableRegistry => true;
+
+    /// <inheritdoc />
     public override async Task Destroy() => await WebApplication.DisposeAsync();
 
     /// <inheritdoc />

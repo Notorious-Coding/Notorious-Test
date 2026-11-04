@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NotoriousTest.Dependencies.Azure.FunctionCoreTools\NotoriousTest.Dependencies.Azure.FunctionCoreTools.csproj"/>
+    <ProjectReference Include="..\NotoriousTest.Process\NotoriousTest.Process.csproj"/>
     <ProjectReference Include="..\NotoriousTest.Web\NotoriousTest.Web.csproj"/>
   </ItemGroup>
 

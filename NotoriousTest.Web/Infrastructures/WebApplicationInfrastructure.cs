@@ -18,9 +18,6 @@ public abstract class WebApplicationInfrastructure : Infrastructure, IConfigurat
     {
     }
 
-    ///<inheritdoc />
-    public override bool DisableRegistry => true;
-
     /// <summary>
     ///     Static configuration to be passed to the application.
     /// </summary>

@@ -4,9 +4,11 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using NotoriousTest.Core;
+using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
 using NotoriousTest.Dependencies.Azure.FunctionCoreTools;
+using NotoriousTest.Processes;
 using NotoriousTest.Web.Helpers;
 using NotoriousTest.Web.Infrastructures;
 
@@ -14,7 +16,9 @@ namespace NotoriousTest.Web.AzureFunctions;
 
 /// <summary>
 ///     Create an Azure Function application infrastructure.
+///     The <c>func</c> process is registered in the watchdog registry, so it is killed if the tests crash.
 /// </summary>
+[Cleaner(typeof(ProcessInfrastructureCleaner))]
 public abstract class AzureFunctionWebApplicationInfrastructure : WebApplicationInfrastructure
 {
     /// <summary>
@@ -78,7 +82,7 @@ public abstract class AzureFunctionWebApplicationInfrastructure : WebApplication
     private async Task<HttpClient> Start()
     {
         int freePort = GetFreeHttpPortOnMachine();
-        AzureFunctionProcess = StartAzureFunctionProcess(freePort);
+        AzureFunctionProcess = await StartAzureFunctionProcess(freePort);
         HttpClient client = CreateClient(freePort);
         AzureFunctionState = await WaitForHostStateAsync(client, AzureFunctionProcess, StartupTimeout);
 
@@ -116,7 +120,7 @@ public abstract class AzureFunctionWebApplicationInfrastructure : WebApplication
         return AzureFunctionState.Failed;
     }
 
-    private Process StartAzureFunctionProcess(int port)
+    private async Task<Process> StartAzureFunctionProcess(int port)
     {
         var psi = new ProcessStartInfo
         {
@@ -136,6 +140,10 @@ public abstract class AzureFunctionWebApplicationInfrastructure : WebApplication
         foreach ((string key, string value) in AdditionalConfiguration) psi.Environment[key] = value;
 
         var process = Process.Start(psi)!;
+        Metadata = ProcessMetadata.From(process);
+        // Registered right away: the startup (including the build) can take minutes, a crash meanwhile must not leave
+        // func running.
+        await Register();
         process.OutputDataReceived += (sender, e) => Logs.AppendLine(e.Data);
         process.ErrorDataReceived += (sender, e) => Logs.AppendLine(e.Data);
         process.BeginOutputReadLine();
