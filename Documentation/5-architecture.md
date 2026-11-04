@@ -147,7 +147,7 @@ application then receives them with zero mapping code.
   container or rerun migrations there.
 - **Disable reset when there is nothing to reset.** A read-only service (a mock server with fixed responses) can set
   `AutoReset = false`.
-- **Make crashes recoverable.** Anything that outlives the test process (containers, databases, files) should store
+- **Make crashes recoverable.** Anything that outlives the test process (containers, databases, processes, files) should store
   its identifiers in `Metadata` and have a [cleaner](./2-core-concepts.md#2-doggydog). The built-in infrastructures
   already have one.
 - **Declare what the machine needs.** Add [requirements](./2-core-concepts.md#12-requirements) (e.g.
