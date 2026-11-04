@@ -61,6 +61,14 @@ public abstract class BrowserInfrastructure : Infrastructure, IConfigurationCons
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    ///     The browser is launched by the Playwright driver, linked to the test process by a pipe: when the test
+    ///     process dies, the pipe closes and the driver closes the browsers it launched. Playwright does not expose
+    ///     the browser PID either, so there is nothing reliable for the watchdog to clean.
+    /// </remarks>
+    public override bool DisableRegistry => true;
+
+    /// <inheritdoc />
     public override async Task Destroy()
     {
         // Closing the context first flushes the recorded videos and HAR.

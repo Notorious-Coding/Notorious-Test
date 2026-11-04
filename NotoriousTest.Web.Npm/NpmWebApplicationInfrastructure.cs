@@ -4,8 +4,10 @@ using System.Net.Sockets;
 using System.Text;
 using NotoriousTest.Core;
 using NotoriousTest.Core.Configuration;
+using NotoriousTest.Core.Infrastructures.Cleaner;
 using NotoriousTest.Core.Logger;
 using NotoriousTest.Core.Registry;
+using NotoriousTest.Processes;
 using NotoriousTest.Web.Helpers;
 using NotoriousTest.Web.Infrastructures;
 
@@ -14,7 +16,9 @@ namespace NotoriousTest.Web.Npm;
 /// <summary>
 ///     Create a web application infrastructure started with an npm script (<c>npm run &lt;Command&gt;</c>).
 ///     The port to listen on is given to the application with the <c>PORT</c> environment variable.
+///     The npm process is registered in the watchdog registry, so it is killed if the tests crash.
 /// </summary>
+[Cleaner(typeof(ProcessInfrastructureCleaner))]
 public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, ITestLogger logger, IRegistry registry)
     : WebApplicationInfrastructure(contextId, logger, registry)
 {
@@ -65,7 +69,7 @@ public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, I
         if (NpmProcess == null) return;
 
         // npm spawns the script (node, vite...) as a child process.
-        if (!NpmProcess.HasExited) await KillProcessTreeAsync(NpmProcess);
+        if (!NpmProcess.HasExited) await ProcessTree.KillAsync(NpmProcess);
         await NpmProcess.WaitForExitAsync();
         NpmProcess.Dispose();
         NpmProcess = null;
@@ -179,6 +183,9 @@ public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, I
         foreach ((string key, string value) in envVariables) psi.Environment[key] = value;
 
         var process = Process.Start(psi)!;
+        Metadata = ProcessMetadata.From(process);
+        // Registered right away: the startup can take minutes, a crash meanwhile must not leave npm running.
+        await Register();
         process.OutputDataReceived += (sender, e) => Logs.AppendLine(e.Data);
         process.ErrorDataReceived += (sender, e) => Logs.AppendLine(e.Data);
         process.BeginOutputReadLine();
@@ -186,28 +193,6 @@ public abstract class NpmWebApplicationInfrastructure(EnvironmentId contextId, I
 
         State = NpmWebApplicationState.Starting;
         return process;
-    }
-
-    private static async Task KillProcessTreeAsync(Process process)
-    {
-        if (!OperatingSystem.IsWindows())
-        {
-            process.Kill(true);
-            return;
-        }
-
-        // On Windows, Process.Kill(true) misses the node process started by npm (cmd > npm > cmd > node).
-        // It keeps the redirected output open, so WaitForExitAsync would never complete.
-        using var taskkill = Process.Start(new ProcessStartInfo
-        {
-            FileName = "taskkill",
-            ArgumentList = { "/T", "/F", "/PID", process.Id.ToString() },
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true
-        })!;
-        await taskkill.WaitForExitAsync();
     }
 
     private int GetFreeHttpPortOnMachine()

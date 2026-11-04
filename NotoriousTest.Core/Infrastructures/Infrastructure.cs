@@ -111,9 +111,14 @@ public abstract class Infrastructure(EnvironmentId contextId, ITestLogger logger
 
     /// <summary>
     ///     Register the infrastructure in the watchdog registry.
+    ///     Called automatically at the end of <see cref="Initialize" />: call it earlier, as soon as the resource to
+    ///     clean exists (and <see cref="Metadata" /> is set), when the rest of the initialization takes time.
+    ///     Does nothing if the watchdog or the registry is disabled, or if already registered.
     /// </summary>
     protected async Task Register()
     {
+        if (WatchdogDisabled || DisableRegistry || Registered) return;
+
         await Registry.Register(new InfrastuctureRegistryEntry
         {
             InfrastructureId = Id,
@@ -134,7 +139,7 @@ public abstract class Infrastructure(EnvironmentId contextId, ITestLogger logger
             var sw = Stopwatch.StartNew();
 
             await Initialize();
-            if (!WatchdogDisabled && !DisableRegistry && !Registered) await Register();
+            await Register();
 
             Logger.Log($"[{GetType().Name}] Initialization completed in {sw.ElapsedMilliseconds} ms", EnvironmentId);
         }
@@ -142,6 +147,8 @@ public abstract class Infrastructure(EnvironmentId contextId, ITestLogger logger
         {
             Logger.Log("Initialization failed with exception: " + ec, EnvironmentId);
             await Destroy();
+            // Registered early (before the failure): the resource is destroyed, the watchdog must forget it.
+            if (Registered) await Registry.Remove(Id);
             throw;
         }
     }

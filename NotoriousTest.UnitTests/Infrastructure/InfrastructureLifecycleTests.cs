@@ -52,6 +52,42 @@ public class InfrastructureLifecycleTests
     }
 
     [Fact]
+    public async Task InitializeAsync_Should_SkipEarlyRegistration_WhenRegistryDisabled()
+    {
+        var infrastructure = new RegisteredInfrastructureStub(_testLogger, _registry, disableRegistry: true);
+        await infrastructure.InitializeAsync();
+        A.CallTo(() => _registry.Register(A<InfrastuctureRegistryEntry>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_Should_RemoveFromRegistry_WhenInitializationFailsAfterEarlyRegistration()
+    {
+        var infrastructure = new RegisteredInfrastructureStub(_testLogger, _registry)
+        {
+            OnInitialize = () => throw new InvalidOperationException("Startup failed")
+        };
+
+        Func<Task> initialize = () => infrastructure.InitializeAsync();
+
+        await initialize.Should().ThrowAsync<InvalidOperationException>();
+        A.CallTo(() => _registry.Remove(infrastructure.Id)).MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task InitializeAsync_Should_NotRemoveFromRegistry_WhenInitializationFailsBeforeRegistration()
+    {
+        var infrastructure = new InfrastructureStub(_testLogger, _registry)
+        {
+            OnInitialize = () => throw new InvalidOperationException("Startup failed")
+        };
+
+        Func<Task> initialize = () => infrastructure.InitializeAsync();
+
+        await initialize.Should().ThrowAsync<InvalidOperationException>();
+        A.CallTo(() => _registry.Remove(A<Guid>._)).MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task InitializeAsync_Should_LogStartAndCompletionTimes()
     {
         var infrastructure = new InfrastructureStub(_testLogger, _registry);
